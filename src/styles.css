@@ -340,3 +340,102 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 .nav-dock a.dock-active{background:#d9f36a;color:var(--ink)}
 .nav-dock a.dock-active .dock-number{opacity:.7}
 .nav-dock .dock-home.dock-active .dock-home-mark{color:var(--ink)}
+
+
+/* Section 05 — compact editorial identity panel */
+.about{
+  padding-top:clamp(76px,8vw,108px);
+  padding-bottom:clamp(78px,8vw,110px);
+  grid-template-columns:minmax(220px,.72fr) minmax(0,1.28fr);
+  gap:clamp(48px,7vw,100px);
+  align-items:start;
+}
+.about-side{
+  min-height:280px;
+  justify-content:space-between;
+}
+.about-logo{
+  width:min(100%,250px);
+}
+.about-main h2{
+  font-size:clamp(58px,7vw,104px);
+  line-height:.88;
+  margin:0 0 24px;
+}
+.about-main .lead{
+  font-size:clamp(18px,1.7vw,22px);
+  margin-bottom:14px;
+}
+.about-main>p:not(.lead){
+  margin:0 0 12px;
+  line-height:1.75;
+}
+.about-main strong{
+  margin-top:22px;
+  padding-top:16px;
+  border-top:1px solid #c6c6bd;
+  color:#55564f;
+}
+@media(max-width:760px){
+  .about{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    gap:28px;
+    padding:54px 6vw 62px;
+  }
+  .about-side{
+    min-height:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-rows:auto auto;
+    align-items:center;
+    gap:8px 18px;
+  }
+  .about-side>.eyebrow{
+    grid-column:1;
+    grid-row:1;
+    align-self:end;
+    font-size:7px;
+  }
+  .about-logo{
+    grid-column:2;
+    grid-row:1 / span 2;
+    width:clamp(88px,25vw,116px);
+    max-width:none;
+    justify-self:end;
+  }
+  .about-side-note{
+    grid-column:1;
+    grid-row:2;
+    align-self:start;
+    font-size:7px;
+    line-height:1.55;
+  }
+  .about-main h2{
+    font-size:clamp(43px,11.8vw,66px);
+    line-height:.9;
+    letter-spacing:-.085em;
+    margin-bottom:18px;
+  }
+  .about-main .lead{
+    font-size:18px;
+    line-height:1.35;
+    margin-bottom:12px;
+  }
+  .about-main>p:not(.lead){
+    font-size:12px;
+    line-height:1.7;
+    margin-bottom:10px;
+  }
+  .about-main strong{
+    margin-top:16px;
+    padding-top:13px;
+    font-size:8px;
+    line-height:1.6;
+  }
+}
+@media(max-width:360px){
+  .about{padding-inline:5vw;gap:24px}
+  .about-main h2{font-size:clamp(40px,11.6vw,48px)}
+  .about-logo{width:88px}
+}
