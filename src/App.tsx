@@ -27,6 +27,7 @@ export default function App() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
+  const navDockRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
@@ -135,6 +136,20 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const dock = navDockRef.current;
+    if (!dock) return;
+    const activeLink = dock.querySelector<HTMLAnchorElement>(`a[href="#${activeDock}"]`);
+    if (!activeLink) return;
+    const targetLeft = activeLink.offsetLeft - (dock.clientWidth - activeLink.clientWidth) / 2;
+    const maxLeft = dock.scrollWidth - dock.clientWidth;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    dock.scrollTo({
+      left: Math.max(0, Math.min(maxLeft, targetLeft)),
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+  }, [activeDock]);
+
+  useEffect(() => {
     const finePointer = window.matchMedia('(pointer: fine)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!finePointer || reduceMotion || !cursorRef.current || !cursorDotRef.current) return;
@@ -235,7 +250,7 @@ export default function App() {
       </main>
 
       {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>A culture-led object made for the things that make you, you. This is an editorial concept preview; final product photography and material specifications will be revealed with the drop.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Waitlist sign-up will open with the official drop. No details have been submitted."); }}><label htmlFor="object-email">GET THE FIRST SIGNAL</label><div><input id="object-email" type="email" placeholder="Your email address" required /><button type="submit">NOTIFY ME ↗</button></div><small>{waitlistNotice || "Preview interaction only — email collection is not connected yet."}</small></form></div></div></div>}
-      <nav className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
+      <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
         <a className="dock-home" href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
         <a href="#manifesto" className={activeDock === 'manifesto' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'manifesto')} aria-current={activeDock === 'manifesto' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">IDEA</span></a>
