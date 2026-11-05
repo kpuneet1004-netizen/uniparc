@@ -27,14 +27,13 @@ export default function App() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
   const [waitlistNotice, setWaitlistNotice] = useState('');
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
-  const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -97,6 +96,21 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const targets = ['home', 'worlds', 'drop', 'about']
+      .map((id) => document.getElementById(id))
+      .filter((node): node is HTMLElement => Boolean(node));
+    if (!targets.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) setActiveDock(visible.target.id);
+    }, { rootMargin: '-24% 0px -48% 0px', threshold: [0, 0.15, 0.35, 0.6] });
+    targets.forEach((target) => observer.observe(target));
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     const finePointer = window.matchMedia('(pointer: fine)').matches;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!finePointer || reduceMotion || !cursorRef.current || !cursorDotRef.current) return;
@@ -135,11 +149,8 @@ export default function App() {
 
       <header className="topbar">
         <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
-        <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Main navigation">
-          <a href="#worlds" onClick={closeMenu}><span>01</span> THE WORLDS</a><a href="#drop" onClick={closeMenu}><span>02</span> THE DROP</a><a href="#about" onClick={closeMenu}><span>03</span> OUR POINT OF VIEW</a>
-        </nav>
-        <a className="nav-cta" href="#drop">EXPLORE THE EDIT <Arrow diagonal /></a>
-        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label={menuOpen ? 'Close menu' : 'Open menu'}>{menuOpen ? 'CLOSE −' : 'MENU +'}</button>
+        <span className="topbar-note">A PLACE WHERE CULTURE BELONGS</span>
+        <span className="topbar-edition">INDEPENDENT CULTURE / 2026</span>
       </header>
 
       <main>
@@ -200,6 +211,13 @@ export default function App() {
       </main>
 
       {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>A culture-led object made for the things that make you, you. This is an editorial concept preview; final product photography and material specifications will be revealed with the drop.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Waitlist sign-up will open with the official drop. No details have been submitted."); }}><label htmlFor="object-email">GET THE FIRST SIGNAL</label><div><input id="object-email" type="email" placeholder="Your email address" required /><button type="submit">NOTIFY ME ↗</button></div><small>{waitlistNotice || "Preview interaction only — email collection is not connected yet."}</small></form></div></div></div>}
+      <nav className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Quick navigation">
+        <a className="dock-home" href="#home" aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
+        <span className="dock-divider" aria-hidden="true" />
+        <a href="#worlds" className={activeDock === 'worlds' ? 'dock-link dock-active' : 'dock-link'} aria-current={activeDock === 'worlds' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">CULTURE</span></a>
+        <a href="#drop" className={activeDock === 'drop' ? 'dock-link dock-active' : 'dock-link'} aria-current={activeDock === 'drop' ? 'location' : undefined}><span className="dock-number">02</span><span className="dock-label">THE EDIT</span></a>
+        <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">03</span><span className="dock-label">ABOUT</span></a>
+      </nav>
       <footer className="footer">
         <div className="footer-main">
           <div className="footer-brand-column">
