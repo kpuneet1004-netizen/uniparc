@@ -26,10 +26,11 @@ export default function App(){
  useEffect(()=>{
   const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const lenis=reduce?null:new Lenis({lerp:.085,smoothWheel:true,autoRaf:false});
+  let tickerFn:((time:number)=>void)|undefined;
   if(lenis){
    lenis.on('scroll',ScrollTrigger.update);
-   const tick=(time:number)=>lenis.raf(time*1000);
-   gsap.ticker.add(tick);
+   tickerFn=(time:number)=>lenis.raf(time*1000);
+   gsap.ticker.add(tickerFn);
    gsap.ticker.lagSmoothing(0);
   }
   const ctx=gsap.context(()=>{
@@ -43,7 +44,7 @@ export default function App(){
     gsap.to('.artwork-stamp',{y:-22,rotate:-3,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
    }
   });
-  return()=>{ctx.revert();if(lenis){gsap.ticker.remove((time:number)=>lenis.raf(time*1000));lenis.destroy();}};
+  return()=>{ctx.revert();if(lenis){if(tickerFn)gsap.ticker.remove(tickerFn);lenis.destroy();}};
  },[]);
  const go=(id:string)=>{setMenuOpen(false);document.getElementById(id)?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
  const filtered=activeCategory==='ALL'?edits:edits.filter((_,i)=>activeCategory==='APPAREL'||(activeCategory==='CULTURE'&&i!==1));
