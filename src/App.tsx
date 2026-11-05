@@ -1,0 +1,48 @@
+import {useEffect,useRef,useState} from 'react';
+import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight,Menu,X,Plus} from 'lucide-react';
+import {gsap} from 'gsap';
+import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import OrbitScene from './components/OrbitScene';
+gsap.registerPlugin(ScrollTrigger);
+const products=[
+{name:'THE PANEL STUDY',type:'GRAPHIC TEE / 01',image:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=900&q=85',tag:'NEW DROP'},
+{name:'AFTER HOURS',type:'OVERSIZED TEE / 02',image:'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=900&q=85',tag:'COMMUNITY PICK'},
+{name:'NO SIGNAL',type:'STREETWEAR / 03',image:'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=900&q=85',tag:'JUST LANDED'},
+{name:'FRAME OF MIND',type:'ESSENTIAL TEE / 04',image:'https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=900&q=85',tag:'LIMITED'}
+];
+const faqs=[
+['Where can I buy UNIPARC products?','Product selections will connect directly to official marketplace listings. Marketplace destinations must be confirmed before launch.'],
+['What does UNIPARC stand for?','UNIPARC is for people who wear what represents them — their interests, culture and point of view.'],
+['Do you ship across India?','Shipping availability, delivery estimates and returns are managed by the marketplace selling the selected product.']
+];
+export default function App(){
+const [menuOpen,setMenuOpen]=useState(false),[activeFaq,setActiveFaq]=useState<number|null>(0),[slide,setSlide]=useState(0);
+const root=useRef<HTMLDivElement>(null);
+useEffect(()=>{const ctx=gsap.context(()=>{
+const intro=gsap.timeline();
+intro.fromTo('.intro-mark',{scale:.72,opacity:0,rotate:-18},{scale:1,opacity:1,rotate:0,duration:1.2,ease:'power4.out'}).to('.intro-mark',{scale:.88,opacity:0,duration:.55,ease:'power2.in'},'+=.35').to('.intro-screen',{yPercent:-100,duration:.9,ease:'power4.inOut'},'-.15');
+gsap.from('.hero-kicker,.hero-title .line,.hero-bottom',{y:70,opacity:0,duration:1.05,stagger:.12,ease:'power4.out',delay:1.6});
+gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.fromTo(el,{y:70,opacity:0},{y:0,opacity:1,duration:1,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 86%',once:true}}));
+gsap.to('.hero-orbit',{yPercent:18,rotate:12,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+gsap.utils.toArray<HTMLElement>('.category-panel').forEach(el=>gsap.fromTo(el,{clipPath:'inset(12% 8% 12% 8%)'},{clipPath:'inset(0% 0% 0% 0%)',duration:1.2,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 82%'}}));
+},root);return()=>ctx.revert();},[]);
+const scrollTo=(id:string)=>{setMenuOpen(false);document.getElementById(id)?.scrollIntoView({behavior:'smooth'});};
+const moveSlide=(d:number)=>setSlide(v=>(v+d+products.length)%products.length);
+return <div ref={root} className="site-shell">
+<div className="intro-screen"><div className="intro-mark"><img src="/assets/uniparc-logo.png" alt="UNIPARC"/></div><span>WEAR WHAT REPRESENTS YOU.</span></div>
+<header className="site-header"><button className="menu-trigger" onClick={()=>setMenuOpen(v=>!v)} aria-label="Toggle menu">{menuOpen?<X/>:<Menu/>}<span>MENU</span></button><a className="header-logo" href="#top" aria-label="UNIPARC home"><img src="/assets/uniparc-logo.png" alt="UNIPARC"/></a><button className="header-index" onClick={()=>scrollTo('discover')}>DISCOVER <ArrowUpRight size={15}/></button></header>
+<main id="top">
+<section className="hero section-pad"><div className="hero-grid"><div className="hero-copy"><p className="eyebrow hero-kicker"><span className="status-dot"/> INDEPENDENT CULTURE / EST. 2024</p><h1 className="hero-title"><span className="line">WEAR WHAT</span><span className="line outline-text">REPRESENTS</span><span className="line">YOU<span className="period">.</span></span></h1><div className="hero-bottom"><p>Not just a fit.<br/>A point of view.</p><button className="round-cta" onClick={()=>scrollTo('discover')} aria-label="Explore UNIPARC"><ArrowDown/></button><span className="vertical-note">SCROLL TO EXPLORE — 001</span></div></div><div className="hero-art"><div className="hero-orbit"><OrbitScene/></div><div className="hero-stamp">U<br/><small>UNIVERSE<br/>IN MOTION</small></div><div className="hero-coordinate">12° 58' N<br/>77° 35' E</div></div></div><div className="hero-marquee"><div>UNIPARC — CULTURE IN EVERY THREAD — UNIPARC — CULTURE IN EVERY THREAD —&nbsp;</div></div></section>
+<section className="intro-statement section-pad" data-reveal><p className="eyebrow">01 / THE UNIPARC UNIVERSE</p><h2>YOUR WORLD.<br/><em>YOUR UNIFORM.</em></h2><div className="statement-foot"><p>Anime. Gaming. Music. Art. The things that make you, you. Find your people in what you wear.</p><span>SCROLL / DISCOVER</span></div></section>
+<section id="discover" className="discover-section section-pad"><div className="section-heading" data-reveal><div><p className="eyebrow">02 / FIND YOUR FREQUENCY</p><h2>CHOOSE YOUR<br/><em>UNIVERSE.</em></h2></div><p className="heading-note">Different worlds.<br/>One point of view.</p></div><div className="category-grid">
+<button className="category-panel manga-panel" onClick={()=>scrollTo('products')}><div className="category-image manga-image"/><div className="category-grain"/><span className="category-index">01 / PANEL BY PANEL</span><h3>MANGA<br/><i>& ANIME</i></h3><span className="category-link">EXPLORE THE WORLD <ArrowUpRight/></span></button>
+<button className="category-panel gaming-panel" onClick={()=>scrollTo('products')}><div className="category-image gaming-image"/><div className="category-grain"/><span className="category-index">02 / PLAYER ONE</span><h3>GAME<br/><i>ON.</i></h3><span className="category-link">ENTER THE LOBBY <ArrowUpRight/></span></button></div></section>
+<section id="products" className="product-section section-pad"><div className="section-heading" data-reveal><div><p className="eyebrow">03 / THE CURRENT ROTATION</p><h2>FRESH FROM<br/><em>THE FEED.</em></h2></div><div className="carousel-controls"><button onClick={()=>moveSlide(-1)} aria-label="Previous products"><ArrowLeft/></button><button onClick={()=>moveSlide(1)} aria-label="Next products"><ArrowRight/></button></div></div><div className="product-track-window"><div className="product-track" style={{transform:`translateX(-${slide*25}%)`}}>{products.map((p,i)=><article className="product-card" key={p.name}><a className="product-visual" href="#" onClick={e=>e.preventDefault()} aria-label={p.name+' marketplace listing pending'}><img src={p.image} alt={p.name} loading="lazy"/><span className="product-tag">{p.tag}</span><span className="product-open"><ArrowUpRight/></span></a><div className="product-meta"><div><h3>{p.name}</h3><p>{p.type}</p></div><span>MARKETPLACE</span></div><span className="product-number">0{i+1} / 04</span></article>)}</div></div><div className="product-bottom"><span>MARKETPLACE-FIRST / NO CHECKOUT HERE</span><button className="text-link" onClick={()=>scrollTo('faq')}>HOW TO SHOP <ArrowUpRight/></button></div></section>
+<section className="campaign-section"><div className="campaign-image"><div className="campaign-overlay"/><div className="campaign-copy" data-reveal><p className="eyebrow">04 / CULTURE NEVER STANDS STILL</p><h2>MORE THAN<br/><em>MERCH.</em></h2><p>It's the reference. The memory.<br/>The thing you never outgrew.</p><button className="pill-button" onClick={()=>scrollTo('about')}>OUR POINT OF VIEW <ArrowUpRight/></button></div><span className="campaign-side">A UNIPARC ORIGINAL / FILM 001</span></div></section>
+<section id="about" className="about-section section-pad"><div className="about-symbol" data-reveal><OrbitScene/></div><div className="about-copy" data-reveal><p className="eyebrow">05 / ABOUT UNIPARC</p><h2>WEAR WHAT<br/><em>REPRESENTS YOU.</em></h2><p>UNIPARC lives where identity meets culture. We make room for the references, characters, sounds and stories that stay with you. Find something that feels like yours.</p><span className="about-signoff">THIS IS YOUR UNIVERSE. MAKE IT YOURS.</span></div></section>
+<section id="faq" className="faq-section section-pad"><div className="section-heading" data-reveal><div><p className="eyebrow">06 / GOOD TO KNOW</p><h2>THE<br/><em>DETAILS.</em></h2></div><p className="heading-note">A few things<br/>you might be wondering.</p></div><div className="faq-list">{faqs.map(([q,a],i)=><div className={`faq-item ${activeFaq===i?'active':''}`} key={q}><button onClick={()=>setActiveFaq(activeFaq===i?null:i)}><span>0{i+1}</span><strong>{q}</strong><Plus/></button><div className="faq-answer"><p>{a}</p></div></div>)}</div></section>
+<footer className="site-footer section-pad"><div className="footer-top"><div><p className="eyebrow">YOUR WORLD IS WAITING</p><h2>STAY IN<br/><em>THE LOOP.</em></h2></div><button className="round-cta" onClick={()=>scrollTo('top')} aria-label="Back to top"><ArrowUpRight/></button></div><div className="footer-brand"><img src="/assets/uniparc-logo.png" alt="UNIPARC"/><span>WEAR WHAT REPRESENTS YOU.</span></div><div className="footer-bottom"><span>© UNIPARC 2026</span><span>INDEPENDENT CULTURE / BUILT FOR YOU</span><a href="#top">BACK TO TOP ↑</a></div></footer>
+</main>
+<div className={`menu-overlay ${menuOpen?'open':''}`} aria-hidden={!menuOpen}><div className="menu-overlay-inner"><p className="eyebrow">NAVIGATE THE UNIVERSE</p>{[['HOME','top'],['DISCOVER','discover'],['PRODUCTS','products'],['ABOUT','about'],['FAQ','faq']].map(([label,id],i)=><button key={id} onClick={()=>scrollTo(id)}><span>0{i+1}</span>{label}<ArrowUpRight/></button>)}</div><span className="menu-footer">UNIPARC® — WEAR WHAT REPRESENTS YOU.</span></div>
+</div>;
+}
