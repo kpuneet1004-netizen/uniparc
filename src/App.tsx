@@ -1,6 +1,7 @@
 import {useEffect,useState} from 'react';
 import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight,Menu,X,Plus,MoveUpRight} from 'lucide-react';
 import {gsap} from 'gsap';
+import Lenis from 'lenis';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
@@ -23,14 +24,28 @@ const faqs=[
 export default function App(){
  const [menuOpen,setMenuOpen]=useState(false),[activeFaq,setActiveFaq]=useState<number|null>(null),[activeCategory,setActiveCategory]=useState('ALL');
  useEffect(()=>{
+  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lenis=reduce?null:new Lenis({lerp:.085,smoothWheel:true,autoRaf:false});
+  if(lenis){
+   lenis.on('scroll',ScrollTrigger.update);
+   const tick=(time:number)=>lenis.raf(time*1000);
+   gsap.ticker.add(tick);
+   gsap.ticker.lagSmoothing(0);
+  }
   const ctx=gsap.context(()=>{
-   gsap.fromTo('.hero-copy > *',{y:36,opacity:0},{y:0,opacity:1,duration:.85,stagger:.1,ease:'power3.out',delay:.15});
-   gsap.fromTo('.hero-artwork',{clipPath:'inset(0 0 100% 0)'},{clipPath:'inset(0 0 0% 0)',duration:1.15,ease:'power4.inOut',delay:.2});
-   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.fromTo(el,{y:34,opacity:0},{y:0,opacity:1,duration:.8,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
+   gsap.fromTo('.hero-copy > *',{y:48,opacity:0},{y:0,opacity:1,duration:1,stagger:.12,ease:'power4.out',delay:.12});
+   gsap.fromTo('.hero-artwork',{clipPath:'inset(0 0 100% 0)',scale:1.035},{clipPath:'inset(0 0 0% 0)',scale:1,duration:1.45,ease:'power4.inOut',delay:.18});
+   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.fromTo(el,{y:42,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
+   gsap.utils.toArray<HTMLElement>('.universe-card,.edit-card').forEach((el,i)=>gsap.fromTo(el,{y:54,opacity:0},{y:0,opacity:1,duration:.85,delay:(i%2)*.08,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 91%',once:true}}));
+   if(!reduce){
+    gsap.to('.hero-artwork > img',{yPercent:10,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+    gsap.to('.campaign-image img',{yPercent:9,ease:'none',scrollTrigger:{trigger:'.campaign',start:'top bottom',end:'bottom top',scrub:1}});
+    gsap.to('.artwork-stamp',{y:-22,rotate:-3,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+   }
   });
-  return()=>ctx.revert();
+  return()=>{ctx.revert();if(lenis){gsap.ticker.remove((time:number)=>lenis.raf(time*1000));lenis.destroy();}};
  },[]);
- const go=(id:string)=>{setMenuOpen(false);document.getElementById(id)?.scrollIntoView({behavior:'smooth'});};
+ const go=(id:string)=>{setMenuOpen(false);document.getElementById(id)?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
  const filtered=activeCategory==='ALL'?edits:edits.filter((_,i)=>activeCategory==='APPAREL'||(activeCategory==='CULTURE'&&i!==1));
  return <div className="site-shell">
   <header className="site-header">
