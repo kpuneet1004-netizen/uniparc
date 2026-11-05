@@ -26,6 +26,7 @@ export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
@@ -35,9 +36,31 @@ export default function App() {
   const [waitlistNotice, setWaitlistNotice] = useState('');
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
 
+  const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    setActiveDock(id);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      return;
+    }
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(target, {
+        offset: -88,
+        duration: 1.35,
+        easing: (time) => 1 - Math.pow(1 - time, 4),
+      });
+    } else {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9 });
+    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9, anchors: { offset: -88 } });
+    lenisRef.current = lenis;
     let lenisTick: ((time: number) => void) | undefined;
     if (lenis) {
       lenis.on('scroll', ScrollTrigger.update);
@@ -87,6 +110,7 @@ export default function App() {
 
     return () => {
       ctx.revert();
+      lenisRef.current = null;
       if (lenis) {
         if (lenisTick) gsap.ticker.remove(lenisTick);
         lenis.destroy();
@@ -96,7 +120,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const targets = ['home', 'worlds', 'drop', 'about']
+    const targets = ['home', 'manifesto', 'worlds', 'drop', 'campaign', 'about', 'closing', 'footer']
       .map((id) => document.getElementById(id))
       .filter((node): node is HTMLElement => Boolean(node));
     if (!targets.length) return;
@@ -195,7 +219,7 @@ export default function App() {
           <p className="drop-disclaimer">A CREATIVE PREVIEW — PRODUCT DETAILS AND OFFICIAL DROP INFORMATION WILL BE ADDED BEFORE LAUNCH.</p>
         </section>
 
-        <section className="campaign">
+        <section className="campaign" id="campaign">
           <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
           <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>The references you carry. The communities you find. The things that stay with you long after the screen fades to black.</p><a href="#about" className="light-link">THAT'S THE UNIPARC SPIRIT <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
         </section>
@@ -205,20 +229,24 @@ export default function App() {
           <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A little bit of everything that makes you, you.</p><p>UNIPARC is a culture-first lifestyle label built around identity, self-expression and belonging. We make space for fandoms, niche interests, shared obsessions and the unexpected things that bring people together.</p><p>We start with graphic T-shirts: a quiet mark on the front, a world of meaning on the back. And we keep building from there.</p><strong>NO GATEKEEPING. NO SINGLE BOX. JUST YOU.</strong></div>
         </section>
 
-        <section className="closing section">
+        <section className="closing section" id="closing">
           <span className="eyebrow">THE UNIVERSE IS BIGGER TOGETHER</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>Stay close. The first drop is taking shape.</p><a className="closing-link" href="#home">BACK TO THE TOP ↑</a><span className="closing-orbit" aria-hidden="true">U✳</span>
         </section>
       </main>
 
       {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>A culture-led object made for the things that make you, you. This is an editorial concept preview; final product photography and material specifications will be revealed with the drop.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Waitlist sign-up will open with the official drop. No details have been submitted."); }}><label htmlFor="object-email">GET THE FIRST SIGNAL</label><div><input id="object-email" type="email" placeholder="Your email address" required /><button type="submit">NOTIFY ME ↗</button></div><small>{waitlistNotice || "Preview interaction only — email collection is not connected yet."}</small></form></div></div></div>}
-      <nav className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Quick navigation">
-        <a className="dock-home" href="#home" aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
+      <nav className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
+        <a className="dock-home" href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
-        <a href="#worlds" className={activeDock === 'worlds' ? 'dock-link dock-active' : 'dock-link'} aria-current={activeDock === 'worlds' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">CULTURE</span></a>
-        <a href="#drop" className={activeDock === 'drop' ? 'dock-link dock-active' : 'dock-link'} aria-current={activeDock === 'drop' ? 'location' : undefined}><span className="dock-number">02</span><span className="dock-label">THE EDIT</span></a>
-        <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">03</span><span className="dock-label">ABOUT</span></a>
+        <a href="#manifesto" className={activeDock === 'manifesto' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'manifesto')} aria-current={activeDock === 'manifesto' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">IDEA</span></a>
+        <a href="#worlds" className={activeDock === 'worlds' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'worlds')} aria-current={activeDock === 'worlds' ? 'location' : undefined}><span className="dock-number">02</span><span className="dock-label">CULTURE</span></a>
+        <a href="#drop" className={activeDock === 'drop' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'drop')} aria-current={activeDock === 'drop' ? 'location' : undefined}><span className="dock-number">03</span><span className="dock-label">EDIT</span></a>
+        <a href="#campaign" className={activeDock === 'campaign' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'campaign')} aria-current={activeDock === 'campaign' ? 'location' : undefined}><span className="dock-number">04</span><span className="dock-label">LIFE</span></a>
+        <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'about')} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">05</span><span className="dock-label">ABOUT</span></a>
+        <a href="#closing" className={activeDock === 'closing' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'closing')} aria-current={activeDock === 'closing' ? 'location' : undefined}><span className="dock-number">06</span><span className="dock-label">JOIN</span></a>
+        <a href="#footer" className={activeDock === 'footer' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'footer')} aria-current={activeDock === 'footer' ? 'location' : undefined}><span className="dock-number">07</span><span className="dock-label">INFO</span></a>
       </nav>
-      <footer className="footer">
+      <footer className="footer" id="footer">
         <div className="footer-main">
           <div className="footer-brand-column">
             <a className="footer-logo" href="#home" aria-label="UNIPARC home"><img className="brand-logo footer-brand-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
