@@ -292,3 +292,46 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 @media(prefers-reduced-motion:reduce){
   .nav-dock,.nav-dock a{transition:none}
 }
+
+
+/* Horizontal section navigation — keeps every destination reachable on narrow screens */
+.nav-dock{
+  width:max-content;
+  max-width:calc(100vw - 36px);
+  justify-content:flex-start;
+  overflow-x:auto;
+  overflow-y:hidden;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  touch-action:pan-x;
+  scroll-snap-type:x proximity;
+}
+.nav-dock::-webkit-scrollbar{display:none}
+.nav-dock>a,.nav-dock>.dock-divider{flex-shrink:0}
+.nav-dock>a{scroll-snap-align:center}
+@media(max-width:760px){
+  .nav-dock{
+    width:calc(100% - 28px);
+    max-width:430px;
+    justify-content:flex-start;
+    gap:3px;
+    padding:6px 7px;
+  }
+  .nav-dock>a{
+    flex:0 0 auto;
+    min-width:86px;
+    padding:0 12px;
+  }
+  .nav-dock>.dock-home{
+    flex:0 0 48px!important;
+    min-width:48px!important;
+    width:48px;
+    padding:0!important;
+  }
+  .nav-dock>.dock-divider{flex:0 0 1px}
+}
+@media(max-width:360px){
+  .nav-dock{width:calc(100% - 18px)}
+  .nav-dock>a:not(.dock-home){min-width:82px;padding-inline:10px}
+}
