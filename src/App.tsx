@@ -1,105 +1,72 @@
-import {useEffect,useState} from 'react';
-import {ArrowDown,ArrowLeft,ArrowRight,ArrowUpRight,Menu,X,Plus,MoveUpRight} from 'lucide-react';
+import {useEffect,useRef,useState} from 'react';
+import {ArrowDown,ArrowRight,ArrowUpRight,Menu,X,Plus,MoveUpRight,Volume2,VolumeX} from 'lucide-react';
 import {gsap} from 'gsap';
 import Lenis from 'lenis';
 import {ScrollTrigger} from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
-const categories=[
- {id:'anime',index:'01',name:'ANIME',sub:'Worlds worth getting lost in.',image:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1400&q=90'},
- {id:'gaming',index:'02',name:'GAMING',sub:'Continue? Always.',image:'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1400&q=90'},
- {id:'music',index:'03',name:'MUSIC',sub:'For the ones on repeat.',image:'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1400&q=90'},
- {id:'street',index:'04',name:'STREET CULTURE',sub:'Wear your point of view.',image:'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1400&q=90'}
+const worlds=[
+ {n:'01',id:'anime',title:'ANIME',line:'FICTION BECOMES IDENTITY',image:'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1500&q=90'},
+ {n:'02',id:'gaming',title:'GAMING',line:'PRESS START. STAY YOURSELF.',image:'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1500&q=90'},
+ {n:'03',id:'music',title:'MUSIC',line:'SOUNDTRACK YOUR OWN STORY',image:'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1500&q=90'},
+ {n:'04',id:'street',title:'STREET CULTURE',line:'NO UNIFORM. YOUR UNIVERSE.',image:'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1500&q=90'}
 ];
-const edits=[
- {number:'001',name:'THE AFTER HOURS EDIT',type:'STYLE / CULTURE',image:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1000&q=90',note:'OFF-DUTY UNIFORM'},
- {number:'002',name:'PLAYER ONE',type:'GAMING / STREETWEAR',image:'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=1000&q=90',note:'READY WHEN YOU ARE'},
- {number:'003',name:'LORE DEPT.',type:'ANIME / EVERYDAY',image:'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=1000&q=90',note:'FOR THE DEEP DIVERS'}
+const drops=[
+ {n:'001',name:'AFTER HOURS',tag:'STYLE / CULTURE',note:'OFF-DUTY UNIFORM',image:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1100&q=90'},
+ {n:'002',name:'PLAYER ONE',tag:'GAMING / STREETWEAR',note:'READY WHEN YOU ARE',image:'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=1100&q=90'},
+ {n:'003',name:'LORE DEPT.',tag:'ANIME / EVERYDAY',note:'FOR THE DEEP DIVERS',image:'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=1100&q=90'}
 ];
-const faqs=[
- ['Where can I shop UNIPARC?','Each live product will take you directly to its verified marketplace listing. Product destinations will appear here as drops go live.'],
- ['What is UNIPARC?','UNIPARC is a pop-culture label for the things you love, the worlds you escape into and the references only your people understand.'],
- ['Will new drops be added?','This is where new collections, collaborations and limited edits will be announced.']
-];
+const questions=[['What is UNIPARC?','A pop-culture label built around the worlds, stories, sounds and communities that become part of who you are.'],['Where can I shop?','Verified marketplace destinations will be linked here when official product drops are ready.'],['What is coming next?','New edits, collaborations and culture-led drops. Stay close to the orbit.']];
 export default function App(){
- const [menuOpen,setMenuOpen]=useState(false),[activeFaq,setActiveFaq]=useState<number|null>(null),[activeCategory,setActiveCategory]=useState('ALL');
+ const [menu,setMenu]=useState(false),[faq,setFaq]=useState(-1),[filter,setFilter]=useState('ALL'),[sound,setSound]=useState(false);
+ const cursor=useRef<HTMLDivElement>(null);
  useEffect(()=>{
-  const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const lenis=reduce?null:new Lenis({lerp:.085,smoothWheel:true,autoRaf:false});
-  let tickerFn:((time:number)=>void)|undefined;
-  if(lenis){
-   lenis.on('scroll',ScrollTrigger.update);
-   tickerFn=(time:number)=>lenis.raf(time*1000);
-   gsap.ticker.add(tickerFn);
-   gsap.ticker.lagSmoothing(0);
-  }
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lenis=reduced?null:new Lenis({lerp:.075,smoothWheel:true,autoRaf:false});
+  let raf:(t:number)=>void;
+  if(lenis){lenis.on('scroll',ScrollTrigger.update);raf=(t)=>lenis.raf(t*1000);gsap.ticker.add(raf);gsap.ticker.lagSmoothing(0);}
   const ctx=gsap.context(()=>{
-   gsap.fromTo('.hero-copy > *',{y:48,opacity:0},{y:0,opacity:1,duration:1,stagger:.12,ease:'power4.out',delay:.12});
-   gsap.fromTo('.hero-artwork',{clipPath:'inset(0 0 100% 0)',scale:1.035},{clipPath:'inset(0 0 0% 0)',scale:1,duration:1.45,ease:'power4.inOut',delay:.18});
-   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.fromTo(el,{y:42,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
-   gsap.utils.toArray<HTMLElement>('.universe-card,.edit-card').forEach((el,i)=>gsap.fromTo(el,{y:54,opacity:0},{y:0,opacity:1,duration:.85,delay:(i%2)*.08,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 91%',once:true}}));
-   if(!reduce){
-    gsap.to('.hero-artwork > img',{yPercent:10,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
-    gsap.to('.campaign-image img',{yPercent:9,ease:'none',scrollTrigger:{trigger:'.campaign',start:'top bottom',end:'bottom top',scrub:1}});
-    gsap.to('.artwork-stamp',{y:-22,rotate:-3,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+   if(!reduced){
+    const intro=gsap.timeline({defaults:{ease:'power4.out'}});
+    intro.from('.hero-kicker',{y:25,opacity:0,duration:.7,delay:.15})
+      .from('.hero-title .line > span',{yPercent:120,rotate:3,duration:1.15,stagger:.12},'-=.35')
+      .from('.hero-visual',{clipPath:'inset(0 0 100% 0)',scale:1.08,duration:1.4},'-=1')
+      .from('.hero-rail > *',{y:20,opacity:0,stagger:.1,duration:.6},'-=.55');
+    gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el)=>gsap.fromTo(el,{y:75,opacity:0},{y:0,opacity:1,duration:1.1,ease:'power4.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
+    gsap.utils.toArray<HTMLElement>('.world-card').forEach((el,i)=>gsap.fromTo(el,{y:100,rotate:i%2?2:-2,opacity:0},{y:0,rotate:0,opacity:1,duration:1.1,ease:'power4.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
+    gsap.to('.hero-visual img',{yPercent:16,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
+    gsap.to('.orbit-word',{xPercent:-18,ease:'none',scrollTrigger:{trigger:'.manifesto',start:'top bottom',end:'bottom top',scrub:1}});
+    gsap.to('.campaign-photo img',{yPercent:13,ease:'none',scrollTrigger:{trigger:'.campaign',start:'top bottom',end:'bottom top',scrub:1}});
+    gsap.utils.toArray<HTMLElement>('.section-number').forEach(el=>gsap.fromTo(el,{scale:0.5,opacity:0},{scale:1,opacity:1,duration:.8,scrollTrigger:{trigger:el,start:'top 90%',once:true}}));
    }
+   const move=(e:MouseEvent)=>{if(cursor.current)gsap.to(cursor.current,{x:e.clientX,y:e.clientY,duration:.22,ease:'power3.out'});};
+   if(window.matchMedia('(pointer:fine)').matches&&!reduced){window.addEventListener('mousemove',move);document.body.classList.add('has-cursor');}
+   return()=>window.removeEventListener('mousemove',move);
   });
-  return()=>{ctx.revert();if(lenis){if(tickerFn)gsap.ticker.remove(tickerFn);lenis.destroy();}};
+  return()=>{ctx.revert();if(lenis){gsap.ticker.remove(raf!);lenis.destroy();}document.body.classList.remove('has-cursor');};
  },[]);
- const go=(id:string)=>{setMenuOpen(false);document.getElementById(id)?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
- const filtered=activeCategory==='ALL'?edits:edits.filter((_,i)=>activeCategory==='APPAREL'||(activeCategory==='CULTURE'&&i!==1));
+ const go=(id:string)=>{setMenu(false);document.getElementById(id)?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});};
+ const visible=filter==='ALL'?drops:drops.filter((d)=>filter==='APPAREL'?d.n!=='003':d.n!=='002');
  return <div className="site-shell">
-  <header className="site-header">
-   <button className="nav-menu" onClick={()=>setMenuOpen(v=>!v)} aria-label={menuOpen?'Close navigation':'Open navigation'}>{menuOpen?<X/>:<Menu/>}<span>{menuOpen?'CLOSE':'MENU'}</span></button>
-   <a className="brand-lockup" href="#top" aria-label="UNIPARC home"><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/></a>
-   <nav className="desktop-nav"><button onClick={()=>go('universe')}>THE UNIVERSE</button><button onClick={()=>go('edits')}>LATEST EDITS</button><button onClick={()=>go('about')}>ABOUT</button></nav>
-   <button className="nav-shop" onClick={()=>go('edits')}>EXPLORE <ArrowUpRight size={15}/></button>
-  </header>
+  <div className="custom-cursor" ref={cursor}><span>VIEW</span></div>
+  <header className="header"><button className="menu-trigger" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}<span>{menu?'CLOSE':'MENU'}</span></button><a className="logo" href="#top"><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/></a><nav><button onClick={()=>go('worlds')}>WORLDS</button><button onClick={()=>go('edits')}>THE EDIT</button><button onClick={()=>go('about')}>ABOUT</button></nav><button className="header-cta" onClick={()=>go('edits')}>ENTER THE ORBIT <ArrowUpRight size={15}/></button></header>
   <main id="top">
    <section className="hero">
-    <div className="hero-topline"><span><i/> INDEPENDENT POP-CULTURE LABEL</span><span>EST. MMXXIV&nbsp; / &nbsp;INDIA</span></div>
-    <div className="hero-layout">
-     <div className="hero-copy">
-      <p className="hero-kicker">YOUR INTERESTS. NO EXPLANATION NEEDED.</p>
-      <h1>MADE OF<br/><span>WHAT</span><br/>YOU <b>LOVE.</b></h1>
-      <div className="hero-foot"><p>For the fandoms, the soundtracks, the late-night rabbit holes and the things that make you unmistakably you.</p><button className="circle-link" onClick={()=>go('universe')} aria-label="Discover the UNIPARC universe"><ArrowDown/></button></div>
-     </div>
-     <div className="hero-artwork">
-      <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1600&q=90" alt="Editorial streetwear campaign" />
-      <div className="artwork-frame"><span>UNIPARC®</span><span>FIG. 001 — THE CULTURE UNIFORM</span></div>
-      <div className="artwork-stamp">CULTURE<br/>IS PERSONAL<span>UP / 001</span></div>
-      <div className="artwork-index">01—04</div>
-     </div>
+    <div className="hero-meta"><span><i/> INDEPENDENT POP-CULTURE LABEL</span><span>EST. MMXXIV — INDIA</span></div>
+    <div className="hero-grid">
+     <div className="hero-copy"><p className="hero-kicker">NOT A PHASE. NOT AN APOLOGY.</p><h1 className="hero-title"><span className="line"><span>MADE OF</span></span><span className="line outline"><span>WHAT</span></span><span className="line"><span>YOU <em>LOVE.</em></span></span></h1><div className="hero-bottom"><p>Your fandoms. Your soundtracks. Your rabbit holes. Wear every part of what makes you, you.</p><button className="round-arrow" onClick={()=>go('manifesto')} aria-label="Scroll to discover"><ArrowDown/></button></div></div>
+     <div className="hero-visual"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1800&q=95" alt="Monochrome streetwear campaign"/><div className="visual-shade"/><span className="visual-top">UNIPARC® / CULTURE STUDY 001</span><span className="visual-side">CULTURE IS PERSONAL</span><span className="visual-index">01—04</span></div>
     </div>
-    <div className="hero-bottomline"><span>SCROLL TO ENTER</span><div className="ticker"><div>ANIME IS CULTURE ✳ MUSIC IS CULTURE ✳ GAMES ARE CULTURE ✳ STYLE IS CULTURE ✳&nbsp;</div></div><span>THE UNIVERSE IS YOURS ↘</span></div>
+    <div className="hero-rail"><span>SCROLL TO EXPLORE <ArrowDown size={12}/></span><div className="rail-track"><div>ANIME IS CULTURE ✳ GAMES ARE CULTURE ✳ MUSIC IS CULTURE ✳ STYLE IS CULTURE ✳&nbsp;</div></div><span>THE UNIVERSE IS YOURS ↘</span></div>
    </section>
-   <section className="belief section-pad" data-reveal>
-    <p className="eyebrow">A NOTE FROM THE UNIVERSE <span>— 001</span></p>
-    <div className="belief-content"><h2>YOUR WORLD.<br/><em>YOUR RULES.</em></h2><div><p>Some people call it an obsession. We call it having a point of view.</p><p>UNIPARC lives at the intersection of pop culture and personal style. A place for the references, characters, sounds and stories that become part of who you are.</p><button className="underlined-link" onClick={()=>go('about')}>GET TO KNOW UNIPARC <ArrowUpRight size={16}/></button></div></div>
-   </section>
-   <section className="universe section-pad" id="universe">
-    <div className="section-intro" data-reveal><div><p className="eyebrow">01 / FIND YOUR PEOPLE</p><h2>CHOOSE YOUR<br/><em>UNIVERSE.</em></h2></div><span className="section-aside">FOUR WORLDS.<br/>INFINITE WAYS TO BE YOU.</span></div>
-    <div className="universe-grid">{categories.map((c,i)=><button className={'universe-card universe-'+c.id} key={c.id} onClick={()=>{setActiveCategory(i===1?'CULTURE':'ALL');go('edits')}}><img src={c.image} alt="" loading="lazy"/><span className="card-wash"/><span className="universe-number">{c.index} / UNIVERSE</span><span className="universe-title">{c.name}<MoveUpRight/></span><span className="universe-sub">{c.sub}</span></button>)}</div>
-    <div className="universe-endline"><span>THERE'S NO WRONG WAY TO BE A FAN.</span><span>EXPLORE WITHOUT LIMITS ↗</span></div>
-   </section>
-   <section className="edits section-pad" id="edits">
-    <div className="section-intro" data-reveal><div><p className="eyebrow">02 / CURRENTLY IN OUR ORBIT</p><h2>THE CULTURE<br/><em>EDIT.</em></h2></div><p className="section-aside">A ROTATING SELECTION OF<br/>THINGS WE CAN'T STOP THINKING ABOUT.</p></div>
-    <div className="edit-filters" role="group" aria-label="Filter edits">{['ALL','APPAREL','CULTURE'].map(f=><button key={f} className={activeCategory===f?'selected':''} onClick={()=>setActiveCategory(f)}>{f}<span>{f==='ALL'?'03':f==='APPAREL'?'03':'02'}</span></button>)}</div>
-    <div className="edit-grid">{filtered.map((p,i)=><article className="edit-card" key={p.number}><div className="edit-image"><img src={p.image} alt="Editorial apparel preview" loading="lazy"/><span className="edit-index">EDIT / {p.number}</span><span className="edit-note">{p.note}</span><span className="edit-arrow"><ArrowUpRight/></span></div><div className="edit-meta"><div><p>{p.type}</p><h3>{p.name}</h3></div><span>VISUAL STUDY<br/>NOT A LIVE LISTING</span></div></article>)}</div>
-    <p className="catalogue-note">EDITORIAL PREVIEW — LIVE PRODUCT LISTINGS WILL APPEAR HERE.</p>
-   </section>
-   <section className="campaign">
-    <div className="campaign-image"><img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1800&q=90" alt="Live music crowd" loading="lazy"/><div className="campaign-overlay"/></div>
-    <div className="campaign-content"><p className="eyebrow">03 / CULTURE DOESN'T STAY STILL</p><h2>NEVER JUST<br/><em>BACKGROUND.</em></h2><p>The things you love deserve more than a passing mention. They deserve a place in your everyday.</p><button onClick={()=>go('about')}>THIS IS UNIPARC <ArrowUpRight/></button></div>
-    <span className="campaign-caption">A LIFE IN REFERENCES — UNIPARC®</span>
-   </section>
-   <section className="about section-pad" id="about">
-    <div className="about-mark" data-reveal><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/><span>THE CULTURE UNIFORM.</span></div>
-    <div className="about-copy" data-reveal><p className="eyebrow">04 / WHAT WE STAND FOR</p><h2>DON'T FIT IN.<br/><em>FIND YOUR FREQUENCY.</em></h2><p>We believe what you're into says something about who you are. The anime you grew up with. The game you keep coming back to. The song you play until it stops sounding real.</p><p>UNIPARC is for all of it. No gatekeeping. No guilty pleasures. Just your world, worn your way.</p><span className="about-signoff">WEAR WHAT REPRESENTS YOU.®</span></div>
-   </section>
-   <section className="faq section-pad" id="faq"><div className="section-intro" data-reveal><div><p className="eyebrow">05 / GOOD TO KNOW</p><h2>THE QUICK<br/><em>DOWNLOAD.</em></h2></div><span className="section-aside">A FEW THINGS<br/>YOU MIGHT BE WONDERING.</span></div><div className="faq-list">{faqs.map(([q,a],i)=><div className={'faq-row '+(activeFaq===i?'is-open':'')} key={q}><button onClick={()=>setActiveFaq(activeFaq===i?null:i)}><span>0{i+1}</span><strong>{q}</strong><Plus/></button>{activeFaq===i&&<p>{a}</p>}</div>)}</div></section>
-   <footer className="footer section-pad"><div className="footer-hero"><p className="eyebrow">THE UNIVERSE IS YOURS</p><h2>STAY<br/><em>OBSESSED.</em></h2><button onClick={()=>go('top')} className="back-top">BACK TO TOP <ArrowUpRight/></button></div><div className="footer-brand"><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/><span>WEAR WHAT REPRESENTS YOU.</span></div><div className="footer-bottom"><span>© UNIPARC 2026</span><span>INDEPENDENT POP-CULTURE LABEL</span><a href="#top">TOP ↑</a></div></footer>
+   <section className="manifesto" id="manifesto"><div className="manifesto-top"><span className="eyebrow">A NOTE FROM THE UNIVERSE / 001</span><span className="eyebrow">NO GATEKEEPING. EVER.</span></div><div className="manifesto-main" data-reveal><h2>YOUR WORLD.<br/><i>YOUR RULES.</i></h2><div><p className="manifesto-lead">Some people call it an obsession.<br/>We call it having a point of view.</p><p>UNIPARC lives where pop culture meets personal style. A place for the references, characters, sounds and stories that become part of who you are.</p><button className="text-link" onClick={()=>go('about')}>GET TO KNOW US <ArrowUpRight/></button></div></div><div className="orbit-word" aria-hidden="true">BE UNAPOLOGETICALLY YOU — </div></section>
+   <section className="worlds" id="worlds"><div className="section-head" data-reveal><div><span className="eyebrow">01 / FIND YOUR PEOPLE</span><h2>CHOOSE YOUR<br/><i>UNIVERSE.</i></h2></div><span className="section-note">FOUR WORLDS.<br/>INFINITE WAYS TO BE YOU.</span></div><div className="world-grid">{worlds.map((w,i)=><button className={'world-card world-'+w.id} key={w.id} onClick={()=>{setFilter(i===1?'CULTURE':'ALL');go('edits')}}><img src={w.image} alt="" loading="lazy"/><span className="world-overlay"/><span className="world-count">{w.n} / UNIVERSE</span><span className="world-title">{w.title}<MoveUpRight/></span><span className="world-line">{w.line}</span><span className="world-hover">EXPLORE WORLD <ArrowUpRight/></span></button>)}</div><div className="worlds-foot"><span>THERE'S NO WRONG WAY TO BE A FAN.</span><span>EXPLORE WITHOUT LIMITS ↗</span></div></section>
+   <section className="edits" id="edits"><div className="section-head" data-reveal><div><span className="eyebrow">02 / CURRENTLY IN OUR ORBIT</span><h2>THE CULTURE<br/><i>EDIT.</i></h2></div><span className="section-note">A ROTATING SELECTION OF<br/>THINGS WE CAN'T STOP THINKING ABOUT.</span></div><div className="filter-row">{['ALL','APPAREL','CULTURE'].map(x=><button key={x} className={filter===x?'active':''} onClick={()=>setFilter(x)}>{x}<sup>{x==='ALL'?'03':x==='APPAREL'?'02':'02'}</sup></button>)}</div><div className="drop-grid">{visible.map((d,i)=><article className="drop-card" key={d.n}><div className="drop-photo"><img src={d.image} alt="Editorial apparel visual study" loading="lazy"/><span className="drop-no">EDIT / {d.n}</span><span className="drop-note">{d.note}</span><span className="drop-open"><ArrowUpRight/></span><div className="drop-vertical">UNIPARC — CULTURE STUDY</div></div><div className="drop-info"><div><span>{d.tag}</span><h3>{d.name}</h3></div><small>VISUAL STUDY<br/>NOT A LIVE LISTING</small></div></article>)}</div><p className="catalogue-disclaimer">EDITORIAL PREVIEW — OFFICIAL PRODUCT DESTINATIONS WILL APPEAR WITH LIVE DROPS.</p></section>
+   <section className="campaign"><div className="campaign-photo"><img src="https://images.unsplash.com/photo-1506157786151-b8491531f063?w=1900&q=95" alt="Live music crowd" loading="lazy"/></div><div className="campaign-copy" data-reveal><span className="eyebrow">03 / CULTURE DOESN'T STAY STILL</span><h2>NEVER JUST<br/><i>BACKGROUND.</i></h2><p>The things you love deserve more than a passing mention. They deserve a place in your everyday.</p><button className="light-link" onClick={()=>go('about')}>THIS IS UNIPARC <ArrowUpRight/></button></div><span className="campaign-stamp">A LIFE IN<br/>REFERENCES®</span></section>
+   <section className="about" id="about"><div className="about-mark" data-reveal><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/><span>THE CULTURE UNIFORM.</span></div><div className="about-copy" data-reveal><span className="eyebrow">04 / WHAT WE STAND FOR</span><h2>DON'T FIT IN.<br/><i>FIND YOUR FREQUENCY.</i></h2><p>We believe what you're into says something about who you are. The anime you grew up with. The game you keep coming back to. The song you play until it stops sounding real.</p><p>UNIPARC is for all of it. No guilty pleasures. No gatekeeping. Just your world, worn your way.</p><strong>WEAR WHAT REPRESENTS YOU.®</strong></div></section>
+   <section className="faq"><div className="section-head" data-reveal><div><span className="eyebrow">05 / GOOD TO KNOW</span><h2>THE QUICK<br/><i>DOWNLOAD.</i></h2></div><span className="section-note">A FEW THINGS<br/>YOU MIGHT BE WONDERING.</span></div><div className="faq-list">{questions.map(([q,a],i)=><div className={'faq-item '+(faq===i?'open':'')} key={q}><button onClick={()=>setFaq(faq===i?-1:i)}><span>0{i+1}</span><strong>{q}</strong><Plus/></button>{faq===i&&<p>{a}</p>}</div>)}</div></section>
+   <footer className="footer"><div className="footer-main"><span className="eyebrow">THE UNIVERSE IS YOURS</span><h2>STAY<br/><i>OBSESSED.</i></h2><button onClick={()=>go('top')}>BACK TO TOP <ArrowUpRight/></button></div><div className="footer-brand"><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/><span>WEAR WHAT REPRESENTS YOU.</span></div><div className="footer-bottom"><span>© UNIPARC 2026</span><span>INDEPENDENT POP-CULTURE LABEL</span><a href="#top">TOP ↑</a></div></footer>
   </main>
-  <div className={'menu-overlay '+(menuOpen?'is-open':'')} aria-hidden={!menuOpen}><div className="menu-inner"><p className="eyebrow">MOVE THROUGH THE UNIVERSE</p>{[['01','THE UNIVERSE','universe'],['02','LATEST EDITS','edits'],['03','OUR WORLD','about'],['04','QUESTIONS','faq']].map(([n,label,id])=><button key={id} onClick={()=>go(id)}><span>{n}</span>{label}<ArrowUpRight/></button>)}</div><span className="menu-foot">UNIPARC® — WEAR WHAT REPRESENTS YOU.</span></div>
+  <div className={'menu-overlay '+(menu?'show':'')}><div className="menu-content"><span className="eyebrow">MOVE THROUGH THE UNIVERSE</span>{[['01','THE UNIVERSE','worlds'],['02','LATEST EDITS','edits'],['03','OUR WORLD','about'],['04','QUESTIONS','faq']].map(([n,t,id])=><button key={id} onClick={()=>go(id)}><small>{n}</small>{t}<ArrowUpRight/></button>)}</div><span className="menu-sign">UNIPARC® — WEAR WHAT REPRESENTS YOU.</span></div>
  </div>;
 }
