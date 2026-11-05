@@ -109,13 +109,13 @@ export default function App() {
   return (
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden="true">
-        <div className="preloader-inner"><span className="preloader-overline">A PLACE WHERE CULTURE BELONGS</span><div className="preloader-window"><span className="preloader-mark">UNI<span>PARC</span><sup>®</sup></span></div><span className="preloader-rule" /><span className="preloader-bottom">TUNING INTO YOUR UNIVERSE <b>001—∞</b></span></div>
+        <div className="preloader-inner"><span className="preloader-overline">A PLACE WHERE CULTURE BELONGS</span><div className="preloader-window"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /></div><span className="preloader-rule" /><span className="preloader-bottom">TUNING INTO YOUR UNIVERSE <b>001—∞</b></span></div>
       </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
 
       <header className="topbar">
-        <a className="wordmark" href="#home" aria-label="UNIPARC home">UNI<span>PARC</span><sup>®</sup></a>
+        <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
         <nav className={menuOpen ? 'nav nav-open' : 'nav'} aria-label="Main navigation">
           <a href="#worlds" onClick={closeMenu}><span>01</span> THE WORLDS</a><a href="#drop" onClick={closeMenu}><span>02</span> THE DROP</a><a href="#about" onClick={closeMenu}><span>03</span> OUR POINT OF VIEW</a>
         </nav>
@@ -171,7 +171,7 @@ export default function App() {
         </section>
 
         <section className="about section" id="about">
-          <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><div className="about-symbol">U<span>✳</span></div><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
+          <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
           <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A little bit of everything that makes you, you.</p><p>UNIPARC is a culture-first lifestyle label built around identity, self-expression and belonging. We make space for fandoms, niche interests, shared obsessions and the unexpected things that bring people together.</p><p>We start with graphic T-shirts: a quiet mark on the front, a world of meaning on the back. And we keep building from there.</p><strong>NO GATEKEEPING. NO SINGLE BOX. JUST YOU.</strong></div>
         </section>
 
@@ -180,7 +180,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="footer"><a className="footer-logo" href="#home">UNIPARC<sup>®</sup></a><span>WEAR WHAT DEFINES YOU.</span><span>© UNIPARC 2026</span><a href="#home" className="footer-top">BACK UP ↑</a></footer>
+      <footer className="footer"><a className="footer-logo" href="#home" aria-label="UNIPARC home"><img className="brand-logo footer-brand-logo" src="/Uniparc.svg" alt="UNIPARC" /></a><span>WEAR WHAT DEFINES YOU.</span><span>© UNIPARC 2026</span><a href="#home" className="footer-top">BACK UP ↑</a></footer>
     </div>
   );
 }
