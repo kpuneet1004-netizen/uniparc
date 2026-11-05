@@ -125,11 +125,15 @@ export default function App() {
       .map((id) => document.getElementById(id))
       .filter((node): node is HTMLElement => Boolean(node));
     if (!targets.length) return;
+    const visibleSections = new Map<string, number>();
     const observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible) setActiveDock(visible.target.id);
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) visibleSections.set(entry.target.id, entry.intersectionRatio);
+        else visibleSections.delete(entry.target.id);
+      });
+      const activeSection = [...visibleSections.entries()]
+        .sort((a, b) => b[1] - a[1])[0];
+      if (activeSection) setActiveDock(activeSection[0]);
     }, { rootMargin: '-24% 0px -48% 0px', threshold: [0, 0.15, 0.35, 0.6] });
     targets.forEach((target) => observer.observe(target));
     return () => observer.disconnect();
