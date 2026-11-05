@@ -115,6 +115,15 @@ export default function App() {
     return () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerover', onOver); };
   }, []);
 
+  useEffect(() => {
+    if (!selectedPiece) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setSelectedPiece(null); };
+    window.addEventListener('keydown', onKeyDown);
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+  }, [selectedPiece]);
+
   return (
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden="true">
@@ -123,7 +132,6 @@ export default function App() {
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
       <aside className="chapter-index" aria-live="polite"><span className="chapter-index-dot" /><span>{activeChapter}</span><span className="chapter-index-rule" /></aside>
-      <div className="ambient-field" style={{ backgroundImage: "url(" + activeWorld.image + ")", "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties} aria-hidden="true" />
 
       <header className="topbar">
         <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
@@ -161,7 +169,7 @@ export default function App() {
           <div className="manifesto-foot"><span>ONE PERSON. MANY UNIVERSES.</span><span>WEAR WHAT DEFINES YOU.®</span><span>SCROLL / 001</span></div>
         </section>
 
-        <section className="worlds section" id="worlds">
+        <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties}>
           <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Different worlds. Shared energy.<br />There's room for all of it here.</p></div>
           <div className="world-atmosphere-label"><span>NOW TUNED TO</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
             {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} data-cursor-label="ENTER WORLD" onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)} onMouseLeave={() => setActiveWorld(worlds[0])}><img src={world.image} alt="" loading="lazy" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
