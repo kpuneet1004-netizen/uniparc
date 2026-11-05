@@ -33,3 +33,16 @@
 .campaign-copy .pill-button svg{flex-shrink:0}
 @media(max-width:900px){.header-nav{gap:10px;margin-right:14px}.header-nav button{font-size:7px}.hero-title{font-size:clamp(62px,9.8vw,100px)}}
 @media(max-width:620px){.header-nav{display:none}.hero-overline{font-size:8px;margin-top:10px;margin-bottom:14px}.hero-title{font-size:clamp(54px,13.2vw,82px)}.hero-stamp{font-size:25px}.category-panel h3{bottom:130px}.category-subline{left:25px;bottom:92px;font-size:9px}.category-afterline{font-size:8px}.manifesto-section{grid-template-columns:1fr;padding-top:80px;padding-bottom:110px;min-height:620px;gap:50px}.manifesto-side{gap:20px}.manifesto-side span{margin-top:0}.manifesto-copy h2{font-size:clamp(54px,12vw,80px)}.manifesto-mark{right:7%;bottom:3%;font-size:55px}.product-meta h3{font-size:13px}}
+
+
+/* Strict UNIPARC monochrome lock — no colored hover states or media */
+:root{color-scheme:dark;--black:#000;--white:#fff;--grey:#888;--line:#282828}
+html,body,.site-shell{background:#000;color:#fff}
+.product-visual img,.manga-image,.gaming-image,.campaign-image{filter:grayscale(1)!important}
+.product-visual:hover img{filter:grayscale(1)!important}
+.category-panel,.product-section,.faq-section{background-color:#050505}
+.category-image{filter:grayscale(1)!important}
+.category-panel:hover .category-image{filter:grayscale(1)!important}
+.round-cta:hover,.carousel-controls button:hover,.pill-button:hover{background:#fff!important;color:#000!important}
+.status-dot{background:#fff;box-shadow:0 0 12px #ffffff55}
+a,button{accent-color:#fff}
