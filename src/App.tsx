@@ -51,7 +51,7 @@ export default function App(){
  return <div className="site-shell">
   <header className="site-header">
    <button className="nav-menu" onClick={()=>setMenuOpen(v=>!v)} aria-label={menuOpen?'Close navigation':'Open navigation'}>{menuOpen?<X/>:<Menu/>}<span>{menuOpen?'CLOSE':'MENU'}</span></button>
-   <a className="brand-lockup" href="#top" aria-label="UNIPARC home"><img src="/assets/uniparc-logo.webp" alt="UNIPARC"/></a>
+   <a className="brand-lockup" href="#top" aria-label="UNIPARC home"><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/></a>
    <nav className="desktop-nav"><button onClick={()=>go('universe')}>THE UNIVERSE</button><button onClick={()=>go('edits')}>LATEST EDITS</button><button onClick={()=>go('about')}>ABOUT</button></nav>
    <button className="nav-shop" onClick={()=>go('edits')}>EXPLORE <ArrowUpRight size={15}/></button>
   </header>
@@ -94,11 +94,11 @@ export default function App(){
     <span className="campaign-caption">A LIFE IN REFERENCES — UNIPARC®</span>
    </section>
    <section className="about section-pad" id="about">
-    <div className="about-mark" data-reveal><img src="/assets/uniparc-logo.webp" alt="UNIPARC"/><span>THE CULTURE UNIFORM.</span></div>
+    <div className="about-mark" data-reveal><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/><span>THE CULTURE UNIFORM.</span></div>
     <div className="about-copy" data-reveal><p className="eyebrow">04 / WHAT WE STAND FOR</p><h2>DON'T FIT IN.<br/><em>FIND YOUR FREQUENCY.</em></h2><p>We believe what you're into says something about who you are. The anime you grew up with. The game you keep coming back to. The song you play until it stops sounding real.</p><p>UNIPARC is for all of it. No gatekeeping. No guilty pleasures. Just your world, worn your way.</p><span className="about-signoff">WEAR WHAT REPRESENTS YOU.®</span></div>
    </section>
    <section className="faq section-pad" id="faq"><div className="section-intro" data-reveal><div><p className="eyebrow">05 / GOOD TO KNOW</p><h2>THE QUICK<br/><em>DOWNLOAD.</em></h2></div><span className="section-aside">A FEW THINGS<br/>YOU MIGHT BE WONDERING.</span></div><div className="faq-list">{faqs.map(([q,a],i)=><div className={'faq-row '+(activeFaq===i?'is-open':'')} key={q}><button onClick={()=>setActiveFaq(activeFaq===i?null:i)}><span>0{i+1}</span><strong>{q}</strong><Plus/></button>{activeFaq===i&&<p>{a}</p>}</div>)}</div></section>
-   <footer className="footer section-pad"><div className="footer-hero"><p className="eyebrow">THE UNIVERSE IS YOURS</p><h2>STAY<br/><em>OBSESSED.</em></h2><button onClick={()=>go('top')} className="back-top">BACK TO TOP <ArrowUpRight/></button></div><div className="footer-brand"><img src="/assets/uniparc-logo.webp" alt="UNIPARC"/><span>WEAR WHAT REPRESENTS YOU.</span></div><div className="footer-bottom"><span>© UNIPARC 2026</span><span>INDEPENDENT POP-CULTURE LABEL</span><a href="#top">TOP ↑</a></div></footer>
+   <footer className="footer section-pad"><div className="footer-hero"><p className="eyebrow">THE UNIVERSE IS YOURS</p><h2>STAY<br/><em>OBSESSED.</em></h2><button onClick={()=>go('top')} className="back-top">BACK TO TOP <ArrowUpRight/></button></div><div className="footer-brand"><img src="/assets/uniparc-logo.svg" alt="UNIPARC"/><span>WEAR WHAT REPRESENTS YOU.</span></div><div className="footer-bottom"><span>© UNIPARC 2026</span><span>INDEPENDENT POP-CULTURE LABEL</span><a href="#top">TOP ↑</a></div></footer>
   </main>
   <div className={'menu-overlay '+(menuOpen?'is-open':'')} aria-hidden={!menuOpen}><div className="menu-inner"><p className="eyebrow">MOVE THROUGH THE UNIVERSE</p>{[['01','THE UNIVERSE','universe'],['02','LATEST EDITS','edits'],['03','OUR WORLD','about'],['04','QUESTIONS','faq']].map(([n,label,id])=><button key={id} onClick={()=>go(id)}><span>{n}</span>{label}<ArrowUpRight/></button>)}</div><span className="menu-foot">UNIPARC® — WEAR WHAT REPRESENTS YOU.</span></div>
  </div>;
