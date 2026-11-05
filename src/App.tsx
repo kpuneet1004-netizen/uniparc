@@ -196,7 +196,7 @@ export default function App() {
   return (
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden="true">
-        <div className="preloader-inner"><span className="preloader-overline">A PLACE WHERE CULTURE BELONGS</span><div className="preloader-window"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /></div><span className="preloader-rule" /><span className="preloader-bottom">TUNING INTO YOUR UNIVERSE <b>001—∞</b></span></div>
+        <div className="preloader-inner"><span className="preloader-overline">A home for the things you love</span><div className="preloader-window"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /></div><span className="preloader-rule" /><span className="preloader-bottom">MADE FOR EVERY SIDE OF YOU <b>001—∞</b></span></div>
       </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
@@ -204,22 +204,22 @@ export default function App() {
 
       <header className="topbar">
         <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
-        <span className="topbar-note">A PLACE WHERE CULTURE BELONGS</span>
-        <span className="topbar-edition">INDEPENDENT CULTURE / 2026</span>
+        <span className="topbar-note">A HOME FOR WHAT YOU LOVE</span>
+        <span className="topbar-edition">INDEPENDENT CULTURE LABEL / 2026</span>
       </header>
 
       <main>
         <section className="hero" id="home">
-          <div className="hero-meta hero-kicker"><span><i className="status-dot" /> AN INDEPENDENT CULTURE LABEL</span><span>EST. IN THE MANY WORLDS IN YOU <b>IND / 2026</b></span></div>
+          <div className="hero-meta hero-kicker"><span><i className="status-dot" /> A CULTURE-FIRST LIFESTYLE LABEL</span><span>BUILT AROUND WHAT YOU LOVE <b>IND / 2026</b></span></div>
           <div className="hero-copy">
-            <p className="eyebrow hero-kicker">YOUR INTERESTS. YOUR IDENTITIES. YOUR UNIVERSE.</p>
+            <p className="eyebrow hero-kicker">ALL THE THINGS THAT MAKE YOU, YOU.</p>
             <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
-            <div className="hero-foot hero-kicker"><p>Pop culture is personal. UNIPARC is a home for the stories, sounds and subcultures that make you, unmistakably you.</p><a className="scroll-cue" href="#manifesto"><span>SCROLL TO EXPLORE</span><b>↓</b></a></div>
+            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
           </div>
           <div className="hero-visual">
             <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2200&q=90" alt="Streetwear editorial campaign" fetchPriority="high" decoding="async" />
             <div className="hero-visual-wash" /><span className="visual-coordinate">FIG. 001 — THE EVERYDAY UNIVERSE</span>
-            <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>NOT MADE TO BLEND IN.</span></div>
+            <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>MADE TO FEEL LIKE YOU.</span></div>
             <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
           </div>
           <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
@@ -229,43 +229,43 @@ export default function App() {
           <div className="section-label"><span>01 / THE IDEA</span><span>A PLACE WHERE CULTURE BELONGS</span></div>
           <div className="manifesto-ghost" aria-hidden="true">MULTIDIMENSIONAL</div>
           <div className="manifesto-grid">
-            <div className="manifesto-heading reveal-up"><span className="eyebrow dark-eyebrow">IDENTITY IS NEVER ONE-DIMENSIONAL</span><h2 className="masked-reveal">YOU ARE<br />NOT <em>ONE</em><br />THING<span className="period">.</span></h2></div>
-            <div className="manifesto-text reveal-up"><p className="lead">And your style shouldn't have to be either.</p><p>One day it's a manga panel. The next, a late-night game, a lyric that hits too close, or a film you quote by heart. The things you love become part of how you see the world.</p><p>UNIPARC brings those worlds together. No labels to fit into. No gatekeeping at the door.</p><a className="text-link" href="#about">GET TO KNOW UNIPARC <Arrow diagonal /></a></div>
+            <div className="manifesto-heading reveal-up"><span className="eyebrow dark-eyebrow">YOU DON'T HAVE TO PICK JUST ONE</span><h2 className="masked-reveal">YOU ARE<br />NOT <em>ONE</em><br />THING<span className="period">.</span></h2></div>
+            <div className="manifesto-text reveal-up"><p className="lead">Your style can hold every side of you.</p><p>Maybe it's a manga you grew up with. A game you lose hours to. A lyric that says what you couldn't. A film you return to. The things you love are part of your story — and they deserve a place in it.</p><p>UNIPARC brings those worlds together in one place. Explore what you love, find familiar energy and make room for something new. No gatekeeping. No need to choose just one.</p><a className="text-link" href="#about">WHY UNIPARC EXISTS <Arrow diagonal /></a></div>
           </div>
           <div className="manifesto-foot"><span>ONE PERSON. MANY UNIVERSES.</span><span>WEAR WHAT DEFINES YOU.®</span><span>SCROLL / 001</span></div>
         </section>
 
         <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties & { "--ambient-tint": string }}>
           <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Different worlds. Shared energy.<br />There's room for all of it here.</p></div>
-          <div className="world-atmosphere-label"><span>NOW TUNED TO</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
+          <div className="world-atmosphere-label"><span>YOU'RE EXPLORING</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
             {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} data-cursor-label="ENTER WORLD" onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)} onMouseLeave={() => setActiveWorld(worlds[0])}><img src={world.image} alt="" loading="lazy" decoding="async" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
           </div>
-          <p className="worlds-note">AND THAT'S JUST THE BEGINNING. CULTURE NEVER STANDS STILL. <span>↘</span></p>
+          <p className="worlds-note">THAT'S ONLY THE START. THERE'S ALWAYS MORE TO DISCOVER. <span>↘</span></p>
         </section>
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A considered selection of ideas, objects<br />and things worth wearing.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>EDITORIAL PREVIEW / 2026</span></div>
+          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
-          <p className="drop-disclaimer">A CREATIVE PREVIEW — PRODUCT DETAILS AND OFFICIAL DROP INFORMATION WILL BE ADDED BEFORE LAUNCH.</p>
+          <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
         <section className="campaign" id="campaign">
           <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
-          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>The references you carry. The communities you find. The things that stay with you long after the screen fades to black.</p><a href="#about" className="light-link">THAT'S THE UNIPARC SPIRIT <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
+          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>The stories that shape you. The people who get your references. The interests that never really leave. That's culture — and it's part of everyday life.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
         </section>
 
         <section className="about section" id="about">
           <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
-          <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A little bit of everything that makes you, you.</p><p>UNIPARC is a culture-first lifestyle label built around identity, self-expression and belonging. We make space for fandoms, niche interests, shared obsessions and the unexpected things that bring people together.</p><p>We start with graphic T-shirts: a quiet mark on the front, a world of meaning on the back. And we keep building from there.</p><strong>NO GATEKEEPING. NO SINGLE BOX. JUST YOU.</strong></div>
+          <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A place for every interest, influence and side of you.</p><p>UNIPARC is a culture-first lifestyle label for people who don't fit into just one category. We bring fandoms, niche interests and everyday inspirations into a shared space for self-expression and belonging.</p><p>Our first pieces are graphic T-shirts — understated from a distance, full of meaning up close. It's the beginning of a wider world built around the things you love.</p><strong>NO GATEKEEPING. NO BOXES TO FIT. JUST ROOM TO BE YOU.</strong></div>
         </section>
 
         <section className="closing section" id="closing">
-          <span className="eyebrow">THE UNIVERSE IS BIGGER TOGETHER</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>Stay close. The first drop is taking shape.</p><a className="closing-link" href="#home">BACK TO THE TOP ↑</a><span className="closing-orbit" aria-hidden="true">U✳</span>
+          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><span className="closing-orbit" aria-hidden="true">U✳</span>
         </section>
       </main>
 
-      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>A culture-led object made for the things that make you, you. This is an editorial concept preview; final product photography and material specifications will be revealed with the drop.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Waitlist sign-up will open with the official drop. No details have been submitted."); }}><label htmlFor="object-email">GET THE FIRST SIGNAL</label><div><input id="object-email" type="email" placeholder="Your email address" required /><button type="submit">NOTIFY ME ↗</button></div><small>{waitlistNotice || "Preview interaction only — email collection is not connected yet."}</small></form></div></div></div>}
+      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>This concept explores how the things you love can become part of what you wear. Final product images, materials and specifications will be published with the official release.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("This is a preview only. Your email has not been saved or sent."); }}><label htmlFor="object-email">DROP UPDATES</label><div><input id="object-email" type="email" placeholder="Email address (preview only)" required /><button type="submit">PREVIEW RESPONSE ↗</button></div><small>{waitlistNotice || "Demo form only — email collection is not active. Your details will not be stored."}</small></form></div></div></div>}
       <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
         <a className={activeDock === 'home' ? 'dock-home dock-active' : 'dock-home'} href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
