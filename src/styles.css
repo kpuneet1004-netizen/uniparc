@@ -30,3 +30,45 @@
 .menu-overlay.is-open .menu-inner>button:nth-of-type(4){animation-delay:.21s}
 @keyframes menuRise{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.universe-card,.edit-card,.universe-card img,.edit-image img,.hero-artwork>img,.campaign-image img{will-change:auto}}
+
+
+/* Monochrome split-world art direction */
+:root{--ink:#090909;--chalk:#f3f3ef;--soft:#e7e7e2}
+body{background:var(--ink)}
+.belief,.edits,.about{background:var(--chalk);color:var(--ink)}
+.belief .eyebrow,.edits .eyebrow,.about .eyebrow{color:#686864}
+.belief-content>div p,.about-copy>p:not(.eyebrow){color:#555550}
+.belief-content h2 em,.edits .section-intro h2 em,.about-copy h2 em{color:#a1a19b}
+.belief .underlined-link{color:var(--ink);border-color:#777}
+.edits .section-aside{color:#686864}
+.edits .edit-filters{border-color:#c5c5bf}
+.edits .edit-filters button{color:#777}
+.edits .edit-filters button.selected{color:var(--ink)}
+.edits .edit-filters button.selected:after{background:var(--ink)}
+.edits .edit-meta p,.edits .edit-meta>span,.edits .catalogue-note{color:#73736d}
+.edits .edit-meta h3{color:var(--ink)}
+.edits .catalogue-note{border-color:#c5c5bf}
+.about-mark{border-color:#c5c5bf}
+.about-mark span,.about-signoff{color:#777}
+.about-copy .eyebrow{color:#686864}
+.about-copy .about-signoff{color:#666}
+.universe,.faq{background:#101010;color:#f3f3ef}
+.campaign,.footer{background:#080808;color:#f3f3ef}
+.site-header{background:#090909d9}
+.hero-artwork,.universe-card,.edit-image{background:#222}
+.belief,.universe,.edits,.campaign,.about,.faq,.footer{position:relative}
+.belief:before,.edits:before,.about:before{content:'';position:absolute;top:0;left:7vw;right:7vw;height:1px;background:#c9c9c3}
+.belief-content h2,.section-intro h2,.campaign-content h2,.about-copy h2,.footer-hero h2{will-change:transform,opacity}
+.universe-card,.edit-image{clip-path:inset(0);transform:translateZ(0)}
+.universe-card img,.edit-image img,.hero-artwork>img,.campaign-image img{transform-origin:50% 50%}
+.universe-card:hover img,.edit-card:hover .edit-image img{filter:grayscale(.55) contrast(1.08)}
+.circle-link,.edit-arrow{transition:transform .45s cubic-bezier(.2,.8,.2,1),background .3s,color .3s}
+.edit-card:hover .edit-arrow{transform:rotate(45deg) scale(1.08)}
+@media(max-width:650px){
+ .belief:before,.edits:before,.about:before{left:5vw;right:5vw}
+ .belief,.edits,.about{color:var(--ink)}
+ .edits .edit-image{height:115vw}
+}
+@media(prefers-reduced-motion:reduce){
+ .belief-content h2,.section-intro h2,.campaign-content h2,.about-copy h2,.footer-hero h2{will-change:auto}
+}
