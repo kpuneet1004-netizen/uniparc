@@ -35,10 +35,11 @@ export default function App() {
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9 });
+    let lenisTick: ((time: number) => void) | undefined;
     if (lenis) {
       lenis.on('scroll', ScrollTrigger.update);
-      const tick = (time: number) => lenis.raf(time * 1000);
-      gsap.ticker.add(tick);
+      lenisTick = (time: number) => lenis.raf(time * 1000);
+      gsap.ticker.add(lenisTick);
       gsap.ticker.lagSmoothing(0);
       const onRefresh = () => lenis.resize();
       ScrollTrigger.addEventListener('refresh', onRefresh);
@@ -80,7 +81,7 @@ export default function App() {
     return () => {
       ctx.revert();
       if (lenis) {
-        gsap.ticker.remove((time) => lenis.raf(time * 1000));
+        if (lenisTick) gsap.ticker.remove(lenisTick);
         lenis.destroy();
       }
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
