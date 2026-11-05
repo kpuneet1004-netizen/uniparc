@@ -335,3 +335,8 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
   .nav-dock{width:calc(100% - 18px)}
   .nav-dock>a:not(.dock-home){min-width:82px;padding-inline:10px}
 }
+
+/* Keep the active destination unmistakable, including Home */
+.nav-dock a.dock-active{background:#d9f36a;color:var(--ink)}
+.nav-dock a.dock-active .dock-number{opacity:.7}
+.nav-dock .dock-home.dock-active .dock-home-mark{color:var(--ink)}

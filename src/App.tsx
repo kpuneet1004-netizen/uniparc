@@ -125,18 +125,30 @@ export default function App() {
       .map((id) => document.getElementById(id))
       .filter((node): node is HTMLElement => Boolean(node));
     if (!targets.length) return;
-    const visibleSections = new Map<string, number>();
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) visibleSections.set(entry.target.id, entry.intersectionRatio);
-        else visibleSections.delete(entry.target.id);
+
+    let frame = 0;
+    const updateActiveSection = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // The section crossing this fixed reading line is the section the user is in.
+        const readingLine = window.innerHeight * 0.4;
+        let current = targets[0];
+        for (const section of targets) {
+          if (section.getBoundingClientRect().top <= readingLine) current = section;
+          else break;
+        }
+        setActiveDock(current.id);
       });
-      const activeSection = [...visibleSections.entries()]
-        .sort((a, b) => b[1] - a[1])[0];
-      if (activeSection) setActiveDock(activeSection[0]);
-    }, { rootMargin: '-24% 0px -48% 0px', threshold: [0, 0.15, 0.35, 0.6] });
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    window.addEventListener('resize', updateActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', updateActiveSection);
+      window.removeEventListener('resize', updateActiveSection);
+    };
   }, []);
 
   useEffect(() => {
@@ -255,7 +267,7 @@ export default function App() {
 
       {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>A culture-led object made for the things that make you, you. This is an editorial concept preview; final product photography and material specifications will be revealed with the drop.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Waitlist sign-up will open with the official drop. No details have been submitted."); }}><label htmlFor="object-email">GET THE FIRST SIGNAL</label><div><input id="object-email" type="email" placeholder="Your email address" required /><button type="submit">NOTIFY ME ↗</button></div><small>{waitlistNotice || "Preview interaction only — email collection is not connected yet."}</small></form></div></div></div>}
       <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
-        <a className="dock-home" href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
+        <a className={activeDock === 'home' ? 'dock-home dock-active' : 'dock-home'} href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
         <a href="#manifesto" className={activeDock === 'manifesto' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'manifesto')} aria-current={activeDock === 'manifesto' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">IDEA</span></a>
         <a href="#worlds" className={activeDock === 'worlds' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'worlds')} aria-current={activeDock === 'worlds' ? 'location' : undefined}><span className="dock-number">02</span><span className="dock-label">CULTURE</span></a>
