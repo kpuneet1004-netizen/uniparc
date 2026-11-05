@@ -39,6 +39,13 @@ export default function App(){
    gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach(el=>gsap.fromTo(el,{y:42,opacity:0},{y:0,opacity:1,duration:.9,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
    gsap.utils.toArray<HTMLElement>('.universe-card,.edit-card').forEach((el,i)=>gsap.fromTo(el,{y:54,opacity:0},{y:0,opacity:1,duration:.85,delay:(i%2)*.08,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 91%',once:true}}));
    if(!reduce){
+    gsap.fromTo('.hero-copy h1',{yPercent:0,scale:1},{yPercent:-12,scale:.94,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1.2}});
+    gsap.utils.toArray<HTMLElement>('.universe-card,.edit-image').forEach((el,i)=>gsap.fromTo(el,{clipPath:'inset(14% 0 14% 0)',scale:.96},{clipPath:'inset(0% 0 0% 0)',scale:1,ease:'power3.out',duration:1.15,scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
+    gsap.utils.toArray<HTMLElement>('.belief-content h2,.section-intro h2,.campaign-content h2,.about-copy h2,.footer-hero h2').forEach(el=>gsap.fromTo(el,{y:70,opacity:0,rotateX:-8,transformOrigin:'50% 100%'},{y:0,opacity:1,rotateX:0,duration:1.1,ease:'power4.out',scrollTrigger:{trigger:el,start:'top 86%',once:true}}));
+    gsap.to('.campaign-content',{yPercent:-10,ease:'none',scrollTrigger:{trigger:'.campaign',start:'top bottom',end:'bottom top',scrub:1}});
+    gsap.to('.about-mark',{rotate:3,y:-18,ease:'none',scrollTrigger:{trigger:'.about',start:'top bottom',end:'bottom top',scrub:1}});
+   }
+   if(!reduce){
     gsap.to('.hero-artwork > img',{yPercent:10,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
     gsap.to('.campaign-image img',{yPercent:9,ease:'none',scrollTrigger:{trigger:'.campaign',start:'top bottom',end:'bottom top',scrub:1}});
     gsap.to('.artwork-stamp',{y:-22,rotate:-3,ease:'none',scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1}});
