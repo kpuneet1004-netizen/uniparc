@@ -125,18 +125,30 @@ export default function App() {
       .map((id) => document.getElementById(id))
       .filter((node): node is HTMLElement => Boolean(node));
     if (!targets.length) return;
-    const visibleSections = new Map<string, number>();
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) visibleSections.set(entry.target.id, entry.intersectionRatio);
-        else visibleSections.delete(entry.target.id);
+
+    let frame = 0;
+    const updateActiveSection = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // The section crossing this fixed reading line is the section the user is in.
+        const readingLine = window.innerHeight * 0.4;
+        let current = targets[0];
+        for (const section of targets) {
+          if (section.getBoundingClientRect().top <= readingLine) current = section;
+          else break;
+        }
+        setActiveDock(current.id);
       });
-      const activeSection = [...visibleSections.entries()]
-        .sort((a, b) => b[1] - a[1])[0];
-      if (activeSection) setActiveDock(activeSection[0]);
-    }, { rootMargin: '-24% 0px -48% 0px', threshold: [0, 0.15, 0.35, 0.6] });
-    targets.forEach((target) => observer.observe(target));
-    return () => observer.disconnect();
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    window.addEventListener('resize', updateActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', updateActiveSection);
+      window.removeEventListener('resize', updateActiveSection);
+    };
   }, []);
 
   useEffect(() => {
