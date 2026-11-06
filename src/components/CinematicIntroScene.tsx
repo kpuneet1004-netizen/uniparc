@@ -1,15 +1,15 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-const vertexShader = \`
+const vertexShader = `
   varying vec2 vUv;
   void main() {
     vUv = uv;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
-\`;
+`;
 
-const panelFragmentShader = \`
+const panelFragmentShader = `
   varying vec2 vUv;
   uniform float uTime;
   uniform float uSeed;
@@ -58,7 +58,7 @@ const panelFragmentShader = \`
     color *= vignette;
     gl_FragColor = vec4(color, uOpacity);
   }
-\`;
+`;
 
 type FilmPanel = {
   group: THREE.Group;
