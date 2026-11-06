@@ -462,6 +462,7 @@ export default function CinematicIntroScene() {
       roughness: 0.2,
       emissive: 0x11181d,
       emissiveIntensity: 0.12,
+      side: THREE.DoubleSide,
     });
     const head = new THREE.Mesh(makeHeadGeometry(), headMaterial);
     scene.add(head);
