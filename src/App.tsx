@@ -49,6 +49,23 @@ function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   </svg>;
 }
 
+function readIntroSeen() {
+  try {
+    return window.localStorage.getItem('uniparc-intro-seen') === '1';
+  } catch {
+    // Storage can be unavailable in private browsing or restricted webviews.
+    return false;
+  }
+}
+
+function persistIntroSeen() {
+  try {
+    window.localStorage.setItem('uniparc-intro-seen', '1');
+  } catch {
+    // The intro must still finish when storage is blocked.
+  }
+}
+
 export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -138,7 +155,7 @@ export default function App() {
   }, [isLoaded]);
 
   useEffect(() => {
-    setShowSkipIntro(window.localStorage.getItem('uniparc-intro-seen') === '1');
+    setShowSkipIntro(readIntroSeen());
   }, []);
 
   useEffect(() => {
@@ -189,7 +206,7 @@ export default function App() {
         window.scrollTo(0, 0);
         lenisRef.current?.scrollTo(0, { immediate: true, force: true });
         setActiveDock('home');
-        window.localStorage.setItem('uniparc-intro-seen', '1');
+        persistIntroSeen();
         setIsLoaded(true);
       };
       const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
