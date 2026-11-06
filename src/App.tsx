@@ -69,7 +69,7 @@ export default function App() {
 
   useEffect(() => {
     const canvas = cosmicCanvasRef.current;
-    if (!canvas) return;
+    if (!canvas || isLoaded || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 120);
     camera.position.z = 24;
@@ -129,7 +129,7 @@ export default function App() {
       starGeometry.dispose(); starMaterial.dispose(); burstGeometry.dispose(); burstMaterial.dispose(); renderer.dispose();
       burstPointsRef.current = null; burstMaterialRef.current = null;
     };
-  }, []);
+  }, [isLoaded]);
 
   useEffect(() => {
     setShowSkipIntro(window.localStorage.getItem('uniparc-intro-seen') === '1');
