@@ -14,6 +14,7 @@ const panelFragmentShader = \`
   uniform float uTime;
   uniform float uSeed;
   uniform float uStyle;
+  uniform float uOpacity;
   uniform vec3 uAccent;
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float line(float v, float width) { return 1.0 - smoothstep(width, width + 0.012, abs(v)); }
@@ -22,7 +23,7 @@ const panelFragmentShader = \`
     vec2 p = uv - 0.5;
     float t = uTime;
     vec3 base = mix(vec3(0.012, 0.016, 0.021), vec3(0.075, 0.085, 0.092), uv.y);
-    float vignette = smoothstep(0.82, 0.12, length(p * vec2(0.9, 1.25)));
+    float vignette = 1.0 - smoothstep(0.12, 0.82, length(p * vec2(0.9, 1.25)));
     float sweep = 0.0;
     if (uStyle < 0.5) {
       float a = atan(p.y, p.x);
@@ -36,7 +37,7 @@ const panelFragmentShader = \`
       sweep += exp(-abs(p.x - sin(t * 0.4 + uSeed) * 0.25) * 16.0) * 0.35;
     } else if (uStyle < 2.5) {
       float bars = step(0.0, sin(uv.x * 110.0 + sin(uv.y * 13.0 + t) * 2.0));
-      sweep = bars * smoothstep(0.44, 0.0, abs(uv.y - 0.5)) * 0.34;
+      sweep = bars * (1.0 - smoothstep(0.0, 0.44, abs(uv.y - 0.5))) * 0.34;
       sweep += line(p.y - 0.22 * sin(p.x * 9.0 + t * 2.0), 0.014);
     } else if (uStyle < 3.5) {
       vec2 grid = abs(fract(uv * vec2(13.0, 7.0) - t * 0.06) - 0.5);
@@ -55,7 +56,7 @@ const panelFragmentShader = \`
     vec3 color = base + uAccent * sweep * 0.82 + vec3(grain);
     color += uAccent * exp(-abs(uv.x - fract(t * 0.055 + uSeed)) * 38.0) * 0.12;
     color *= vignette;
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(color, uOpacity);
   }
 \`;
 
@@ -227,10 +228,12 @@ export default function CinematicIntroScene() {
       const material = new THREE.ShaderMaterial({
         vertexShader,
         fragmentShader: panelFragmentShader,
+        transparent: true,
         uniforms: {
           uTime: { value: 0 },
           uSeed: { value: index * 1.73 },
           uStyle: { value: index },
+          uOpacity: { value: 0 },
           uAccent: { value: panelPalettes[index] },
         },
         side: THREE.DoubleSide,
@@ -315,6 +318,7 @@ export default function CinematicIntroScene() {
     };
 
     const tangent = new THREE.Vector3();
+    const bodyCenter = new THREE.Vector3();
     const previous = new THREE.Vector3();
     const next = new THREE.Vector3();
     const normal = new THREE.Vector3();
@@ -402,7 +406,7 @@ export default function CinematicIntroScene() {
         const scale = (small ? 0.72 : 0.9) * visible;
         panel.group.scale.setScalar(Math.max(0.001, scale));
         panel.material.uniforms.uTime.value = time;
-        panel.material.opacity = visible;
+        panel.material.uniforms.uOpacity.value = visible;
         (panel.border.material as THREE.LineBasicMaterial).opacity = visible * 0.72;
       });
 
@@ -418,7 +422,7 @@ export default function CinematicIntroScene() {
         for (let i = 0; i <= bodySegments; i++) {
           const u = i / bodySegments;
           const sampleTime = time - u * bodyDelay;
-          const center = pointAt(sampleTime, new THREE.Vector3());
+          const center = pointAt(sampleTime, bodyCenter);
           pointAt(sampleTime - 0.012, previous);
           pointAt(sampleTime + 0.012, next);
           tangent.subVectors(next, previous).normalize();
