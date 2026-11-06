@@ -292,13 +292,13 @@ export default function App() {
         </section>
       </main>
 
-      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
+      {selectedPiece && <div className="object-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
         <div className="object-modal-visual">
           <img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} />
           <span className="object-visual-index">UNIPARC® <i> / </i> OBJECT STUDY {selectedPiece.id}</span>
           <span className="object-visual-note">THE UNIPARC EDIT <b>2026</b></span>
         </div>
-        <div className="object-modal-content">
+        <div className="object-modal-content" data-lenis-prevent>
           <div className="object-modal-topline"><span>OBJECT FILE <b>{selectedPiece.id} / 03</b></span><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE <span>×</span></button></div>
           <div className="object-modal-intro">
             <span className="object-modal-kicker">{selectedPiece.category} <i>—</i> {selectedPiece.label}</span>
