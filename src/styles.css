@@ -439,3 +439,44 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
   .about-main h2{font-size:clamp(40px,11.6vw,48px)}
   .about-logo{width:88px}
 }
+
+/* Experience 2.0 — cinematic chapter continuity */
+.section,
+.campaign,
+.closing{
+  position:relative;
+  isolation:isolate;
+}
+.section::before,
+.campaign::before,
+.closing::before{
+  content:"";
+  position:absolute;
+  z-index:2;
+  top:0;
+  left:8vw;
+  right:8vw;
+  height:1px;
+  pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(217,243,106,.34) 18%,rgba(255,255,255,.16) 50%,transparent 82%);
+}
+.manifesto::before,
+.drop::before,
+.about::before{
+  background:linear-gradient(90deg,transparent,rgba(17,18,15,.18) 20%,rgba(17,18,15,.08) 50%,transparent 80%);
+}
+.worlds::before,
+.campaign::before,
+.closing::before{
+  background:linear-gradient(90deg,transparent,rgba(217,243,106,.42) 22%,rgba(217,243,106,.12) 55%,transparent 84%);
+}
+@media(max-width:760px){
+  .section::before,
+  .campaign::before,
+  .closing::before{left:6vw;right:6vw}
+}
+@media(prefers-reduced-motion:reduce){
+  .section::before,
+  .campaign::before,
+  .closing::before{display:none}
+}
