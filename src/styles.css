@@ -1641,3 +1641,9 @@ html{scroll-padding-top:88px}body{letter-spacing:-.012em}.site{isolation:isolate
 }
 @media(max-width:390px){.hero-title{font-size:clamp(52px,12.5vw,62px)}.hero-visual{height:380px}.manifesto h2{font-size:clamp(54px,12.5vw,68px)}.world-card,.world-card:nth-child(n){height:310px}.piece-grid{gap:20px 8px}.piece-card:last-child:nth-child(odd){width:86%}.nav-dock a{padding-inline:9px}.nav-dock .dock-number{display:none}}
 @media(prefers-reduced-motion:reduce){.world-card,.world-card img,.piece-image img,.scroll-cue b,.nav-dock a{transition:none!important}}
+
+/* Balance the fourth culture tile in the editorial bento grid. */
+@media(min-width:761px){
+  .world-grid{grid-template-rows:repeat(2,minmax(250px,24vw)) minmax(220px,20vw)}
+  .world-card:nth-child(4){grid-column:1/-1;grid-row:3;min-height:220px}
+}
