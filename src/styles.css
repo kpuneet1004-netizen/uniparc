@@ -500,3 +500,59 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 .drop-world-context>a:focus-visible{outline:2px solid var(--acid);outline-offset:5px}
 @media(max-width:600px){.world-selection-mark{top:35px;right:9px;padding:6px;font-size:6px}.drop-world-context{grid-template-columns:1fr auto;gap:7px 12px;margin:22px 0 16px;padding:13px 0}.drop-world-context>span{grid-column:1/-1}.drop-world-context>strong{grid-column:1}.drop-world-context>small{grid-column:1/-1;grid-row:3}.drop-world-context>a{grid-column:2;grid-row:2;font-size:7px}}
 @media(prefers-reduced-motion:reduce){.worlds::after,.world-card,.world-selection-mark,.world-atmosphere-label strong{transition:none}}
+
+
+/* Object-card polish — unified directional icon and a deliberate final-card finish */
+.arrow{
+  display:block;
+  width:17px;
+  height:17px;
+  flex:0 0 auto;
+  overflow:visible;
+  transition:transform .35s var(--ease);
+}
+.arrow-diagonal{transform:none}
+.piece-arrow .arrow{width:17px;height:17px}
+.piece-card:hover .piece-arrow .arrow{transform:translate(1px,-1px)}
+.piece-hover-label{display:inline-flex;align-items:center;gap:9px}
+.piece-hover-label .arrow{width:12px;height:12px}
+.piece-image img.piece-image-failed{display:none}
+.piece-card-featured .piece-image{
+  background:
+    radial-gradient(ellipse at 78% 18%,rgba(255,221,190,.55),transparent 42%),
+    linear-gradient(145deg,#ff8968 0%,#f36a4e 54%,#d94e3e 100%);
+}
+.piece-card-featured .piece-image::before{
+  content:"03";
+  position:absolute;
+  z-index:0;
+  right:-.035em;
+  bottom:-.23em;
+  color:rgba(20,21,17,.13);
+  font:clamp(150px,22vw,310px)/.8 var(--display);
+  letter-spacing:-.12em;
+  pointer-events:none;
+}
+.piece-card-featured .piece-image::after{
+  content:"CULTURE OBJECT / 003";
+  position:absolute;
+  z-index:1;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) rotate(-90deg);
+  color:rgba(20,21,17,.58);
+  font:8px var(--mono);
+  letter-spacing:.22em;
+  white-space:nowrap;
+  pointer-events:none;
+}
+.piece-card-featured .piece-index,
+.piece-card-featured .piece-caption,
+.piece-card-featured .piece-arrow{z-index:2}
+.piece-card-featured .piece-caption{max-width:calc(100% - 78px)}
+.piece-card-featured .piece-arrow{background:var(--ink);color:var(--acid)}
+.piece-card-featured:hover .piece-arrow{background:var(--acid);color:var(--ink)}
+.piece-arrow:focus-visible{outline:2px solid var(--acid);outline-offset:4px}
+@media(prefers-reduced-motion:reduce){
+  .arrow,.piece-arrow .arrow{transition:none}
+}
