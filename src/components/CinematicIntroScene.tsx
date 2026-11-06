@@ -49,12 +49,10 @@ export default function CinematicIntroScene() {
     // Deep-space field: fixed points, sparse enough to preserve the black void.
     const starCount = small ? 420 : 760;
     const starPositions = new Float32Array(starCount * 3);
-    const starOpacities = new Float32Array(starCount);
     for (let i = 0; i < starCount; i++) {
       starPositions[i * 3] = (Math.random() - 0.5) * 54;
       starPositions[i * 3 + 1] = (Math.random() - 0.5) * 32;
       starPositions[i * 3 + 2] = -28 + Math.random() * 34;
-      starOpacities[i] = 0.2 + Math.random() * 0.8;
     }
     const starGeometry = new THREE.BufferGeometry();
     starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
@@ -306,6 +304,8 @@ export default function CinematicIntroScene() {
 
     const axisX = new THREE.Vector3(1, 0, 0);
     const tangent = new THREE.Vector3();
+    const headTangent = new THREE.Vector3();
+    const headPosition = new THREE.Vector3();
     const before = new THREE.Vector3();
     const after = new THREE.Vector3();
     const center = new THREE.Vector3();
@@ -317,18 +317,16 @@ export default function CinematicIntroScene() {
 
     const serpentPath = (time: number, target: THREE.Vector3) => {
       const t = time - 11.55;
-      const start = new THREE.Vector3(-8.2 * aspectFit.value, 2.55, 1.8);
-      if (t <= 0) return target.copy(start);
+      const fit = aspectFit.value;
+      const startX = -8.2 * fit;
+      if (t <= 0) return target.set(startX, 2.55, 1.8);
       if (t < 2.1) {
         const u = THREE.MathUtils.smoothstep(t, 0, 2.1);
         const inv = 1 - u;
-        const p1 = new THREE.Vector3(-4.9 * aspectFit.value, 3.0, 2.2);
-        const p2 = new THREE.Vector3(-2.1 * aspectFit.value, -1.8, 0.9);
-        const p3 = new THREE.Vector3(0, -1.8, 0.2);
         return target.set(
-          (inv ** 3 * start.x + 3 * inv ** 2 * u * p1.x + 3 * inv * u ** 2 * p2.x + u ** 3 * p3.x),
-          inv ** 3 * start.y + 3 * inv ** 2 * u * p1.y + 3 * inv * u ** 2 * p2.y + u ** 3 * p3.y,
-          inv ** 3 * start.z + 3 * inv ** 2 * u * p1.z + 3 * inv * u ** 2 * p2.z + u ** 3 * p3.z
+          inv ** 3 * startX + 3 * inv ** 2 * u * (-4.9 * fit) + 3 * inv * u ** 2 * (-2.1 * fit),
+          inv ** 3 * 2.55 + 3 * inv ** 2 * u * 3.0 + 3 * inv * u ** 2 * -1.8 + u ** 3 * -1.8,
+          inv ** 3 * 1.8 + 3 * inv ** 2 * u * 2.2 + 3 * inv * u ** 2 * 0.9 + u ** 3 * 0.2
         );
       }
       const orbitTime = Math.max(0, t - 2.1);
@@ -437,11 +435,11 @@ export default function CinematicIntroScene() {
       serpent.visible = snakeOpacity > 0.001;
       head.visible = serpent.visible;
       if (serpent.visible) {
-        const current = serpentPath(time, center);
+        serpentPath(time, headPosition);
         serpentPath(time - 0.025, before);
         serpentPath(time + 0.025, after);
-        tangent.subVectors(after, before).normalize();
-        if (tangent.lengthSq() < 0.0001) tangent.set(1, 0, 0);
+        headTangent.subVectors(after, before).normalize();
+        if (headTangent.lengthSq() < 0.0001) headTangent.set(1, 0, 0);
 
         const positionAttribute = bodyGeometry.attributes.position as THREE.BufferAttribute;
         const normalAttribute = bodyGeometry.attributes.normal as THREE.BufferAttribute;
@@ -476,8 +474,8 @@ export default function CinematicIntroScene() {
         normalAttribute.needsUpdate = true;
         serpentMaterial.opacity = snakeOpacity * 0.98;
 
-        head.position.copy(current);
-        head.quaternion.setFromUnitVectors(axisX, tangent);
+        head.position.copy(headPosition);
+        head.quaternion.setFromUnitVectors(axisX, headTangent);
         head.scale.setScalar(snakeIn * snakeOut);
       }
 
