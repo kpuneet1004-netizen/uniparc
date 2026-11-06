@@ -698,3 +698,85 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 @media(prefers-reduced-motion:reduce){
   .object-modal,.object-modal-panel{animation:none}
 }
+
+
+/* Product detail overlay — complete editorial object dossier */
+.object-modal{
+  position:fixed;inset:0;z-index:120;display:grid;place-items:center;
+  padding:clamp(14px,3vh,30px);background:rgba(8,9,7,.82);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  overflow:auto;overscroll-behavior:contain;
+}
+.object-modal-panel{
+  position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  width:min(1160px,100%);height:min(760px,calc(100dvh - 60px));min-height:560px;
+  max-height:none;overflow:hidden;background:#f1f0e9;color:#151613;
+  border:1px solid rgba(255,255,255,.16);box-shadow:0 30px 100px #0008;
+}
+.object-modal-visual{position:relative;min-width:0;min-height:0;overflow:hidden;background:#d7d5cc}
+.object-modal-visual:after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.38));pointer-events:none}
+.object-modal-visual img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 38%}
+.object-visual-index,.object-visual-note{position:absolute;z-index:1;color:#f5f3ec;font:9px var(--mono);letter-spacing:.13em}
+.object-visual-index{left:clamp(18px,3vw,38px);bottom:clamp(20px,3vw,38px);padding:13px 15px;background:#151613}
+.object-visual-index i{color:var(--acid);font-style:normal;padding:0 4px}
+.object-visual-note{right:24px;top:24px;display:flex;gap:14px;align-items:center;text-shadow:0 1px 8px #0008}
+.object-visual-note b{color:var(--acid);font-weight:400}
+.object-modal-content{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0;padding:clamp(25px,3.4vw,48px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#aaa99f transparent}
+.object-modal-topline{display:flex;justify-content:space-between;align-items:center;gap:18px;padding-bottom:22px;border-bottom:1px solid #d0cfc6;color:#77786f;font:8px var(--mono);letter-spacing:.14em}
+.object-modal-topline>span b{color:#171814;font-weight:500;margin-left:8px}
+.object-close{position:static;float:none;z-index:2;display:flex;align-items:center;gap:13px;margin:0;padding:13px 15px;border:0;background:#171814;color:#f5f3ec;font:9px var(--mono);letter-spacing:.12em;cursor:pointer}
+.object-close span{font-size:15px;line-height:.7;color:var(--acid)}
+.object-modal-intro{padding:clamp(28px,4vh,48px) 0 30px}
+.object-modal-kicker{color:#77786f;font:8px var(--mono);letter-spacing:.16em}
+.object-modal-kicker i{color:#a0a095;font-style:normal;padding:0 5px}
+.object-modal-intro h2{margin:17px 0 20px;font:800 clamp(42px,5.1vw,72px)/.88 var(--display);letter-spacing:-.085em;overflow-wrap:anywhere}
+.object-modal-intro>p{max-width:43ch;margin:0;color:#55564f;font-size:clamp(13px,1.1vw,15px);line-height:1.85}
+.object-detail-block{border-top:1px solid #c9c8bf;padding-top:17px}
+.object-detail-heading{display:flex;align-items:center;gap:11px;color:#171814;font:8px var(--mono);letter-spacing:.13em}
+.object-detail-heading>span{color:#88897f}
+.object-detail-heading>i{margin-left:auto;color:#88897f;font-style:normal;font-size:7px}
+.object-detail-list{margin:16px 0 0}
+.object-detail-list>div{display:grid;grid-template-columns:minmax(100px,.8fr) minmax(0,1.2fr);gap:12px;padding:10px 0;border-top:1px solid #deddd5}
+.object-detail-list dt{color:#77786f;font:8px var(--mono);letter-spacing:.12em}
+.object-detail-list dd{margin:0;color:#171814;text-align:right;font:8px var(--mono);letter-spacing:.08em;overflow-wrap:anywhere}
+.object-modal-signup{margin-top:clamp(24px,4vh,42px);padding:22px;background:#e7e6dd}
+.object-modal-signup h3{margin:9px 0 5px;font:700 clamp(25px,2.6vw,34px)/1 var(--display);letter-spacing:-.06em}
+.object-modal-signup>p{margin:0 0 17px;color:#66675f;font-size:11px;line-height:1.65}
+.object-modal-signup form label{display:block;margin-bottom:8px;color:#77786f;font:7px var(--mono);letter-spacing:.14em}
+.object-email-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.object-email-row input{width:100%;min-width:0;min-height:46px;padding:0 13px;border:1px solid #c7c6bd;border-radius:0;background:#f5f4ee;color:#171814;font:11px var(--mono)}
+.object-email-row input:focus{outline:2px solid #171814;outline-offset:2px}
+.object-email-row button{display:flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:0 15px;border:0;background:#171814;color:#f5f3ec;font:8px var(--mono);letter-spacing:.1em;cursor:pointer;white-space:nowrap}
+.object-email-row button span{color:var(--acid);font-size:14px}
+.object-modal-signup form small{display:block;margin-top:9px;color:#77786f;font-size:9px;line-height:1.6}
+.object-modal-foot{display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding-top:22px;color:#88897f;font:7px var(--mono);letter-spacing:.12em}
+@media(max-width:760px){
+ .object-modal{display:block;padding:0;background:#f1f0e9;backdrop-filter:none}
+ .object-modal-panel{display:flex;flex-direction:column;width:100%;height:auto;min-height:100dvh;max-height:none;border:0;overflow:visible;box-shadow:none}
+ .object-modal-visual{flex:0 0 auto;height:clamp(280px,43svh,440px);min-height:0}
+ .object-modal-visual img{object-position:center 35%}
+ .object-visual-index{left:18px;bottom:18px;font-size:8px;padding:11px 12px}
+ .object-visual-note{top:18px;right:18px;font-size:8px}
+ .object-modal-content{display:block;overflow:visible;padding:0 22px calc(28px + env(safe-area-inset-bottom))}
+ .object-modal-topline{position:relative;padding:18px 0}
+ .object-close{padding:12px 13px}
+ .object-modal-intro{padding:30px 0 26px}
+ .object-modal-intro h2{font-size:clamp(42px,11vw,64px);margin:15px 0}
+ .object-modal-intro>p{font-size:13px;line-height:1.8}
+ .object-detail-list>div{grid-template-columns:minmax(95px,.8fr) minmax(0,1.2fr);padding:12px 0}
+ .object-detail-list dt,.object-detail-list dd{font-size:8px}
+ .object-modal-signup{margin-top:28px;padding:20px}
+ .object-modal-signup h3{font-size:30px}
+ .object-modal-foot{margin-top:24px}
+}
+@media(max-width:420px){
+ .object-modal-visual{height:38svh;min-height:250px}
+ .object-modal-content{padding-inline:18px}
+ .object-modal-intro h2{font-size:clamp(38px,10.5vw,48px)}
+ .object-detail-list>div{grid-template-columns:1fr;gap:6px}
+ .object-detail-list dd{text-align:left}
+ .object-email-row{grid-template-columns:minmax(0,1fr)}
+ .object-email-row button{width:100%}
+ .object-modal-signup{padding:17px}
+}
+@media(prefers-reduced-motion:reduce){.object-modal{scroll-behavior:auto}}
