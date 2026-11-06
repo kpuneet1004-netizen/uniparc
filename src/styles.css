@@ -806,3 +806,35 @@ html{scroll-padding-top:24px}
 .nav-dock .dock-indicator{transition:transform .26s cubic-bezier(.2,.8,.2,1),width .22s cubic-bezier(.2,.8,.2,1)}
 .nav-dock a{transition:color .16s ease,transform .2s ease}
 @media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator,.nav-dock a{transition:none}}
+
+
+/* Manifesto type system refinement — deliberate scale, tracking and reading rhythm */
+.manifesto-grid{grid-template-columns:minmax(0,1.08fr) minmax(280px,.72fr);gap:clamp(48px,7vw,112px);align-items:center}
+.manifesto-heading{min-width:0}
+.manifesto-heading>.eyebrow{display:inline-block;margin:0 0 clamp(22px,3vw,38px);font-size:9px;line-height:1.5;letter-spacing:.2em;font-weight:500}
+.manifesto h2{font-size:clamp(76px,9vw,136px);line-height:.88;letter-spacing:-.072em;font-weight:400;text-wrap:initial}
+.manifesto h2 em{display:inline-block;font-size:.76em;line-height:.98;letter-spacing:-.045em;white-space:nowrap;vertical-align:.035em;color:#a3a39b}
+.manifesto h2 .period{color:var(--acid);letter-spacing:-.04em}
+.manifesto-text{max-width:390px;padding-bottom:0}
+.manifesto-text .lead{max-width:18ch;margin:0 0 22px;font-size:clamp(21px,2vw,27px);line-height:1.2;letter-spacing:-.045em;font-weight:600}
+.manifesto-text>p:not(.lead){max-width:42ch;font-size:14px;line-height:1.8;letter-spacing:-.008em;color:#62635b}
+.manifesto-text>p+p{margin-top:14px}
+.manifesto-text .text-link{margin-top:22px;font-size:9px;letter-spacing:.16em}
+.manifesto-foot{font-size:8px;letter-spacing:.14em}
+@media (min-width:761px) and (max-width:1100px){
+ .manifesto h2{font-size:clamp(76px,8.8vw,104px)}
+ .manifesto-grid{gap:5vw}
+}
+@media (max-width:760px){
+ .manifesto-grid{gap:34px}
+ .manifesto-heading>.eyebrow{margin-bottom:22px;font-size:8px;letter-spacing:.17em}
+ .manifesto h2{font-size:clamp(64px,13.4vw,100px);line-height:.9;letter-spacing:-.07em}
+ .manifesto h2 em{font-size:.74em;letter-spacing:-.04em}
+ .manifesto-text{max-width:560px}
+ .manifesto-text .lead{max-width:22ch;font-size:clamp(21px,5.6vw,25px)}
+ .manifesto-text>p:not(.lead){font-size:13px;line-height:1.82}
+}
+@media (max-width:390px){
+ .manifesto h2{font-size:clamp(56px,13.2vw,68px);letter-spacing:-.065em}
+ .manifesto h2 em{font-size:.72em}
+}
