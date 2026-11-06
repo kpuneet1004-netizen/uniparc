@@ -600,6 +600,7 @@ export default function CinematicIntroScene() {
         const appear = THREE.MathUtils.smoothstep(time, 5.5 + stagger, 7.0 + stagger);
         const vanish = THREE.MathUtils.smoothstep(time, 11.85 + stagger * 0.4, 13.25 + stagger * 0.4);
         const visibility = appear * (1 - vanish);
+        const fromCenter = 1 - appear;
         const aspect = root.clientWidth / Math.max(1, root.clientHeight);
         const horizontalFit = THREE.MathUtils.clamp(aspect / 1.28, 0.43, 1);
         const targetXFit = targetX * horizontalFit;
