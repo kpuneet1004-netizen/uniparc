@@ -16,6 +16,8 @@ const panelFragmentShader = `
   uniform float uStyle;
   uniform float uOpacity;
   uniform vec3 uAccent;
+  uniform sampler2D uVideo;
+  uniform float uHasVideo;
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float line(float v, float width) { return 1.0 - smoothstep(width, width + 0.012, abs(v)); }
   void main() {
@@ -53,9 +55,11 @@ const panelFragmentShader = `
       sweep += exp(-abs(length(p) - (0.2 + 0.12 * sin(t * 0.7))) * 28.0) * 0.55;
     }
     float grain = hash(floor(uv * vec2(480.0, 270.0)) + floor(t * 12.0)) * 0.035;
-    vec3 color = base + uAccent * sweep * 0.82 + vec3(grain);
-    color += uAccent * exp(-abs(uv.x - fract(t * 0.055 + uSeed)) * 38.0) * 0.12;
-    color *= vignette;
+    vec3 motionDesign = base + uAccent * sweep * 0.82 + vec3(grain);
+    motionDesign += uAccent * exp(-abs(uv.x - fract(t * 0.055 + uSeed)) * 38.0) * 0.12;
+    motionDesign *= vignette;
+    vec3 footage = texture2D(uVideo, uv).rgb;
+    vec3 color = mix(motionDesign, footage, uHasVideo);
     gl_FragColor = vec4(color, uOpacity);
   }
 `;
@@ -64,6 +68,8 @@ type FilmPanel = {
   group: THREE.Group;
   material: THREE.ShaderMaterial;
   border: THREE.LineSegments;
+  video: HTMLVideoElement;
+  videoTexture: THREE.VideoTexture;
   index: number;
 };
 
@@ -221,10 +227,32 @@ export default function CinematicIntroScene() {
       [0.0, -2.55, -0.4],
     ];
     const panels: FilmPanel[] = [];
+    // Drop licensed, muted MP4 clips into public/media/pop-culture using these names.
+    // Missing files gracefully retain the shader-driven motion-design placeholder.
+    const footageSources = [
+      '/media/pop-culture/anime-action.mp4',
+      '/media/pop-culture/movie-moment.mp4',
+      '/media/pop-culture/music-video.mp4',
+      '/media/pop-culture/meme-reaction.mp4',
+      '/media/pop-culture/anime-impact.mp4',
+      '/media/pop-culture/cinema-trailer.mp4',
+    ];
     const panelWidth = small ? 2.05 : 2.75;
     const panelHeight = panelWidth * 0.5625;
     panelTargets.forEach((_, index) => {
       const group = new THREE.Group();
+      const video = document.createElement('video');
+      video.src = footageSources[index];
+      video.loop = true;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.crossOrigin = 'anonymous';
+      const videoTexture = new THREE.VideoTexture(video);
+      videoTexture.colorSpace = THREE.SRGBColorSpace;
+      videoTexture.minFilter = THREE.LinearFilter;
+      videoTexture.magFilter = THREE.LinearFilter;
       const material = new THREE.ShaderMaterial({
         vertexShader,
         fragmentShader: panelFragmentShader,
@@ -235,10 +263,20 @@ export default function CinematicIntroScene() {
           uStyle: { value: index },
           uOpacity: { value: 0 },
           uAccent: { value: panelPalettes[index] },
+          uVideo: { value: videoTexture },
+          uHasVideo: { value: 0 },
         },
         side: THREE.DoubleSide,
         depthWrite: false,
       });
+      video.addEventListener('canplay', () => {
+        material.uniforms.uHasVideo.value = 1;
+        video.play().catch(() => { /* Muted playback may still be blocked by browser policy. */ });
+      });
+      video.addEventListener('error', () => {
+        material.uniforms.uHasVideo.value = 0;
+      });
+      video.load();
       const screen = new THREE.Mesh(new THREE.PlaneGeometry(panelWidth, panelHeight), material);
       group.add(screen);
 
@@ -255,7 +293,7 @@ export default function CinematicIntroScene() {
       group.position.set(0, 0, 1.2);
       group.scale.setScalar(0.001);
       scene.add(group);
-      panels.push({ group, material, border, index });
+      panels.push({ group, material, border, video, videoTexture, index });
     });
 
     // A continuous, tapered metallic body follows one smooth flight path.
@@ -407,6 +445,9 @@ export default function CinematicIntroScene() {
         panel.group.scale.setScalar(Math.max(0.001, scale));
         panel.material.uniforms.uTime.value = time;
         panel.material.uniforms.uOpacity.value = visible;
+        if (panel.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          panel.material.uniforms.uHasVideo.value = 1;
+        }
         (panel.border.material as THREE.LineBasicMaterial).opacity = visible * 0.72;
       });
 
@@ -481,6 +522,10 @@ export default function CinematicIntroScene() {
       bodyMaterial.dispose();
       glowTexture.dispose();
       panels.forEach((panel) => {
+        panel.video.pause();
+        panel.video.removeAttribute('src');
+        panel.video.load();
+        panel.videoTexture.dispose();
         panel.material.dispose();
         panel.border.geometry.dispose();
         (panel.border.material as THREE.Material).dispose();
