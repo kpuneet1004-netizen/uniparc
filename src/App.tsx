@@ -19,7 +19,9 @@ const pieces = [
 ];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return <span aria-hidden="true" className="arrow">{diagonal ? '↗' : '↘'}</span>;
+  return <svg aria-hidden="true" className={diagonal ? 'arrow arrow-diagonal' : 'arrow'} viewBox="0 0 20 20" fill="none">
+    <path d={diagonal ? 'M5 15 15 5M6 5h9v9' : 'M5 5 15 15M6 15h9V6'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>;
 }
 
 export default function App() {
@@ -290,7 +292,7 @@ export default function App() {
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
           <div className="drop-world-context" aria-live="polite"><span>YOUR FREQUENCY</span><strong>{selectedWorld.name}</strong><small>{selectedWorld.note} — the concept edit below is a general preview, not a live category catalogue.</small><a href="#worlds">CHANGE WORLD ↑</a></div><div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="piece-grid">{filtered.map((piece) => <article className={'piece-card' + (piece.id === '03' ? ' piece-card-featured' : '')} key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="" loading="lazy" decoding="async" onError={(event) => { event.currentTarget.classList.add('piece-image-failed'); }} /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE <Arrow diagonal /></span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
