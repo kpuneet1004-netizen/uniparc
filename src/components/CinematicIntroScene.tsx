@@ -190,10 +190,12 @@ export default function CinematicIntroScene() {
       { title: 'MUSIC / SOUND', code: '05', accent: '#eee0d2', hot: '#bd7869', kind: 4 },
       { title: 'COMIC / ART', code: '06', accent: '#eee1bd', hot: '#bd984b', kind: 5 },
     ];
-    const panelPositions = [
-      [-4.55, 1.75, -1.25], [-1.5, 2.45, -0.85], [1.75, 1.9, -1.3],
-      [4.55, 0.2, -2.0], [-3.65, -1.9, -1.45], [0.0, -2.4, -0.9],
-    ];
+    const panelPositions = small
+      ? [[-0.58, 2.55, -1.25], [0.52, 1.55, -0.85], [-0.52, 0.55, -1.3], [0.54, -0.48, -2.0], [-0.5, -1.5, -1.45], [0.48, -2.52, -0.9]]
+      : [
+          [-4.55, 1.75, -1.25], [-1.5, 2.45, -0.85], [1.75, 1.9, -1.3],
+          [4.55, 0.2, -2.0], [-3.65, -1.9, -1.45], [0.0, -2.4, -0.9],
+        ];
     const panels: CulturePanel[] = [];
 
     culture.forEach((item, index) => {
@@ -519,7 +521,7 @@ export default function CinematicIntroScene() {
       p1.x = -5.5 * horizontalFit;
       p2.x = -2.0 * horizontalFit;
       p3.x = -2.0 * horizontalFit;
-      const compactScale = small ? 0.68 : 0.92;
+      const compactScale = small ? 0.56 : 0.92;
       panels.forEach((panel, index) => {
         const [x, y, z] = panelPositions[index];
         panel.group.position.set(x * horizontalFit, y * (small ? 0.88 : 1), z);
@@ -598,7 +600,7 @@ export default function CinematicIntroScene() {
           (index % 2 ? -1 : 1) * (0.035 + (1 - spread) * 0.11),
           (index % 2 ? -1 : 1) * (0.018 + (1 - spread) * 0.065)
         );
-        panel.group.scale.setScalar(Math.max(0.001, (small ? 0.68 : 0.92) * visible));
+        panel.group.scale.setScalar(Math.max(0.001, (small ? 0.56 : 0.92) * visible));
         panel.material.opacity = visible;
         panel.frameMaterial.opacity = visible * 0.48;
       });
