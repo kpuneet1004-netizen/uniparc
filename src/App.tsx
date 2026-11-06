@@ -267,7 +267,41 @@ export default function App() {
         </section>
       </main>
 
-      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>This concept explores how the things you love can become part of what you wear. Final product images, materials and specifications will be published with the official release.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("This is a preview only. Your email has not been saved or sent."); }}><label htmlFor="object-email">DROP UPDATES</label><div><input id="object-email" type="email" placeholder="Email address (preview only)" required /><button type="submit">PREVIEW RESPONSE ↗</button></div><small>{waitlistNotice || "Demo form only — email collection is not active. Your details will not be stored."}</small></form></div></div></div>}
+      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
+        <div className="object-modal-visual">
+          <img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} />
+          <span className="object-visual-index">UNIPARC® <i> / </i> OBJECT STUDY {selectedPiece.id}</span>
+          <span className="object-visual-note">THE UNIPARC EDIT <b>2026</b></span>
+        </div>
+        <div className="object-modal-content">
+          <div className="object-modal-topline"><span>OBJECT FILE <b>{selectedPiece.id} / 03</b></span><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE <span>×</span></button></div>
+          <div className="object-modal-intro">
+            <span className="object-modal-kicker">{selectedPiece.category} <i>—</i> {selectedPiece.label}</span>
+            <h2 id="object-title">{selectedPiece.name}</h2>
+            <p>A wearable expression of the worlds, stories and details that stay with you. This concept is part of the evolving UNIPARC universe — made for every side of you.</p>
+          </div>
+          <div className="object-detail-block">
+            <div className="object-detail-heading"><span>01</span><b>THE DETAILS</b><i>CONCEPT PREVIEW</i></div>
+            <dl className="object-detail-list">
+              <div><dt>DESIGN INTENT</dt><dd>IDENTITY / EXPRESSION</dd></div>
+              <div><dt>COLLECTION</dt><dd>THE UNIPARC EDIT</dd></div>
+              <div><dt>MATERIAL & FIT</dt><dd>TO BE ANNOUNCED</dd></div>
+              <div><dt>RELEASE WINDOW</dt><dd>FIRST DROP / 2026</dd></div>
+            </dl>
+          </div>
+          <div className="object-modal-signup">
+            <span className="object-modal-kicker">BE THERE FROM THE FIRST DROP</span>
+            <h3>Get the signal.</h3>
+            <p>Release information will be shared here when the collection is ready.</p>
+            <form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Preview only — your email has not been saved or sent."); }}>
+              <label htmlFor="object-email">EMAIL ADDRESS</label>
+              <div className="object-email-row"><input id="object-email" type="email" placeholder="you@example.com" required /><button type="submit" aria-label="Preview signup response">NOTIFY ME <span>↗</span></button></div>
+              <small>{waitlistNotice || "Preview form only. Email collection is not active and no details are stored."}</small>
+            </form>
+          </div>
+          <div className="object-modal-foot"><span>WEAR WHAT DEFINES YOU.®</span><span>UNIPARC / 2026</span></div>
+        </div>
+      </article></div>}
       <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
         <a className={activeDock === 'home' ? 'dock-home dock-active' : 'dock-home'} href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
