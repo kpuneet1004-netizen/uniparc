@@ -43,7 +43,6 @@ export default function App() {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
-    setActiveDock(id);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const topOffset = 24;
     if (reduceMotion) {
@@ -53,7 +52,7 @@ export default function App() {
     const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset);
     if (lenisRef.current) {
       lenisRef.current.scrollTo(destination, {
-        duration: 1.55,
+        duration: 1.2,
         easing: (time) => 1 - Math.pow(1 - time, 4),
         force: true,
       });
@@ -89,7 +88,7 @@ export default function App() {
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9, anchors: { offset: -88 } });
+    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
     let lenisTick: ((time: number) => void) | undefined;
     if (lenis) {
