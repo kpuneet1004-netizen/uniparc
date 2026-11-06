@@ -91,7 +91,7 @@ export default function App() {
     window.history.replaceState(null, '', window.location.pathname + window.location.search);
     window.scrollTo(0, 0);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
+    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
     let lenisTick: ((time: number) => void) | undefined;
     if (lenis) {
@@ -119,6 +119,14 @@ export default function App() {
         });
         gsap.utils.toArray<HTMLElement>('.piece-card').forEach((card, i) => {
           gsap.fromTo(card, { y: 90, autoAlpha: 0, rotate: i === 1 ? 2 : -1 }, { y: 0, autoAlpha: 1, rotate: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
+        });
+        // Image planes reveal like a printed frame being uncovered; existing parallax remains independent.
+        gsap.utils.toArray<HTMLElement>('.world-card img, .piece-image img').forEach((image) => {
+          gsap.fromTo(image,
+            { clipPath: 'inset(0 0 100% 0)', scale: 1.08 },
+            { clipPath: 'inset(0 0 0% 0)', scale: 1, duration: 1.35, ease: 'power4.inOut',
+              scrollTrigger: { trigger: image, start: 'top 88%', once: true } }
+          );
         });
         gsap.fromTo('.campaign-image', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
         gsap.fromTo('.closing-title', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: '.closing', start: 'top 75%', once: true } });
