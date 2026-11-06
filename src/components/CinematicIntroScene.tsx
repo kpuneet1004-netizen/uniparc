@@ -221,12 +221,15 @@ export default function CinematicIntroScene() {
       head.visible = serpent.visible;
       if (serpent.visible) {
         const phase = (t - 11.4) * .72;
+        const orbitTighten = THREE.MathUtils.smoothstep(t, 19.0, 21.0);
+        const orbitX = THREE.MathUtils.lerp(3.35, .34, orbitTighten);
+        const orbitY = THREE.MathUtils.lerp(2.45, .28, orbitTighten);
         const cx = Math.sin(phase) * .22, cy = Math.cos(phase) * .14;
         const points: THREE.Vector3[] = [];
         for (let i = 0; i <= 80; i++) {
           const a = (i / 80) * Math.PI * 2 + phase;
           const wobble = Math.sin(a * 2 - phase * 1.4) * .13 + Math.sin(a * 3 + phase) * .045;
-          points.push(new THREE.Vector3(cx + Math.cos(a) * (3.35 + wobble), cy + Math.sin(a) * (2.45 + wobble), Math.sin(a * 2 + phase) * .22));
+          points.push(new THREE.Vector3(cx + Math.cos(a) * (orbitX + wobble * (1 - orbitTighten)), cy + Math.sin(a) * (orbitY + wobble * (1 - orbitTighten)), Math.sin(a * 2 + phase) * .22 * (1 - orbitTighten)));
         }
         const curve = new THREE.CatmullRomCurve3(points, true, 'centripetal');
         const pos = bodyGeo.attributes.position as THREE.BufferAttribute;
