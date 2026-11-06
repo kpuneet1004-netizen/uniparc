@@ -111,15 +111,25 @@ export default function App() {
         setActiveDock('home');
         setIsLoaded(true);
       };
-      const intro = gsap.timeline({ defaults: { ease: 'power4.inOut' }, onComplete: finishIntro });
+      const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
       if (reduceMotion) {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
-        intro.fromTo('.preloader-mark', { yPercent: 120, rotate: 8 }, { yPercent: 0, rotate: 0, duration: 0.85 })
-          .fromTo('.preloader-rule', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.65 }, '-=0.45')
-          .to('.preloader-mark', { yPercent: -120, rotate: -5, duration: 0.65, delay: 0.12 })
-          .to('.preloader', { yPercent: -100, duration: 0.85, ease: 'power4.inOut' }, '-=0.18')
-          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.85, stagger: 0.09, ease: 'power3.out' }, '-=0.45');
+        intro.set('.cosmic-stage', { autoAlpha: 1 })
+          .fromTo('.cosmic-star', { scale: .08, rotation: -24, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: .9, ease: 'back.out(2)' })
+          .to('.cosmic-star', { scale: 1.16, duration: .5, repeat: 2, yoyo: true, ease: 'sine.inOut' })
+          .to('.cosmic-star', { scale: 1.8, autoAlpha: 0, duration: .18, ease: 'power2.in' })
+          .fromTo('.culture-token', { x: 0, y: 0, scale: .2, rotation: () => gsap.utils.random(-70, 70), autoAlpha: 0 }, { x: (i, el) => parseFloat(getComputedStyle(el).getPropertyValue('--tx')) || 0, y: (i, el) => parseFloat(getComputedStyle(el).getPropertyValue('--ty')) || 0, scale: 1, autoAlpha: 1, duration: .62, stagger: .018, ease: 'power4.out' }, '-=.08')
+          .to('.culture-token', { scale: .72, autoAlpha: 0, duration: .55, stagger: .012, ease: 'power2.in' }, '+=.28')
+          .fromTo('.ouro-body', { strokeDashoffset: 1180 }, { strokeDashoffset: 0, duration: .95, ease: 'power2.out' })
+          .fromTo('.ouroboros', { scale: 1.55, rotation: -85, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: .95, ease: 'power3.out' }, '<')
+          .to('.ouroboros', { rotation: 360, scale: .78, duration: 1.05, ease: 'power2.inOut' })
+          .to('.cosmic-core', { scale: .03, autoAlpha: 0, duration: .55, ease: 'power3.in' }, '-=.52')
+          .to('.ouroboros', { scale: .08, autoAlpha: 0, duration: .55, ease: 'power3.in' }, '-=.42')
+          .fromTo('.cosmic-wordmark', { scale: .72, autoAlpha: 0, filter: 'blur(16px)' }, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: .85, ease: 'power3.out' }, '-=.08')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .55, delay: .5 })
+          .to('.preloader', { yPercent: -100, duration: .85, ease: 'power4.inOut' })
+          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
       }
 
       if (!reduceMotion) {
@@ -234,7 +244,22 @@ export default function App() {
   return (
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden="true">
-        <div className="preloader-inner"><span className="preloader-overline">A home for the things you love</span><div className="preloader-window"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /></div><span className="preloader-rule" /><span className="preloader-bottom">MADE FOR EVERY SIDE OF YOU <b>001—∞</b></span></div>
+        <div className="cosmic-stage">
+          <div className="cosmic-starfield" />
+          <svg className="cosmic-star" viewBox="0 0 120 120" aria-hidden="true"><path d="M60 3 72 43 113 29 82 60 113 91 72 77 60 117 48 77 7 91 38 60 7 29 48 43Z" /><circle cx="60" cy="60" r="15" /></svg>
+          <div className="culture-burst" aria-hidden="true">
+            <span className="culture-token token-manga">MANGA <b>漫</b></span><span className="culture-token token-game">INSERT COIN <b>▶</b></span><span className="culture-token token-cinema">CINEMA <b>▣</b></span><span className="culture-token token-meme">MEME CULTURE <b>ツ</b></span><span className="culture-token token-music">SOUND <b>♫</b></span><span className="culture-token token-comic">POW! <b>✳</b></span><span className="culture-token token-anime">ANIME <b>アニメ</b></span><span className="culture-token token-internet">INTERNET LORE <b>404</b></span><span className="culture-token token-style">STREET CULTURE <b>★</b></span><span className="culture-token token-toy">COLLECT / PLAY <b>◈</b></span><span className="culture-token token-tv">AFTER HOURS <b>TV</b></span><span className="culture-token token-art">FAN ART <b>✎</b></span>
+          </div>
+          <svg className="ouroboros" viewBox="0 0 500 500" aria-hidden="true">
+            <defs><linearGradient id="ouro-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#e4ff7b"/><stop offset=".48" stopColor="#a8c943"/><stop offset="1" stopColor="#607a25"/></linearGradient></defs>
+            <path className="ouro-body" d="M250 57 C356 57 443 144 443 250 C443 356 356 443 250 443 C144 443 57 356 57 250 C57 144 144 57 250 57" />
+            <path className="ouro-tail" d="M250 57 C224 29 194 22 173 35 C193 45 205 58 211 77" />
+            <path className="ouro-head" d="M250 57 C273 29 306 22 329 37 C307 45 293 61 288 82 C275 76 261 67 250 57Z" /><circle className="ouro-eye" cx="306" cy="43" r="4" />
+          </svg>
+          <div className="cosmic-core"><span className="core-orbit core-orbit-a" /><span className="core-orbit core-orbit-b" /><span className="core-star">✦</span></div>
+          <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
+          <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
+        </div>
       </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
