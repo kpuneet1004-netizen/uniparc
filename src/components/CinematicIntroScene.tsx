@@ -153,6 +153,8 @@ export default function CinematicIntroScene() {
       group: THREE.Group;
       texture: THREE.CanvasTexture;
       material: THREE.MeshBasicMaterial;
+      sweep: THREE.Mesh;
+      sweepMaterial: THREE.MeshBasicMaterial;
     };
     const culture = [
       { title: 'ANIME', sub: 'STORIES / WORLDS', color: '#e5b9a8', kind: 0 },
@@ -242,9 +244,16 @@ export default function CinematicIntroScene() {
       const plane = new THREE.Mesh(new THREE.PlaneGeometry(3.0, 1.5), material);
       const group = new THREE.Group();
       group.add(plane);
+      const sweepMaterial = new THREE.MeshBasicMaterial({
+        color: ink, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const sweep = new THREE.Mesh(new THREE.PlaneGeometry(0.018, 1.28), sweepMaterial);
+      sweep.position.set(-1.35, 0, 0.025);
+      group.add(sweep);
       group.scale.setScalar(0.001);
       scene.add(group);
-      return { group, texture, material };
+      return { group, texture, material, sweep, sweepMaterial };
     });
 
     // A continuous, tapered tube. Position and normal buffers are updated in-place;
@@ -433,6 +442,8 @@ export default function CinematicIntroScene() {
         const scale = (small ? 0.68 : 0.88) * visible * (1 + flyPast * 0.16);
         plate.group.scale.setScalar(Math.max(0.001, scale));
         plate.material.opacity = visible * 0.96;
+        plate.sweep.position.x = Math.sin(time * 1.05 + i * 1.25) * 1.28;
+        plate.sweepMaterial.opacity = visible * (0.12 + (0.5 + Math.sin(time * 1.8 + i) * 0.5) * 0.3);
       });
 
       // 04 — serpent enters with momentum, then revolves around the stellar core.
