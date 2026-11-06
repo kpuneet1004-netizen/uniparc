@@ -13,6 +13,30 @@ const worlds = [
   { id: 'sound', number: '04', name: 'MUSIC / SOUND', note: 'Wear your soundtrack', image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1400&q=88', tag: 'FEEL EVERY FREQUENCY' },
 ];
 
+const introCulture = [
+  { label: 'ANIME', glyph: 'ア' }, { label: 'MANGA', glyph: '漫' },
+  { label: 'GAMING', glyph: '⌁' }, { label: 'CINEMA', glyph: '▶' },
+  { label: 'MEMES', glyph: '404' }, { label: 'MUSIC', glyph: '♫' },
+  { label: 'COMICS', glyph: '✳' }, { label: 'STREET', glyph: '✦' },
+  { label: 'FANDOM', glyph: '✧' }, { label: 'ARCADE', glyph: '▣' },
+  { label: 'ANIMATION', glyph: '◈' }, { label: 'INTERNET', glyph: '⌘' },
+  { label: 'COLLECTIBLES', glyph: '◇' }, { label: 'SERIES', glyph: '▤' },
+  { label: 'SOUND', glyph: '∿' }, { label: 'ART', glyph: '⌖' },
+];
+const introFragments = Array.from({ length: 112 }, (_, index) => {
+  const angle = index * 2.399963229728653;
+  const radius = .12 + ((index * 37) % 83) / 100;
+  const category = introCulture[index % introCulture.length];
+  return {
+    index, ...category,
+    dx: Math.cos(angle) * radius * .56,
+    dy: Math.sin(angle) * radius * .48,
+    rotation: ((index * 47) % 150) - 75,
+    card: index < 16,
+    scale: .55 + ((index * 13) % 65) / 100,
+  };
+});
+
 const pieces = [
   { id: '01', name: 'SIGNAL / 001', category: 'APPAREL', label: 'THE FIRST FREQUENCY', color: 'lime', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1100&q=88' },
   { id: '02', name: 'AFTERIMAGE / 002', category: 'APPAREL', label: 'A MEMORY IN MOTION', color: 'violet', image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=1100&q=88' },
@@ -174,17 +198,32 @@ export default function App() {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
         intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .fromTo('.cosmic-starfield', { scale: 1.12, autoAlpha: .12 }, { scale: 1, autoAlpha: .72, duration: 1.1, ease: 'power2.out' })
-          .fromTo('.cosmic-star', { scale: .015, rotation: -35, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.05, ease: 'expo.out' }, '<')
-          .fromTo('.star-sphere', { filter: 'brightness(.65)' }, { filter: 'brightness(1.55)', duration: .42, yoyo: true, repeat: 3, ease: 'sine.inOut' }, '<')
-          .to('.cosmic-star', { scale: 1.2, duration: .62, repeat: 2, yoyo: true, ease: 'sine.inOut' })
-          .fromTo('.cosmic-orbit', { scale: .72, rotation: -18, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: .72, duration: 1.25, ease: 'power2.out' }, '+=.08')
-          .to('.cosmic-star', { scale: 1.42, autoAlpha: .18, duration: 1.05, ease: 'power2.inOut' }, '<')
-          .to('.cosmic-orbit', { scale: 1.72, rotation: 22, autoAlpha: 0, duration: 1.2, ease: 'power2.inOut' }, '-=.35')
-          .to('.cosmic-star', { scale: 1.8, autoAlpha: 0, duration: .72, ease: 'power2.in' }, '<')
-          .fromTo('.cosmic-wordmark', { scale: .58, y: 24, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.05, ease: 'expo.out' }, '-=.05')
-          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .5, delay: .72 })
-          .to('.preloader', { yPercent: -100, duration: .95, ease: 'power4.inOut' })
+          .fromTo('.cosmic-starfield', { scale: 1.18, autoAlpha: .04 }, { scale: 1, autoAlpha: .8, duration: 2.1, ease: 'power2.out' })
+          .fromTo('.cosmic-star', { scale: .015, autoAlpha: 0, rotation: -28 }, { scale: 1, autoAlpha: 1, rotation: 0, duration: 1.6, ease: 'expo.out' }, '<')
+          .fromTo('.star-sphere', { filter: 'brightness(.55)' }, { filter: 'brightness(1.9)', duration: .72, repeat: 4, yoyo: true, ease: 'sine.inOut' }, '<')
+          .to('.cosmic-star', { scale: 1.22, duration: .78, repeat: 3, yoyo: true, ease: 'sine.inOut' }, '+=.35')
+          .to('.star-sphere', { filter: 'brightness(4)' , duration: .16, ease: 'power2.in' })
+          .fromTo('.bigbang-flash', { autoAlpha: 0 }, { autoAlpha: 1, duration: .08, yoyo: true, repeat: 1 }, '<')
+          .fromTo('.bigbang-ring', { scale: .02, autoAlpha: 1 }, { scale: 18, autoAlpha: 0, duration: 1.15, ease: 'expo.out' }, '<')
+          .fromTo('.bigbang-rays', { scale: .05, rotation: -12, autoAlpha: 0 }, { scale: 1.7, rotation: 24, autoAlpha: .9, duration: 1.1, ease: 'power3.out' }, '<')
+          .to('.cosmic-star', { scale: 2.6, autoAlpha: 0, duration: .28, ease: 'power4.in' }, '<')
+          .fromTo('.culture-shard', { x: 0, y: 0, scale: .05, rotation: (i, el) => Number(el.dataset.rotation || 0), autoAlpha: 0 }, {
+            x: (i, el) => Number(el.dataset.dx || 0) * window.innerWidth,
+            y: (i, el) => Number(el.dataset.dy || 0) * window.innerHeight,
+            scale: (i, el) => Number(el.dataset.scale || 1),
+            rotation: (i, el) => Number(el.dataset.rotation || 0) * 1.8,
+            autoAlpha: 1, duration: 1.65, stagger: { each: .009, from: 'random' }, ease: 'expo.out'
+          }, '-=.78')
+          .to('.culture-shard', { x: 0, y: 0, scale: .08, rotation: (i) => i % 2 ? 150 : -150, autoAlpha: 0, duration: 1.05, stagger: { each: .006, from: 'edges' }, ease: 'power3.in' }, '+=.65')
+          .fromTo('.cosmic-core', { scale: .12, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: .48, ease: 'back.out(1.7)' }, '-=.58')
+          .fromTo('.ouroboros', { scale: 1.72, rotation: -92, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.55, ease: 'power3.out' }, '-=.08')
+          .fromTo('.ouro-body', { strokeDashoffset: 1800 }, { strokeDashoffset: 0, duration: 1.65, ease: 'power2.inOut' }, '<')
+          .to('.ouroboros', { rotation: 360, scale: .82, duration: 1.6, ease: 'power2.inOut' })
+          .to('.cosmic-core', { scale: .015, autoAlpha: 0, duration: .7, ease: 'expo.in' }, '-=.55')
+          .to('.ouroboros', { rotation: 690, scale: .055, autoAlpha: 0, duration: .85, ease: 'expo.in' }, '-=.58')
+          .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
+          .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
           .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
       }
 
@@ -304,7 +343,29 @@ export default function App() {
           <canvas ref={cosmicCanvasRef} className="cosmic-webgl" aria-hidden="true" />
           <div className="cosmic-starfield" />
           <div className="cosmic-star" aria-hidden="true"><span className="star-corona" /><span className="star-sphere" /><span className="star-flare" /></div>
-          <div className="cosmic-orbit" aria-hidden="true" />
+          <div className="bigbang-flash" aria-hidden="true" />
+          <div className="bigbang-ring" aria-hidden="true" />
+          <div className="bigbang-rays" aria-hidden="true" />
+          <div className="culture-eruption" aria-hidden="true">
+            {introFragments.map((fragment) => <span key={fragment.index} className={fragment.card ? 'culture-shard culture-shard-card' : 'culture-shard culture-shard-glyph'} data-dx={fragment.dx} data-dy={fragment.dy} data-rotation={fragment.rotation} data-scale={fragment.scale}>
+              {fragment.card ? <><i>{fragment.glyph}</i><b>{fragment.label}</b><small>UNIPARC / CULTURE FILE</small></> : fragment.glyph}
+            </span>)}
+          </div>
+          <div className="cosmic-core" aria-hidden="true"><span className="core-star">✳</span><i className="core-orbit" /><i className="core-orbit core-orbit-b" /></div>
+          <svg className="ouroboros" viewBox="0 0 600 600" aria-hidden="true">
+            <defs>
+              <linearGradient id="ouro-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f5ffd0" /><stop offset=".22" stopColor="#b9d66a" /><stop offset=".48" stopColor="#52652b" /><stop offset=".7" stopColor="#d7e99a" /><stop offset="1" stopColor="#788d3d" /></linearGradient>
+              <pattern id="ouro-scales" width="24" height="20" patternUnits="userSpaceOnUse"><path d="M0 10 Q12 -2 24 10 Q12 22 0 10Z" fill="none" stroke="#e5f5ae" strokeOpacity=".32" strokeWidth="1.2" /></pattern>
+              <filter id="ouro-glow"><feGaussianBlur stdDeviation="5" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+            </defs>
+            <path className="ouro-body" d="M300 74 C430 74 526 174 526 300 C526 426 426 526 300 526 C174 526 74 426 74 300 C74 174 174 74 300 74" />
+            <path className="ouro-scale-overlay" d="M300 74 C430 74 526 174 526 300 C526 426 426 526 300 526 C174 526 74 426 74 300 C74 174 174 74 300 74" />
+            <path className="ouro-head" d="M284 83 L263 55 L274 23 L300 44 L327 24 L340 55 L320 84 L303 100Z" />
+            <path className="ouro-jaw" d="M276 67 Q301 82 329 64 L321 92 Q299 108 280 88Z" />
+            <path className="ouro-eye" d="M279 54 l9 -4 2 8 -9 3Z M316 54 l9 -4 2 8 -9 3Z" />
+            <path className="ouro-horn" d="M276 43 L260 13 L292 34 M325 42 L343 13 L309 34" />
+            <path className="ouro-nostril" d="M296 73 l4 2 M307 73 l4 2" />
+          </svg>
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
           {showSkipIntro && <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>}
