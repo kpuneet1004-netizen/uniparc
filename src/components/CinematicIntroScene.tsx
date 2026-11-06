@@ -19,7 +19,15 @@ export default function CinematicIntroScene() {
     scene.fog = new THREE.FogExp2(0x020303, 0.018);
     const camera = new THREE.PerspectiveCamera(42, 1, .1, 180);
     camera.position.set(0, 0, 18);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
+    // WebGL can be unavailable in restricted browsers or exhausted GPU contexts.
+    // Keep the React page and HTML logo reveal functional when that happens.
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
+    } catch (error) {
+      console.warn('UNIPARC intro: WebGL unavailable; continuing with the HTML intro.', error);
+      return;
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.6));
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -176,8 +184,12 @@ export default function CinematicIntroScene() {
 
     let raf = 0;
     const render = () => {
-      raf = requestAnimationFrame(render);
       const t = clock.getElapsedTime();
+      // The parent timeline transitions to the wordmark at 21.5s. Stop the
+      // expensive scene shortly after the serpent exits instead of animating
+      // invisibly for the remainder of the page session.
+      if (t > 22.2) { renderer.render(scene, camera); return; }
+      raf = requestAnimationFrame(render);
       stars.rotation.y = t * .008; stars.rotation.x = Math.sin(t * .12) * .012;
       // The core survives the Big Bang as the object the serpent eventually consumes.
       const starIn = THREE.MathUtils.smoothstep(t, 1.0, 3.2) * (1 - THREE.MathUtils.smoothstep(t, 20.0, 21.2));
