@@ -142,7 +142,7 @@ export default function App() {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
         intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .to({}, { duration: 22.4, ease: 'none' })
+          .to({}, { duration: 15.0, ease: 'none' })
           .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
           .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
           .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
