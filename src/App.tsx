@@ -116,19 +116,24 @@ export default function App() {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
         intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .fromTo('.cosmic-star', { scale: .08, rotation: -24, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: .9, ease: 'back.out(2)' })
-          .to('.cosmic-star', { scale: 1.16, duration: .5, repeat: 2, yoyo: true, ease: 'sine.inOut' })
-          .to('.cosmic-star', { scale: 1.8, autoAlpha: 0, duration: .18, ease: 'power2.in' })
-          .fromTo('.culture-token', { x: 0, y: 0, scale: .2, rotation: () => gsap.utils.random(-70, 70), autoAlpha: 0 }, { x: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--tx').trim(); const n = parseFloat(v) || 0; return v.endsWith('vw') ? n * window.innerWidth / 100 : n; }, y: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--ty').trim(); const n = parseFloat(v) || 0; return v.endsWith('vh') ? n * window.innerHeight / 100 : n; }, scale: 1, autoAlpha: 1, duration: .62, stagger: .018, ease: 'power4.out' }, '-=.08')
-          .to('.culture-token', { scale: .72, autoAlpha: 0, duration: .55, stagger: .012, ease: 'power2.in' }, '+=.28')
-          .fromTo('.ouro-body', { strokeDashoffset: 1180 }, { strokeDashoffset: 0, duration: .95, ease: 'power2.out' })
-          .fromTo('.ouroboros', { scale: 1.55, rotation: -85, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: .95, ease: 'power3.out' }, '<')
-          .to('.ouroboros', { rotation: 360, scale: .78, duration: 1.05, ease: 'power2.inOut' })
-          .to('.cosmic-core', { scale: .03, autoAlpha: 0, duration: .55, ease: 'power3.in' }, '-=.52')
-          .to('.ouroboros', { scale: .08, autoAlpha: 0, duration: .55, ease: 'power3.in' }, '-=.42')
-          .fromTo('.cosmic-wordmark', { scale: .72, autoAlpha: 0, filter: 'blur(16px)' }, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: .85, ease: 'power3.out' }, '-=.08')
-          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .55, delay: .5 })
-          .to('.preloader', { yPercent: -100, duration: .85, ease: 'power4.inOut' })
+          .fromTo('.cosmic-starfield', { scale: 1.12, autoAlpha: .12 }, { scale: 1, autoAlpha: .72, duration: 1.1, ease: 'power2.out' })
+          .fromTo('.cosmic-star', { scale: .015, rotation: -35, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.05, ease: 'expo.out' }, '<')
+          .fromTo('.star-sphere', { filter: 'brightness(.65)' }, { filter: 'brightness(1.55)', duration: .42, yoyo: true, repeat: 3, ease: 'sine.inOut' }, '<')
+          .to('.cosmic-star', { scale: 1.2, duration: .62, repeat: 2, yoyo: true, ease: 'sine.inOut' })
+          .to('.burst-ring', { scale: 15, autoAlpha: 0, duration: .9, ease: 'power3.out' }, '+=.02')
+          .to('.burst-rays', { scale: 2.8, rotation: 24, autoAlpha: 0, duration: .72, ease: 'power3.out' }, '<')
+          .to('.cosmic-star', { scale: 2.35, autoAlpha: 0, duration: .22, ease: 'power2.in' }, '<')
+          .fromTo('.culture-token', { x: 0, y: 0, scale: .15, rotation: () => gsap.utils.random(-110, 110), autoAlpha: 0 }, { x: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--tx').trim(); const n = parseFloat(v) || 0; return v.endsWith('vw') ? n * window.innerWidth / 100 : n; }, y: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--ty').trim(); const n = parseFloat(v) || 0; return v.endsWith('vh') ? n * window.innerHeight / 100 : n; }, scale: 1, rotation: (i, el) => Number(el.getAttribute('data-rotation') || 0), autoAlpha: 1, duration: .9, stagger: .035, ease: 'expo.out' }, '-=.08')
+          .to('.culture-token', { x: 0, y: 0, scale: .12, rotation: (i) => (i % 2 ? 180 : -180), autoAlpha: 0, duration: .72, stagger: .025, ease: 'power3.in' }, '+=.55')
+          .fromTo('.cosmic-core', { scale: .25, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: .45, ease: 'back.out(1.8)' }, '-=.5')
+          .fromTo('.ouro-body', { strokeDashoffset: 1180 }, { strokeDashoffset: 0, duration: 1.25, ease: 'power2.out' })
+          .fromTo('.ouroboros', { scale: 1.9, rotation: -115, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.05, ease: 'power3.out' }, '<')
+          .to('.ouroboros', { rotation: 360, scale: .72, duration: 1.15, ease: 'power2.inOut' })
+          .to('.cosmic-core', { scale: .015, autoAlpha: 0, duration: .68, ease: 'expo.in' }, '-=.55')
+          .to('.ouroboros', { scale: .06, autoAlpha: 0, duration: .7, ease: 'expo.in' }, '-=.48')
+          .fromTo('.cosmic-wordmark', { scale: .58, y: 24, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.05, ease: 'expo.out' }, '-=.05')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .5, delay: .72 })
+          .to('.preloader', { yPercent: -100, duration: .95, ease: 'power4.inOut' })
           .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
       }
 
@@ -247,8 +252,21 @@ export default function App() {
         <div className="cosmic-stage">
           <div className="cosmic-starfield" />
           <div className="cosmic-star" aria-hidden="true"><span className="star-corona" /><span className="star-sphere" /><span className="star-flare" /></div>
+          <div className="burst-ring" aria-hidden="true" />
+          <div className="burst-rays" aria-hidden="true" />
           <div className="culture-burst" aria-hidden="true">
-            <span className="culture-token token-manga">MANGA / GRAPHIC FICTION</span><span className="culture-token token-game">GAMES / WORLDS</span><span className="culture-token token-cinema">CINEMA / FRAME</span><span className="culture-token token-meme">MEME / INTERNET</span><span className="culture-token token-music">SOUND / MUSIC</span><span className="culture-token token-comic">COMICS / PANELS</span><span className="culture-token token-anime">ANIMATION / ANIME</span><span className="culture-token token-internet">DIGITAL CULTURE / 404</span><span className="culture-token token-style">STREET / STYLE</span><span className="culture-token token-toy">COLLECTIBLES / TOYS</span><span className="culture-token token-tv">SERIES / AFTER HOURS</span><span className="culture-token token-art">FAN ART / CREATION</span>
+            <span className="culture-token token-manga"><i>漫</i><b>MANGA</b><small>INK / PANELS</small></span>
+            <span className="culture-token token-game"><i>⌁</i><b>GAMES</b><small>WORLDS / PLAY</small></span>
+            <span className="culture-token token-cinema"><i>▶</i><b>CINEMA</b><small>FRAME / STORY</small></span>
+            <span className="culture-token token-meme"><i>404</i><b>MEMES</b><small>INTERNET LORE</small></span>
+            <span className="culture-token token-music"><i>♫</i><b>MUSIC</b><small>SOUND / SCENE</small></span>
+            <span className="culture-token token-comic"><i>✳</i><b>COMICS</b><small>INK / HEROES</small></span>
+            <span className="culture-token token-anime"><i>ア</i><b>ANIME</b><small>ANIMATION</small></span>
+            <span className="culture-token token-internet"><i>⌘</i><b>NET CULTURE</b><small>ONLINE / ALWAYS</small></span>
+            <span className="culture-token token-style"><i>✦</i><b>STREET</b><small>STYLE / FORM</small></span>
+            <span className="culture-token token-toy"><i>◇</i><b>COLLECTIBLES</b><small>OBJECT / PLAY</small></span>
+            <span className="culture-token token-tv"><i>▣</i><b> SERIES</b><small>EPISODES / WORLDS</small></span>
+            <span className="culture-token token-art"><i>⌖</i><b>FAN ART</b><small>MADE BY FANS</small></span>
           </div>
           <svg className="ouroboros" viewBox="0 0 500 500" aria-hidden="true">
             <defs><linearGradient id="ouro-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#e4ff7b"/><stop offset=".48" stopColor="#a8c943"/><stop offset="1" stopColor="#607a25"/></linearGradient></defs>
