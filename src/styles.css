@@ -807,23 +807,28 @@ html{scroll-padding-top:24px}
 .nav-dock a{transition:color .16s ease,transform .2s ease}
 @media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator,.nav-dock a{transition:none}}
 
-/* UNIPARC cosmic origin sequence */
-.preloader{background:#050605;color:#f1f0e9;overflow:hidden}
-.cosmic-stage{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#11170c 0%,#070907 34%,#050605 72%)}
-.cosmic-starfield{position:absolute;inset:-10%;opacity:.5;background-image:radial-gradient(1px 1px at 8% 17%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 22% 71%,#d9f36a 98%,transparent),radial-gradient(1px 1px at 74% 21%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 91% 63%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 46% 9%,#d9f36a 98%,transparent),radial-gradient(1px 1px at 63% 84%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 15% 46%,#f4f2e7 98%,transparent)}
-.cosmic-star{position:absolute;width:clamp(90px,13vw,150px);height:auto;fill:#e4ff7b;opacity:0;filter:drop-shadow(0 0 26px #d9f36a80);transform-origin:center}
-.cosmic-star circle{fill:#fffce5;filter:drop-shadow(0 0 15px #fff)}
-.culture-burst{position:absolute;inset:0;pointer-events:none}
-.culture-token{position:absolute;left:50%;top:50%;display:flex;align-items:center;gap:12px;padding:12px 15px;background:#e9e8df;color:#10120d;font:9px var(--mono);letter-spacing:.12em;white-space:nowrap;box-shadow:0 12px 40px #0005;opacity:0}
-.culture-token b{font-size:19px;color:#526b20;letter-spacing:0}
+
+/* UNIPARC — cinematic cosmic identity sequence */
+.preloader{background:#020303;color:#f1f0e9;overflow:hidden}
+.cosmic-stage{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(ellipse at 50% 48%,#11140e 0%,#080a08 23%,#030404 65%,#010202 100%)}
+.cosmic-stage:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 12%,#000 82%);pointer-events:none;z-index:2}
+.cosmic-starfield{position:absolute;inset:-10%;opacity:.32;background-image:radial-gradient(1px 1px at 8% 17%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 22% 71%,#d9f36a 98%,transparent),radial-gradient(1px 1px at 74% 21%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 91% 63%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 46% 9%,#d9f36a 98%,transparent),radial-gradient(1px 1px at 63% 84%,#f4f2e7 98%,transparent),radial-gradient(1px 1px at 15% 46%,#f4f2e7 98%,transparent)}
+.cosmic-star{position:absolute;width:clamp(90px,13vw,150px);aspect-ratio:1;opacity:0;transform-origin:center;display:grid;place-items:center}
+.star-corona{position:absolute;inset:-90%;border-radius:50%;background:radial-gradient(circle,rgba(224,255,143,.22) 0%,rgba(190,226,94,.12) 23%,rgba(160,192,79,.035) 48%,transparent 70%);filter:blur(9px)}
+.star-sphere{position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle at 34% 28%,#fff 0%,#f5ffd6 8%,#dfff9b 18%,#b3d65d 36%,#657b31 59%,#1a2410 78%,#050705 100%);box-shadow:inset -12px -15px 28px #000a,0 0 25px #d9f36a70,0 0 85px #d9f36a35}
+.star-flare{position:absolute;width:180%;height:1px;background:linear-gradient(90deg,transparent,#efffc2aa,transparent);transform:rotate(-35deg);filter:blur(1px);box-shadow:0 0 14px #e4ff9a}
+.culture-burst{position:absolute;inset:0;pointer-events:none;z-index:3}
+.culture-token{position:absolute;left:50%;top:50%;display:block;padding:9px 13px;border:1px solid #d9e6b52b;background:linear-gradient(120deg,#151914c9,#090c09d9);color:#d8ddce;font:8px var(--mono);letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;box-shadow:0 8px 30px #0008;backdrop-filter:blur(8px);opacity:0}
+.culture-token:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:#d9f36a;margin:0 10px 1px 0;box-shadow:0 0 9px #d9f36a}
+.culture-token b{display:none}
 .token-manga{--tx:-34vw;--ty:-24vh}.token-game{--tx:31vw;--ty:-28vh}.token-cinema{--tx:-38vw;--ty:5vh}.token-meme{--tx:35vw;--ty:8vh}.token-music{--tx:-25vw;--ty:31vh}.token-comic{--tx:23vw;--ty:32vh}.token-anime{--tx:-8vw;--ty:-38vh}.token-internet{--tx:9vw;--ty:38vh}.token-style{--tx:-43vw;--ty:-17vh}.token-toy{--tx:42vw;--ty:-12vh}.token-tv{--tx:-39vw;--ty:25vh}.token-art{--tx:39vw;--ty:25vh}
-.ouroboros{position:absolute;width:min(72vw,560px);height:auto;opacity:0;overflow:visible;filter:drop-shadow(0 0 22px #b8d85b35);transform-origin:center}
-.ouro-body{fill:none;stroke:url(#ouro-gradient);stroke-width:25;stroke-linecap:round;stroke-dasharray:1180;stroke-dashoffset:1180}
-.ouro-tail{fill:none;stroke:#a8c943;stroke-width:17;stroke-linecap:round;stroke-linejoin:round}
-.ouro-head{fill:#d9f36a;stroke:#718d2e;stroke-width:2;stroke-linejoin:round}.ouro-eye{fill:#11150c}
-.cosmic-core{position:absolute;width:clamp(100px,15vw,170px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#f5ffb5 0%,#d9f36a 14%,#7c9b31 36%,#1c2810 62%,transparent 72%);filter:drop-shadow(0 0 40px #d9f36a90)}
-.core-star{color:#fffde5;font-size:38px;text-shadow:0 0 25px #fff}.core-orbit{position:absolute;inset:-20%;border:1px solid #d9f36a65;border-radius:50%;transform:rotate(40deg) scaleY(.32)}.core-orbit-b{transform:rotate(-40deg) scaleY(.32)}
-.cosmic-wordmark{position:absolute;display:flex;flex-direction:column;align-items:center;gap:20px;opacity:0}.cosmic-wordmark .preloader-logo{width:clamp(210px,34vw,390px);height:auto;filter:brightness(0) invert(1);max-height:none}.cosmic-wordmark>span{font:8px var(--mono);letter-spacing:.28em;color:#d9f36a}
-.cosmic-caption{position:absolute;left:4.5vw;right:4.5vw;bottom:30px;display:flex;justify-content:space-between;color:#8d9082;font:8px var(--mono);letter-spacing:.15em}
-@media(max-width:640px){.culture-token{font-size:7px;padding:9px 10px;gap:8px}.culture-token b{font-size:15px}.token-manga{--tx:-28vw;--ty:-22vh}.token-game{--tx:25vw;--ty:-27vh}.token-cinema{--tx:-31vw;--ty:4vh}.token-meme{--tx:28vw;--ty:7vh}.token-music{--tx:-24vw;--ty:27vh}.token-comic{--tx:19vw;--ty:29vh}.token-anime{--tx:-7vw;--ty:-34vh}.token-internet{--tx:8vw;--ty:35vh}.token-style{--tx:-32vw;--ty:-15vh}.token-toy{--tx:33vw;--ty:-12vh}.token-tv{--tx:-30vw;--ty:22vh}.token-art{--tx:29vw;--ty:23vh}.ouroboros{width:min(100vw,500px)}.cosmic-caption{bottom:18px;font-size:6px;letter-spacing:.1em}}
+.ouroboros{position:absolute;width:min(72vw,560px);height:auto;opacity:0;overflow:visible;filter:drop-shadow(0 0 34px #b8d85b30);transform-origin:center;z-index:4}
+.ouro-body{fill:none;stroke:url(#ouro-gradient);stroke-width:34;stroke-linecap:round;stroke-dasharray:1180;stroke-dashoffset:1180;filter:drop-shadow(0 0 9px #b5d45b45)}
+.ouro-tail{fill:none;stroke:#7f9b3e;stroke-width:24;stroke-linecap:round;stroke-linejoin:round}
+.ouro-head{fill:url(#ouro-gradient);stroke:#c9e879;stroke-width:1.2;stroke-linejoin:round;filter:drop-shadow(0 0 8px #d9f36a55)}.ouro-eye{fill:#10140b}
+.cosmic-core{position:absolute;width:clamp(100px,15vw,170px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#fffde0 0%,#eaffad 5%,#c5e66b 13%,#718c37 27%,#273418 43%,#0b1008 58%,transparent 72%);filter:drop-shadow(0 0 50px #d9f36a80);z-index:3}
+.core-star{color:#fffde5;font-size:22px;text-shadow:0 0 25px #fff}.core-orbit{position:absolute;inset:-20%;border:1px solid #d9f36a55;border-radius:50%;transform:rotate(40deg) scaleY(.32)}.core-orbit-b{transform:rotate(-40deg) scaleY(.32)}
+.cosmic-wordmark{position:absolute;display:flex;flex-direction:column;align-items:center;gap:20px;opacity:0;z-index:5}.cosmic-wordmark .preloader-logo{width:clamp(210px,34vw,390px);height:auto;filter:brightness(0) invert(1);max-height:none}.cosmic-wordmark>span{font:8px var(--mono);letter-spacing:.32em;color:#c7df82}
+.cosmic-caption{position:absolute;left:4.5vw;right:4.5vw;bottom:30px;display:flex;justify-content:space-between;color:#74796d;font:7px var(--mono);letter-spacing:.2em;z-index:5}
+@media(max-width:640px){.culture-token{font-size:6px;padding:8px 9px;letter-spacing:.13em}.token-manga{--tx:-28vw;--ty:-22vh}.token-game{--tx:25vw;--ty:-27vh}.token-cinema{--tx:-31vw;--ty:4vh}.token-meme{--tx:28vw;--ty:7vh}.token-music{--tx:-24vw;--ty:27vh}.token-comic{--tx:19vw;--ty:29vh}.token-anime{--tx:-7vw;--ty:-34vh}.token-internet{--tx:8vw;--ty:35vh}.token-style{--tx:-32vw;--ty:-15vh}.token-toy{--tx:33vw;--ty:-12vh}.token-tv{--tx:-30vw;--ty:22vh}.token-art{--tx:29vw;--ty:23vh}.ouroboros{width:min(100vw,500px)}.cosmic-caption{bottom:18px;font-size:6px;letter-spacing:.1em}}
 @media(prefers-reduced-motion:reduce){.cosmic-stage{display:none}.preloader{display:none}}
