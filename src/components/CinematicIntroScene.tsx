@@ -70,6 +70,8 @@ type FilmPanel = {
   border: THREE.LineSegments;
   video: HTMLVideoElement;
   videoTexture: THREE.VideoTexture;
+  videoSource: string;
+  videoRequested: boolean;
   index: number;
 };
 
@@ -242,12 +244,11 @@ export default function CinematicIntroScene() {
     panelTargets.forEach((_, index) => {
       const group = new THREE.Group();
       const video = document.createElement('video');
-      video.src = footageSources[index];
       video.loop = true;
       video.muted = true;
       video.defaultMuted = true;
       video.playsInline = true;
-      video.preload = 'metadata';
+      video.preload = 'none';
       video.crossOrigin = 'anonymous';
       const videoTexture = new THREE.VideoTexture(video);
       videoTexture.colorSpace = THREE.SRGBColorSpace;
@@ -276,7 +277,6 @@ export default function CinematicIntroScene() {
       video.addEventListener('error', () => {
         material.uniforms.uHasVideo.value = 0;
       });
-      video.load();
       const screen = new THREE.Mesh(new THREE.PlaneGeometry(panelWidth, panelHeight), material);
       group.add(screen);
 
@@ -293,7 +293,7 @@ export default function CinematicIntroScene() {
       group.position.set(0, 0, 1.2);
       group.scale.setScalar(0.001);
       scene.add(group);
-      panels.push({ group, material, border, video, videoTexture, index });
+      panels.push({ group, material, border, video, videoTexture, videoSource: footageSources[index], videoRequested: false, index });
     });
 
     // A continuous, tapered metallic body follows one smooth flight path.
@@ -423,10 +423,15 @@ export default function CinematicIntroScene() {
 
       // 4.1–9.4s: frames burst from the star, turn in depth, then sweep away.
       panels.forEach((panel, index) => {
-        const stagger = index * 0.075;
+        const stagger = index * 0.14;
         const appear = THREE.MathUtils.smoothstep(time, 4.05 + stagger, 5.35 + stagger);
         const clear = THREE.MathUtils.smoothstep(time, 8.0 + stagger * 0.2, 9.55 + stagger * 0.2);
         const visible = appear * (1 - clear);
+        if (appear > 0.02 && !panel.videoRequested) {
+          panel.videoRequested = true;
+          panel.video.src = panel.videoSource;
+          panel.video.load();
+        }
         const [x, y, z] = panelTargets[index];
         const aspect = root.clientWidth / Math.max(1, root.clientHeight);
         const fitX = THREE.MathUtils.clamp(aspect / 1.3, 0.42, 1);
