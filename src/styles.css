@@ -780,3 +780,14 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
  .object-modal-signup{padding:17px}
 }
 @media(prefers-reduced-motion:reduce){.object-modal{scroll-behavior:auto}}
+
+
+/* Sliding active-state capsule */
+.nav-dock{isolation:isolate}
+.nav-dock .dock-indicator{position:absolute;z-index:0;left:0;top:7px;width:var(--dock-indicator-width,58px);height:50px;border-radius:999px;background:#d9f36a;pointer-events:none;transform:translate3d(var(--dock-indicator-x,10px),0,0);transition:transform .58s cubic-bezier(.22,1,.36,1),width .42s cubic-bezier(.22,1,.36,1);will-change:transform,width}
+.nav-dock a{z-index:1;background:transparent!important;transition:color .28s ease,transform .32s var(--ease)}
+.nav-dock a.dock-active{color:var(--ink)}
+.nav-dock a.dock-active .dock-number{opacity:.7}
+.nav-dock .dock-home.dock-active .dock-home-mark{color:var(--ink)}
+@media(max-width:760px){.nav-dock .dock-indicator{top:6px;height:50px}}
+@media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator{transition:none}}
