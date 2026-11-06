@@ -45,18 +45,20 @@ export default function App() {
     event.preventDefault();
     setActiveDock(id);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const topOffset = 24;
     if (reduceMotion) {
-      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+      window.scrollTo({ top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset), behavior: 'auto' });
       return;
     }
+    const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset);
     if (lenisRef.current) {
-      lenisRef.current.scrollTo(target, {
-        offset: -88,
-        duration: 1.35,
+      lenisRef.current.scrollTo(destination, {
+        duration: 1.55,
         easing: (time) => 1 - Math.pow(1 - time, 4),
+        force: true,
       });
     } else {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.scrollTo({ top: destination, behavior: 'smooth' });
     }
   };
 
@@ -158,7 +160,7 @@ export default function App() {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         // The section crossing this fixed reading line is the section the user is in.
-        const readingLine = window.innerHeight * 0.4;
+        const readingLine = Math.min(180, window.innerHeight * 0.28);
         let current = targets[0];
         for (const section of targets) {
           if (section.getBoundingClientRect().top <= readingLine) current = section;
