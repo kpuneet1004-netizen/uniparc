@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
 
 /**
  * UNIPARC — cinematic origin sequence.
@@ -14,6 +15,18 @@ export default function CinematicIntroScene() {
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const scene = new THREE.Scene();
+    const vectorLogo = new THREE.Group();
+    vectorLogo.visible = false;
+    scene.add(vectorLogo);
+    let vectorLogoReady = false;
+    let disposed = false;
+    const fitVectorLogo = () => {
+      const viewHeight = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const size = Math.min(8.4, viewHeight * camera.aspect * 0.78, viewHeight * 0.78);
+      const scale = size / 284;
+      vectorLogo.scale.set(scale, -scale, scale);
+      vectorLogo.position.set(-142 * scale, 142 * scale, 1.8);
+    };
     const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
     camera.position.set(0, 0, 19);
 
@@ -39,6 +52,27 @@ export default function CinematicIntroScene() {
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.08;
     root.appendChild(renderer.domElement);
+
+    // Load the supplied master SVG and build the actual logo as vector geometry.
+    // This gives the emblem a native scene-space reveal before the crisp HTML lockup takes over.
+    new SVGLoader().load('/Uniparc.svg', (data) => {
+      if (disposed) return;
+      data.paths.forEach((path) => {
+        SVGLoader.createShapes(path).forEach((shape) => {
+          const geometry = new THREE.ShapeGeometry(shape, 16);
+          const material = new THREE.MeshBasicMaterial({
+            color: 0xffffff, side: THREE.DoubleSide, transparent: true,
+            opacity: 0, depthWrite: false, toneMapped: false,
+          });
+          vectorLogo.add(new THREE.Mesh(geometry, material));
+        });
+      });
+      vectorLogoReady = vectorLogo.children.length > 0;
+      vectorLogo.visible = vectorLogoReady;
+      fitVectorLogo();
+    }, undefined, (error) => {
+      console.warn('UNIPARC intro: vector logo could not be loaded; HTML logo fallback will continue.', error);
+    });
 
     const ambient = new THREE.AmbientLight(0x8792a0, 0.22);
     scene.add(ambient);
@@ -309,6 +343,7 @@ export default function CinematicIntroScene() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       serpentMat.uniforms.uAspect.value = width / height;
+      fitVectorLogo();
     };
     const observer = new ResizeObserver(resize);
     observer.observe(root);
@@ -407,6 +442,15 @@ export default function CinematicIntroScene() {
         headGroup.scale.setScalar(snakeIn * snakeOut);
       }
 
+      const logoIn = THREE.MathUtils.smoothstep(time, 20.95, 22.05);
+      const logoOut = 1 - THREE.MathUtils.smoothstep(time, 22.15, 22.72);
+      const vectorLogoOpacity = vectorLogoReady ? logoIn * logoOut : 0;
+      vectorLogo.visible = vectorLogoReady && vectorLogoOpacity > 0.001;
+      vectorLogo.children.forEach((child) => {
+        const material = (child as THREE.Mesh).material as THREE.MeshBasicMaterial;
+        material.opacity = vectorLogoOpacity;
+      });
+
       const consume = THREE.MathUtils.smoothstep(time, 18.8, 19.8);
       const remaining = 1 - consume;
       if (time > 18.8) {
@@ -430,6 +474,7 @@ export default function CinematicIntroScene() {
     render();
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(raf);
       observer.disconnect();
       glowTexture.dispose();
