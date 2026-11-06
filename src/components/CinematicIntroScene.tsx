@@ -480,14 +480,15 @@ export default function CinematicIntroScene() {
     const vBinormal = new THREE.Vector3();
     const vUp = new THREE.Vector3(0, 1, 0);
     const axisX = new THREE.Vector3(1, 0, 0);
+    let aspectFit = 1;
     const headPosition = (time: number, target: THREE.Vector3) => {
       const local = time - 12.25;
-      if (local <= 0) return target.copy(startPoint);
+      if (local <= 0) return target.set(startPoint.x * aspectFit, startPoint.y, startPoint.z);
       if (local < 2.35) {
         const u = THREE.MathUtils.smoothstep(local, 0, 2.35);
         const inv = 1 - u;
         return target.set(
-          inv * inv * inv * p0.x + 3 * inv * inv * u * p1.x + 3 * inv * u * u * p2.x + u * u * u * p3.x,
+          (inv * inv * inv * p0.x + 3 * inv * inv * u * p1.x + 3 * inv * u * u * p2.x + u * u * u * p3.x) * aspectFit,
           inv * inv * inv * p0.y + 3 * inv * inv * u * p1.y + 3 * inv * u * u * p2.y + u * u * u * p3.y,
           inv * inv * inv * p0.z + 3 * inv * inv * u * p1.z + 3 * inv * u * u * p2.z + u * u * u * p3.z
         );
@@ -498,7 +499,7 @@ export default function CinematicIntroScene() {
         const angle = -Math.PI * 0.5 + eased * Math.PI * 2.2;
         const radius = 1.62 - 0.55 * eased;
         return target.set(
-          Math.cos(angle) * radius,
+          Math.cos(angle) * radius * Math.max(0.78, aspectFit),
           Math.sin(angle) * radius * 0.82,
           0.32 + Math.sin(angle * 1.5) * 0.2
         );
@@ -507,7 +508,7 @@ export default function CinematicIntroScene() {
         const u = THREE.MathUtils.smoothstep(local, 5.9, 6.55);
         const eased = u * u * (3 - 2 * u);
         return target.set(
-          THREE.MathUtils.lerp(0.63, 0, eased),
+          THREE.MathUtils.lerp(0.63 * Math.max(0.78, aspectFit), 0, eased),
           THREE.MathUtils.lerp(-0.71, 0, eased),
           THREE.MathUtils.lerp(0.52, 0.05, eased)
         );
@@ -519,7 +520,7 @@ export default function CinematicIntroScene() {
       const angle = -Math.PI * 0.5 + loopTime * 2.03 + Math.max(0, loopTime - 3.0) * 0.22;
       const radius = 2.28 * radiusIn + Math.sin(loopTime * 0.65) * 0.045 * radiusIn;
       return target.set(
-        Math.cos(angle) * radius,
+        Math.cos(angle) * radius * Math.max(0.78, aspectFit),
         Math.sin(angle) * radius * 0.86,
         Math.sin(angle * 2.0) * 0.22
       );
@@ -532,7 +533,8 @@ export default function CinematicIntroScene() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       const aspect = width / height;
-      const horizontalFit = THREE.MathUtils.clamp(aspect / 1.28, 0.43, 1);
+      aspectFit = THREE.MathUtils.clamp(aspect / 1.28, 0.43, 1);
+      const horizontalFit = aspectFit;
       panels.forEach((panel, i) => {
         const [x, y, z] = panelLayout[i];
         panel.group.position.set(x * horizontalFit, y * (isSmall ? 0.88 : 1), z);
@@ -666,8 +668,9 @@ export default function CinematicIntroScene() {
         const headScale = snakeIn * snakeOut;
         head.scale.setScalar(headScale);
         // The coil gains a subtle rotational momentum after the star disappears.
-        const coilSpin = Math.max(0, time - 19.0) * 0.16;
-        serpent.rotation.set(0, 0, coilSpin);
+        // The delayed flight path itself carries the coil's rotation, keeping
+        // the head and body locked together without a detached mesh spin.
+        serpent.rotation.set(0, 0, 0);
         head.rotation.z = 0;
       }
 
