@@ -439,3 +439,10 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
   .about-main h2{font-size:clamp(40px,11.6vw,48px)}
   .about-logo{width:88px}
 }
+
+
+/* Consistent SVG arrow geometry across text links and circular action controls. */
+.arrow{width:16px;height:16px;display:inline-block;flex:0 0 auto;vertical-align:middle;overflow:visible;transition:transform .35s var(--ease)}
+.world-info b .arrow,.piece-arrow .arrow{width:17px;height:17px;margin:0;display:block;vertical-align:initial}
+.piece-hover-label .arrow{width:12px;height:12px;margin:0;display:block}
+@media(prefers-reduced-motion:reduce){.arrow{transition:none}}
