@@ -1702,3 +1702,78 @@ html,body,.site{background:#050505;color:var(--paper)}::selection{background:var
 @media(max-width:390px){.hero-title{font-size:clamp(58px,13vw,72px)}.hero-foot{flex-direction:column}.world-grid{grid-template-rows:repeat(2,minmax(230px,68vw))}.nav-dock a{padding-inline:6px}.dock-label{font-size:6px}}
 @media(prefers-reduced-motion:reduce){.scroll-cue b,.world-card img,.piece-image img{transition:none!important}}
 
+
+
+
+/* ── Awwwards refinement pass: atmosphere, image reveals, cursor tactility ── */
+:root{
+  --ink:#050505;--paper:#f5f5f1;--muted:#a3a39a;--line:rgba(255,255,255,.18);
+  --acid:#d8ff00;--ease:cubic-bezier(.2,.75,.25,1);
+  color-scheme:dark;background:#050505;
+}
+html,body,.site{background:#050505;color:#f5f5f1}
+body{isolation:isolate}
+@media(pointer:fine) and (prefers-reduced-motion:no-preference){
+  body,a,button{cursor:none}
+}
+/* Fine print grain: a tiny inline SVG tile, no canvas loop or runtime cost. */
+body:before{
+  content:"";position:fixed;inset:-50%;z-index:999;pointer-events:none;opacity:.032;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.72'/%3E%3C/svg%3E");
+  background-size:180px 180px;mix-blend-mode:soft-light;transform:translateZ(0)
+}
+.site:after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,rgba(216,255,0,.035),transparent 44%),radial-gradient(ellipse at 50% 100%,rgba(255,255,255,.035),transparent 52%);
+  opacity:.8
+}
+.site>*{position:relative}
+.site>.cursor-aura,.site>.cursor-dot,.site>.scroll-progress,.site>.chapter-index,.site>.nav-dock{z-index:1000}
+.hero,.manifesto,.worlds,.drop,.campaign,.about,.closing,.footer{isolation:isolate}
+.hero:after,.worlds:after,.campaign:after,.closing:after{
+  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 78% 18%,rgba(216,255,0,.055),transparent 36%),linear-gradient(180deg,transparent 65%,rgba(0,0,0,.24));
+}
+.hero>* ,.worlds>* ,.campaign>* ,.closing>*{position:relative;z-index:1}
+.worlds:before{background:radial-gradient(ellipse at 72% 25%,color-mix(in srgb,var(--ambient-tint,var(--acid)) 16%,transparent),transparent 52%),radial-gradient(ellipse at 12% 90%,rgba(255,255,255,.035),transparent 36%)}
+.world-card,.piece-image,.campaign{background-color:#101010}
+.world-card img,.piece-image img,.campaign-image{will-change:transform,clip-path}
+.world-card img,.piece-image img{clip-path:inset(0 0 0 0)}
+.world-card:after{content:"";position:absolute;inset:0;pointer-events:none;border:1px solid rgba(255,255,255,.08);z-index:2}
+.piece-image:after{transition:opacity .6s var(--ease)}
+.piece-card:hover .piece-image:after{opacity:.65}
+.cursor-aura{
+  width:44px;height:44px;border:1px solid rgba(216,255,0,.7);
+  background:rgba(216,255,0,0);mix-blend-mode:normal;
+  backdrop-filter:blur(0);transition:width .38s cubic-bezier(.16,1,.3,1),height .38s cubic-bezier(.16,1,.3,1),background .38s,border-color .38s,border-radius .38s;
+  display:grid;place-items:center
+}
+.cursor-aura:after{
+  content:attr(data-label);font:8px/1 var(--mono);letter-spacing:.13em;color:#050505;
+  opacity:0;white-space:nowrap;transform:scale(.8);transition:opacity .2s,transform .3s
+}
+.cursor-aura.cursor-active{
+  width:94px;height:94px;background:var(--acid);border-color:var(--acid);
+  border-radius:50%;box-shadow:0 0 36px rgba(216,255,0,.12)
+}
+.cursor-aura.cursor-active:after{opacity:1;transform:scale(1)}
+.cursor-dot{width:5px;height:5px;background:var(--acid);box-shadow:0 0 10px rgba(216,255,0,.7)}
+.chapter-index{left:24px;gap:13px;color:#c5c5bc;font-size:8px;letter-spacing:.19em}
+.chapter-index-dot{width:6px;height:6px;box-shadow:0 0 16px var(--acid)}
+.chapter-index-rule{height:64px;background:linear-gradient(var(--acid),rgba(255,255,255,.12));opacity:.7}
+.topbar{background:rgba(5,5,5,.82);border-color:rgba(255,255,255,.16)}
+.section-heading h2,.manifesto h2,.campaign h2,.about-main h2,.closing h2{font-kerning:normal;font-feature-settings:"kern" 1,"liga" 1}
+.eyebrow,.section-label,.hero-meta,.world-number,.world-tag,.piece-index,.piece-meta,.footer-heading{letter-spacing:.18em}
+@media(max-width:760px){
+  body:before{opacity:.022}
+  .site:after{opacity:.5}
+  .chapter-index{display:none}
+  .cursor-aura,.cursor-dot{display:none}
+  body,a,button{cursor:auto}
+}
+@media(prefers-reduced-motion:reduce){
+  body:before{display:none}
+  .cursor-aura,.cursor-dot{display:none}
+  .world-card img,.piece-image img{clip-path:none!important;will-change:auto}
+}
+
