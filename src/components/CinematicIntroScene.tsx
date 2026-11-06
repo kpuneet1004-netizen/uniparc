@@ -209,7 +209,7 @@ export default function CinematicIntroScene() {
         p.material.opacity = visibility * .96;
       });
       const snakeIn = THREE.MathUtils.smoothstep(t, 11.4, 13.2);
-      const snakeOut = 1 - THREE.MathUtils.smoothstep(t, 17.2, 18.5);
+      const snakeOut = 1 - THREE.MathUtils.smoothstep(t, 20.4, 21.5);
       serpent.visible = snakeIn > .001 && snakeOut > .001;
       head.visible = serpent.visible;
       if (serpent.visible) {
@@ -242,7 +242,7 @@ export default function CinematicIntroScene() {
         serpent.scale.setScalar(snakeIn * snakeOut);
         head.scale.setScalar(snakeIn * snakeOut);
         serpent.rotation.z = Math.sin(t * .35) * .025;
-        starGroup.scale.multiplyScalar(1 - THREE.MathUtils.smoothstep(t, 15.4, 16.3) * .98);
+        starGroup.scale.multiplyScalar(1 - THREE.MathUtils.smoothstep(t, 19.8, 20.8) * .98);
       }
       camera.position.x = Math.sin(t * .16) * .18;
       camera.position.y = Math.cos(t * .13) * .12;
