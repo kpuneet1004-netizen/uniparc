@@ -800,3 +800,9 @@ html{scroll-padding-top:24px}
 .nav-dock .dock-indicator{transition:transform .68s cubic-bezier(.16,1,.3,1),width .52s cubic-bezier(.16,1,.3,1)}
 .nav-dock a{transition:color .32s ease,transform .38s cubic-bezier(.16,1,.3,1)}
 @media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator,.nav-dock a{transition:none}}
+
+
+/* Tighten nav feedback so the indicator tracks the section change without trailing it. */
+.nav-dock .dock-indicator{transition:transform .26s cubic-bezier(.2,.8,.2,1),width .22s cubic-bezier(.2,.8,.2,1)}
+.nav-dock a{transition:color .16s ease,transform .2s ease}
+@media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator,.nav-dock a{transition:none}}
