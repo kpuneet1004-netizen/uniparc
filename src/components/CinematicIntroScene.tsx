@@ -470,8 +470,9 @@ export default function CinematicIntroScene() {
     const startPoint = new THREE.Vector3(-7.4, 2.65, 2.0);
     const p0 = new THREE.Vector3(-7.4, 2.65, 2.0);
     const p1 = new THREE.Vector3(-4.0, 2.8, 2.4);
-    const p2 = new THREE.Vector3(-1.4, -1.6, 1.6);
-    const p3 = new THREE.Vector3(0, 0, 0.2);
+    const p2 = new THREE.Vector3(-0.2, -1.32, 0.18);
+    const p3 = new THREE.Vector3(0, -1.32, 0.18);
+    const headDirection = new THREE.Vector3();
     const vA = new THREE.Vector3();
     const vB = new THREE.Vector3();
     const vTangent = new THREE.Vector3();
@@ -492,9 +493,10 @@ export default function CinematicIntroScene() {
         );
       }
       if (local < 5.9) {
-        const u = (local - 2.35) / 3.55;
-        const angle = -Math.PI * 0.5 + u * Math.PI * 2.2;
-        const radius = 1.62 - 0.55 * u;
+        const u = THREE.MathUtils.clamp((local - 2.35) / 3.55, 0, 1);
+        const eased = u * u * (3 - 2 * u);
+        const angle = -Math.PI * 0.5 + eased * Math.PI * 2.2;
+        const radius = 1.62 - 0.55 * eased;
         return target.set(
           Math.cos(angle) * radius,
           Math.sin(angle) * radius * 0.82,
@@ -503,17 +505,19 @@ export default function CinematicIntroScene() {
       }
       if (local < 6.55) {
         const u = THREE.MathUtils.smoothstep(local, 5.9, 6.55);
+        const eased = u * u * (3 - 2 * u);
         return target.set(
-          Math.sin(u * Math.PI) * 0.2,
-          THREE.MathUtils.lerp(-0.45, 0, u),
-          THREE.MathUtils.lerp(0.38, 0.05, u)
+          THREE.MathUtils.lerp(0.63, 0, eased),
+          THREE.MathUtils.lerp(-0.71, 0, eased),
+          THREE.MathUtils.lerp(0.52, 0.05, eased)
         );
       }
       // After the star is consumed, the serpent closes into a living ouroboros.
       // A full 3.1-second body delay lets the head meet the tail without a hard cut.
       const loopTime = local - 6.55;
+      const radiusIn = THREE.MathUtils.smoothstep(loopTime, 0, 0.65);
       const angle = -Math.PI * 0.5 + loopTime * 2.03 + Math.max(0, loopTime - 3.0) * 0.22;
-      const radius = 2.28 + Math.sin(loopTime * 0.65) * 0.045;
+      const radius = 2.28 * radiusIn + Math.sin(loopTime * 0.65) * 0.045 * radiusIn;
       return target.set(
         Math.cos(angle) * radius,
         Math.sin(angle) * radius * 0.86,
@@ -547,7 +551,6 @@ export default function CinematicIntroScene() {
     const render = () => {
       raf = requestAnimationFrame(render);
       const time = clock.getElapsedTime();
-      const dt = Math.min(0.05, time - lastTime);
       lastTime = time;
 
       starField.rotation.y = time * 0.003;
@@ -601,12 +604,11 @@ export default function CinematicIntroScene() {
         const horizontalFit = THREE.MathUtils.clamp(aspect / 1.28, 0.43, 1);
         const targetXFit = targetX * horizontalFit;
         const fly = 1 - THREE.MathUtils.smoothstep(time, 9.6, 13.0);
-        const fromCenter = 1 - appear;
         const drift = Math.sin(time * 0.38 + i * 1.7) * 0.08;
         panel.group.position.set(
-          THREE.MathUtils.lerp(targetXFit, targetXFit * 1.08, 1 - fly) + (i % 2 ? 1 : -1) * fromCenter * 0.12,
-          targetY + drift,
-          targetZ + Math.sin(time * 0.22 + i) * 0.12
+          THREE.MathUtils.lerp(0, targetXFit, appear) * (1 + (1 - fly) * 0.08),
+          THREE.MathUtils.lerp(0, targetY, appear) + drift,
+          THREE.MathUtils.lerp(1.35, targetZ, appear) + Math.sin(time * 0.22 + i) * 0.12
         );
         panel.group.rotation.set(
           (i % 2 ? -1 : 1) * (0.025 + fromCenter * 0.06),
@@ -630,8 +632,8 @@ export default function CinematicIntroScene() {
         const current = headPosition(time, vA);
         const before = headPosition(time - 0.025, vB);
         const after = headPosition(time + 0.025, vTangent);
-        vTangent.subVectors(after, before).normalize();
-        if (vTangent.lengthSq() < 0.0001) vTangent.set(1, 0, 0);
+        headDirection.subVectors(after, before).normalize();
+        if (headDirection.lengthSq() < 0.0001) headDirection.set(1, 0, 0);
 
         const position = bodyGeo.attributes.position as THREE.BufferAttribute;
         const bodyDelay = 3.1;
@@ -662,7 +664,7 @@ export default function CinematicIntroScene() {
         bodyMat.opacity = snakeOpacity * 0.96;
 
         head.position.copy(current);
-        head.quaternion.setFromUnitVectors(axisX, vTangent);
+        head.quaternion.setFromUnitVectors(axisX, headDirection);
         const headScale = snakeIn * snakeOut;
         head.scale.setScalar(headScale);
         // The coil gains a subtle rotational momentum after the star disappears.
