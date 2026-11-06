@@ -791,3 +791,12 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 .nav-dock .dock-home.dock-active .dock-home-mark{color:var(--ink)}
 @media(max-width:760px){.nav-dock .dock-indicator{top:6px;height:50px}}
 @media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator{transition:none}}
+
+
+/* Consistent landing rhythm for every section navigation destination. */
+html{scroll-padding-top:24px}
+#home,#manifesto,#worlds,#drop,#campaign,#about,#closing,#footer{scroll-margin-top:24px}
+/* The active capsule uses a continuous, slightly weighted glide between links. */
+.nav-dock .dock-indicator{transition:transform .68s cubic-bezier(.16,1,.3,1),width .52s cubic-bezier(.16,1,.3,1)}
+.nav-dock a{transition:color .32s ease,transform .38s cubic-bezier(.16,1,.3,1)}
+@media(prefers-reduced-motion:reduce){.nav-dock .dock-indicator,.nav-dock a{transition:none}}
