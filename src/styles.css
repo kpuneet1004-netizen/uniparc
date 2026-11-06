@@ -546,3 +546,155 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 @media(prefers-reduced-motion:reduce){
   .object-modal,.object-modal-panel{animation:none}
 }
+
+
+
+/* Object preview modal — balanced editorial split with a genuinely scrollable detail view */
+.object-modal{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:clamp(12px,2.4vh,24px) clamp(12px,2.4vw,28px);
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.object-modal-panel{
+  width:min(1180px,100%);
+  min-height:0;
+  max-height:calc(100dvh - clamp(24px,4.8vh,48px));
+  grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#aaa99f transparent;
+}
+.object-modal-image{
+  position:sticky;
+  top:0;
+  align-self:start;
+  height:calc(100dvh - clamp(24px,4.8vh,48px));
+  min-height:0;
+  max-height:calc(100dvh - clamp(24px,4.8vh,48px));
+}
+.object-modal-copy{
+  min-width:0;
+  min-height:100%;
+  justify-content:center;
+  padding:clamp(34px,4.5vw,66px);
+}
+.object-modal-copy h2{
+  font-size:clamp(36px,4.5vw,64px);
+  line-height:.92;
+  overflow-wrap:anywhere;
+}
+.object-modal-copy>p{max-width:48ch}
+.object-modal-copy form{margin-top:10px}
+.object-modal-copy form>div{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:stretch;
+  gap:12px;
+  border:0;
+}
+.object-modal-copy input{
+  width:100%;
+  min-width:0;
+  min-height:48px;
+  padding:12px 0;
+  border:0;
+  border-bottom:1px solid var(--ink);
+  border-radius:0;
+}
+.object-modal-copy form button{
+  min-height:48px;
+  max-width:100%;
+  padding:0 16px;
+  white-space:normal;
+  line-height:1.4;
+}
+.object-modal-copy form small{
+  display:block;
+  max-width:100%;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+.object-specs span{
+  display:grid;
+  grid-template-columns:minmax(100px,.7fr) minmax(0,1.3fr);
+  align-items:start;
+  gap:12px;
+  line-height:1.6;
+}
+.object-specs strong{
+  min-width:0;
+  overflow-wrap:anywhere;
+  text-align:right;
+}
+.object-close{
+  position:sticky;
+  float:right;
+  top:12px;
+  right:auto;
+  margin:12px 12px -54px 0;
+}
+@media(max-width:680px){
+  .object-modal{
+    display:block;
+    padding:0;
+    scroll-padding-top:0;
+  }
+  .object-modal-panel{
+    display:grid;
+    width:100%;
+    max-height:none;
+    min-height:100dvh;
+    grid-template-columns:minmax(0,1fr);
+    overflow:visible;
+    border-radius:0;
+  }
+  .object-modal-image{
+    position:relative;
+    top:auto;
+    width:100%;
+    height:clamp(250px,42svh,430px);
+    min-height:250px;
+    max-height:none;
+    aspect-ratio:auto;
+  }
+  .object-modal-image img{object-fit:cover}
+  .object-modal-copy{
+    min-height:0;
+    padding:clamp(28px,7vw,42px) clamp(20px,6vw,32px) calc(42px + env(safe-area-inset-bottom));
+  }
+  .object-modal-copy h2{
+    font-size:clamp(38px,10vw,58px);
+    margin:18px 0;
+  }
+  .object-modal-copy>p{font-size:13px;line-height:1.8}
+  .object-specs{gap:12px;margin:18px 0;padding:16px 0}
+  .object-specs span{
+    grid-template-columns:minmax(82px,.65fr) minmax(0,1.35fr);
+    font-size:7px;
+    gap:8px;
+  }
+  .object-modal-copy form>div{grid-template-columns:minmax(0,1fr)}
+  .object-modal-copy form button{width:100%}
+  .object-close{
+    position:sticky;
+    z-index:5;
+    top:12px;
+    margin:12px 12px -54px 0;
+    justify-self:end;
+  }
+}
+@media(max-width:380px){
+  .object-modal-image{height:36svh;min-height:220px}
+  .object-modal-copy{padding-inline:18px}
+  .object-specs span{font-size:6.5px}
+}
+@media(prefers-reduced-motion:reduce){
+  .object-modal,.object-modal-panel{animation:none}
+}
