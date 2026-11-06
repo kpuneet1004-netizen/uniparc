@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import * as THREE from 'three';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -28,9 +29,14 @@ export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
+  const cosmicCanvasRef = useRef<HTMLCanvasElement>(null);
+  const burstPointsRef = useRef<THREE.Points | null>(null);
+  const burstMaterialRef = useRef<THREE.PointsMaterial | null>(null);
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
@@ -60,6 +66,74 @@ export default function App() {
       window.scrollTo({ top: destination, behavior: 'smooth' });
     }
   };
+
+  useEffect(() => {
+    const canvas = cosmicCanvasRef.current;
+    if (!canvas) return;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 120);
+    camera.position.z = 24;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    const mobile = window.matchMedia('(max-width: 700px)').matches;
+    const starCount = mobile ? 520 : 1250;
+    const starPositions = new Float32Array(starCount * 3);
+    const starColors = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const n = i * 3;
+      starPositions[n] = (Math.random() - .5) * 58;
+      starPositions[n + 1] = (Math.random() - .5) * 36;
+      starPositions[n + 2] = (Math.random() - .5) * 34;
+      const tint = .72 + Math.random() * .28;
+      starColors[n] = tint * .82; starColors[n + 1] = tint; starColors[n + 2] = tint * .58;
+    }
+    const starGeometry = new THREE.BufferGeometry();
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
+    const starMaterial = new THREE.PointsMaterial({ size: .045, vertexColors: true, transparent: true, opacity: .48, sizeAttenuation: true, depthWrite: false });
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+    const burstCount = mobile ? 240 : 560;
+    const burstPositions = new Float32Array(burstCount * 3);
+    for (let i = 0; i < burstCount; i++) {
+      const n = i * 3, theta = Math.random() * Math.PI * 2, phi = Math.acos(2 * Math.random() - 1), radius = .45 + Math.random() * 1.8;
+      burstPositions[n] = Math.sin(phi) * Math.cos(theta) * radius;
+      burstPositions[n + 1] = Math.cos(phi) * radius;
+      burstPositions[n + 2] = Math.sin(phi) * Math.sin(theta) * radius;
+    }
+    const burstGeometry = new THREE.BufferGeometry();
+    burstGeometry.setAttribute('position', new THREE.BufferAttribute(burstPositions, 3));
+    const burstMaterial = new THREE.PointsMaterial({ color: 0xdfff91, size: .075, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+    const burst = new THREE.Points(burstGeometry, burstMaterial);
+    burst.scale.setScalar(.001);
+    burstPointsRef.current = burst; burstMaterialRef.current = burstMaterial;
+    scene.add(burst);
+    const resize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight, false);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    };
+    let frame = 0;
+    const render = () => {
+      stars.rotation.y += .000035;
+      stars.rotation.x = Math.sin(performance.now() * .00008) * .012;
+      renderer.render(scene, camera);
+      frame = requestAnimationFrame(render);
+    };
+    render();
+    window.addEventListener('resize', resize);
+    return () => {
+      cancelAnimationFrame(frame); window.removeEventListener('resize', resize);
+      starGeometry.dispose(); starMaterial.dispose(); burstGeometry.dispose(); burstMaterial.dispose(); renderer.dispose();
+      burstPointsRef.current = null; burstMaterialRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    setShowSkipIntro(window.localStorage.getItem('uniparc-intro-seen') === '1');
+  }, []);
 
   useEffect(() => {
     const nav = navDockRef.current;
@@ -109,9 +183,11 @@ export default function App() {
         window.scrollTo(0, 0);
         lenisRef.current?.scrollTo(0, { immediate: true, force: true });
         setActiveDock('home');
+        window.localStorage.setItem('uniparc-intro-seen', '1');
         setIsLoaded(true);
       };
       const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
+      introTimelineRef.current = intro;
       if (reduceMotion) {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
@@ -122,6 +198,9 @@ export default function App() {
           .to('.cosmic-star', { scale: 1.2, duration: .62, repeat: 2, yoyo: true, ease: 'sine.inOut' })
           .to('.burst-ring', { scale: 15, autoAlpha: 0, duration: .9, ease: 'power3.out' }, '+=.02')
           .to('.burst-rays', { scale: 2.8, rotation: 24, autoAlpha: 0, duration: .72, ease: 'power3.out' }, '<')
+          .to(burstPointsRef.current!.scale, { x: 15, y: 15, z: 15, duration: 1.45, ease: 'expo.out' }, '<')
+          .to(burstMaterialRef.current!, { opacity: .92, duration: .16, yoyo: true, repeat: 1 }, '<')
+          .to(burstMaterialRef.current!, { opacity: 0, duration: 1.15, ease: 'power2.out' }, '<=.16')
           .to('.cosmic-star', { scale: 2.35, autoAlpha: 0, duration: .22, ease: 'power2.in' }, '<')
           .fromTo('.culture-token', { x: 0, y: 0, scale: .15, rotation: () => gsap.utils.random(-110, 110), autoAlpha: 0 }, { x: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--tx').trim(); const n = parseFloat(v) || 0; return v.endsWith('vw') ? n * window.innerWidth / 100 : n; }, y: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--ty').trim(); const n = parseFloat(v) || 0; return v.endsWith('vh') ? n * window.innerHeight / 100 : n; }, scale: 1, rotation: (i, el) => Number(el.getAttribute('data-rotation') || 0), autoAlpha: 1, duration: .9, stagger: .035, ease: 'expo.out' }, '-=.08')
           .to('.culture-token', { x: 0, y: 0, scale: .12, rotation: (i) => (i % 2 ? 180 : -180), autoAlpha: 0, duration: .72, stagger: .025, ease: 'power3.in' }, '+=.55')
@@ -248,8 +327,9 @@ export default function App() {
 
   return (
     <div className="site" ref={rootRef}>
-      <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden="true">
+      <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
         <div className="cosmic-stage">
+          <canvas ref={cosmicCanvasRef} className="cosmic-webgl" aria-hidden="true" />
           <div className="cosmic-starfield" />
           <div className="cosmic-star" aria-hidden="true"><span className="star-corona" /><span className="star-sphere" /><span className="star-flare" /></div>
           <div className="burst-ring" aria-hidden="true" />
@@ -268,15 +348,25 @@ export default function App() {
             <span className="culture-token token-tv"><i>▣</i><b> SERIES</b><small>EPISODES / WORLDS</small></span>
             <span className="culture-token token-art"><i>⌖</i><b>FAN ART</b><small>MADE BY FANS</small></span>
           </div>
-          <svg className="ouroboros" viewBox="0 0 500 500" aria-hidden="true">
-            <defs><linearGradient id="ouro-gradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#e4ff7b"/><stop offset=".48" stopColor="#a8c943"/><stop offset="1" stopColor="#607a25"/></linearGradient></defs>
-            <path className="ouro-body" d="M250 57 C356 57 443 144 443 250 C443 356 356 443 250 443 C144 443 57 356 57 250 C57 144 144 57 250 57" />
-            <path className="ouro-tail" d="M250 57 C224 29 194 22 173 35 C193 45 205 58 211 77" />
-            <path className="ouro-head" d="M250 57 C273 29 306 22 329 37 C307 45 293 61 288 82 C275 76 261 67 250 57Z" /><circle className="ouro-eye" cx="306" cy="43" r="4" />
+          <svg className="ouroboros" viewBox="0 0 600 600" aria-hidden="true">
+            <defs>
+              <linearGradient id="ouro-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#f4ffd1"/><stop offset=".22" stopColor="#c9e879"/><stop offset=".52" stopColor="#647e32"/><stop offset=".76" stopColor="#d8ee9b"/><stop offset="1" stopColor="#43551e"/></linearGradient>
+              <radialGradient id="ouro-glow"><stop stopColor="#dfff91" stopOpacity=".34"/><stop offset="1" stopColor="#dfff91" stopOpacity="0"/></radialGradient>
+              <pattern id="ouro-scales" width="22" height="18" patternUnits="userSpaceOnUse"><path d="M-5 18 Q6 -2 17 18 M6 18 Q17 -2 28 18" fill="none" stroke="#f0ffc1" strokeOpacity=".5" strokeWidth="1.7"/><path d="M-5 18 Q6 5 17 18 M6 18 Q17 5 28 18" fill="none" stroke="#18220c" strokeOpacity=".7" strokeWidth="1"/></pattern>
+              <filter id="ouro-soft-glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="12" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <circle cx="300" cy="300" r="245" fill="url(#ouro-glow)"/>
+            <path className="ouro-body-shadow" d="M300 76 C426 76 524 174 524 300 C524 426 426 524 300 524 C174 524 76 426 76 300 C76 174 174 76 300 76" fill="none" stroke="#050804" strokeWidth="62"/>
+            <path className="ouro-body" d="M300 76 C426 76 524 174 524 300 C524 426 426 524 300 524 C174 524 76 426 76 300 C76 174 174 76 300 76" fill="none" stroke="url(#ouro-metal)" strokeWidth="48" strokeLinecap="round" filter="url(#ouro-soft-glow)"/>
+            <path className="ouro-scale-overlay" d="M300 76 C426 76 524 174 524 300 C524 426 426 524 300 524 C174 524 76 426 76 300 C76 174 174 76 300 76" fill="none" stroke="url(#ouro-scales)" strokeWidth="39"/>
+            <path className="ouro-tail" d="M300 76 C266 38 220 26 188 47 C213 55 235 72 246 102" fill="none" stroke="url(#ouro-metal)" strokeWidth="23" strokeLinecap="round"/>
+            <path className="ouro-head" d="M292 81 C321 39 372 28 412 50 L389 66 L420 81 L385 91 C374 118 352 135 323 132 C305 118 295 101 292 81Z" fill="url(#ouro-metal)" stroke="#efffb8" strokeWidth="2"/>
+            <path d="M355 54 Q378 42 399 53 L380 65Z" fill="#1b260e"/><circle className="ouro-eye" cx="377" cy="65" r="5" fill="#eaff9e"/><path d="M338 103 Q360 116 383 102" fill="none" stroke="#394b1d" strokeWidth="4" strokeLinecap="round"/>
           </svg>
           <div className="cosmic-core"><span className="core-orbit core-orbit-a" /><span className="core-orbit core-orbit-b" /><span className="core-star">✦</span></div>
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
+          {showSkipIntro && <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>}
         </div>
       </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
