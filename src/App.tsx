@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import CinematicIntroScene from './components/CinematicIntroScene';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,32 +24,12 @@ function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   </svg>;
 }
 
-function readIntroSeen() {
-  try {
-    return window.localStorage.getItem('uniparc-intro-seen') === '1';
-  } catch {
-    // Storage can be unavailable in private browsing or restricted webviews.
-    return false;
-  }
-}
-
-function persistIntroSeen() {
-  try {
-    window.localStorage.setItem('uniparc-intro-seen', '1');
-  } catch {
-    // The intro must still finish when storage is blocked.
-  }
-}
-
 export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
-  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
@@ -80,10 +59,6 @@ export default function App() {
       window.scrollTo({ top: destination, behavior: 'smooth' });
     }
   };
-
-  useEffect(() => {
-    setShowSkipIntro(readIntroSeen());
-  }, []);
 
   useEffect(() => {
     const nav = navDockRef.current;
@@ -129,26 +104,6 @@ export default function App() {
     }
 
     const ctx = gsap.context(() => {
-      const finishIntro = () => {
-        window.scrollTo(0, 0);
-        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
-        setActiveDock('home');
-        persistIntroSeen();
-        setIsLoaded(true);
-      };
-      const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
-      introTimelineRef.current = intro;
-      if (reduceMotion) {
-        intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
-      } else {
-        intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .to({}, { duration: 22.4, ease: 'none' })
-          .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
-          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
-          .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
-          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
-      }
-
       if (!reduceMotion) {
         gsap.to('.hero-visual img', { yPercent: 13, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero-visual', start: 'top top', end: 'bottom top', scrub: true } });
         gsap.to('.hero-title .outline-word', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
@@ -260,14 +215,6 @@ export default function App() {
 
   return (
     <div className="site" ref={rootRef}>
-      <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
-        <div className="cosmic-stage">
-          <CinematicIntroScene />
-          <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
-          <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
-          {showSkipIntro && <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>}
-        </div>
-      </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
       <aside className="chapter-index" aria-live="polite"><span className="chapter-index-dot" /><span>{activeChapter}</span><span className="chapter-index-rule" /></aside>
