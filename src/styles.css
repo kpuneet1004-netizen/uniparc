@@ -971,3 +971,45 @@ html{scroll-padding-top:24px}
  .cosmic-caption{font-size:5px;letter-spacing:.09em}
 }
 @media(prefers-reduced-motion:reduce){.cosmic-starfield{animation:none}.preloader{display:none}}
+
+
+/* CINEMATIC INTRO V2 — film-frame montage + organic Ouroboros */
+.cosmic-stage{background:#010202;isolation:isolate}
+.cosmic-stage:before{z-index:8;background:radial-gradient(ellipse at center,transparent 12%,#000 88%)}
+.cosmic-starfield{opacity:.22;filter:blur(.2px)}
+.cosmic-star{width:clamp(100px,15vw,180px)}
+.star-corona{inset:-125%;filter:blur(15px);opacity:.9}
+.star-sphere{inset:23%;box-shadow:inset -14px -16px 32px #000b,0 0 32px #f2f4dfaa,0 0 115px #d9f36a60}
+.star-flare{width:240%;height:2px;background:linear-gradient(90deg,transparent,#fff 48%,transparent);box-shadow:0 0 22px #fff;filter:blur(1px)}
+.culture-eruption{position:absolute;inset:0;z-index:6;pointer-events:none;perspective:1600px;transform-style:preserve-3d}
+.culture-frame{position:absolute;left:50%;top:50%;width:clamp(150px,18vw,258px);aspect-ratio:16/10;overflow:hidden;opacity:0;display:block;background:#090a08;border:1px solid #e9e8df70;box-shadow:0 24px 70px #000c,0 0 0 5px #090a08,0 0 0 6px #ffffff24;transform-style:preserve-3d;backface-visibility:hidden;will-change:transform,opacity}
+.culture-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.72) contrast(1.08);transform:scale(1.02)}
+.culture-frame-shade{position:absolute;inset:0;background:linear-gradient(180deg,#0002 0%,transparent 42%,#000c 100%)}
+.culture-frame-label{position:absolute;left:10px;bottom:9px;color:#f5f3e9;font:7px var(--mono);letter-spacing:.16em;text-shadow:0 2px 10px #000}
+.culture-frame-index{position:absolute;right:9px;top:8px;color:#fff9;font:6px var(--mono);letter-spacing:.12em}
+.ouroboros{position:absolute;width:min(72vw,560px);height:auto;opacity:0;overflow:visible;filter:drop-shadow(0 0 24px #d7e0c22a) drop-shadow(0 0 65px #9eae7b1c);transform-origin:50% 50%;z-index:4;will-change:transform,opacity}
+.ouro-body{fill:none;stroke:url(#ouro-gradient);stroke-width:24;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1800;stroke-dashoffset:1800;filter:url(#ouro-soft-glow)}
+.ouro-head{fill:url(#ouro-gradient);stroke:#e0e5d0;stroke-opacity:.55;stroke-width:1.4;stroke-linejoin:round;filter:url(#ouro-soft-glow)}
+.ouro-eye{fill:#14190f;opacity:.95}
+.cosmic-core{z-index:3;width:clamp(100px,15vw,170px);filter:drop-shadow(0 0 40px #e6f0ca90) drop-shadow(0 0 110px #d9f36a55)}
+.core-star{font-size:16px;color:#fff;text-shadow:0 0 18px #fff,0 0 38px #eaffb0}
+@media(max-width:760px){
+ .culture-frame{width:clamp(112px,31vw,170px);box-shadow:0 16px 42px #000d,0 0 0 3px #090a08,0 0 0 4px #ffffff24}
+ .culture-frame-label{left:7px;bottom:6px;font-size:5px;letter-spacing:.1em}
+ .culture-frame-index{right:6px;top:5px;font-size:5px}
+ .ouroboros{width:min(90vw,460px)}
+ .cosmic-caption{bottom:20px;font-size:6px}
+}
+@media(prefers-reduced-motion:reduce){.culture-frame{display:none}.ouroboros{display:none}}
+
+
+/* Procedural 3D intro scene — replaces still-image montage and vector serpent. */
+.cosmic-stage{background:#010202;isolation:isolate;overflow:hidden}
+.cinematic-sequence{position:absolute;inset:0;z-index:5;overflow:hidden;pointer-events:none}
+.cinematic-sequence canvas{display:block;width:100%;height:100%;outline:0}
+.cosmic-stage:before{z-index:8;pointer-events:none;background:radial-gradient(ellipse at center,transparent 8%,#000 88%)}
+.cosmic-wordmark{z-index:9}
+.cosmic-caption{z-index:10}
+.skip-intro{z-index:12}
+@media(max-width:700px){.cinematic-sequence{inset:0}.cosmic-caption{bottom:18px}}
+@media(prefers-reduced-motion:reduce){.cinematic-sequence{display:none}}
