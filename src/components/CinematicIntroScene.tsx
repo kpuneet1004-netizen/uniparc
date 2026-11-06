@@ -546,12 +546,10 @@ export default function CinematicIntroScene() {
     const clock = new THREE.Clock();
     let raf = 0;
     let lastPanelDraw = -1;
-    let lastTime = 0;
 
     const render = () => {
       raf = requestAnimationFrame(render);
       const time = clock.getElapsedTime();
-      lastTime = time;
 
       starField.rotation.y = time * 0.003;
       starField.rotation.x = Math.sin(time * 0.08) * 0.006;
