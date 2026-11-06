@@ -469,7 +469,6 @@ export default function CinematicIntroScene() {
     const trailDuration = orbitDuration;
     const serpentStart = 8.15;
     let horizontalFit = 1;
-    const startPoint = new THREE.Vector3();
 
     // The flight curve and orbital path share the same tangent at their join.
     // One complete orbit brings the head back to the tail, closing the Ouroboros.
@@ -502,6 +501,7 @@ export default function CinematicIntroScene() {
     const tempPrev = new THREE.Vector3();
     const tempNext = new THREE.Vector3();
     const tangent = new THREE.Vector3();
+    const headTangent = new THREE.Vector3();
     const normal = new THREE.Vector3();
     const binormal = new THREE.Vector3();
     const worldUp = new THREE.Vector3(0, 0, 1);
@@ -570,8 +570,6 @@ export default function CinematicIntroScene() {
       burstGeometry.attributes.position.needsUpdate = true;
       burstMaterial.opacity = bang * (1 - THREE.MathUtils.smoothstep(time, 5.95, 6.8)) * 0.7;
 
-      const panelFadeIn = THREE.MathUtils.smoothstep(time, 4.15, 5.65);
-      const panelFadeOut = 1 - THREE.MathUtils.smoothstep(time, 8.8, 10.0);
       const shouldRedraw = lastPanelDraw < 0 || time - lastPanelDraw >= 1 / 24;
       if (shouldRedraw) lastPanelDraw = time;
       panels.forEach((panel, index) => {
@@ -612,8 +610,8 @@ export default function CinematicIntroScene() {
         const current = serpentPosition(elapsed, tempCenter);
         const before = serpentPosition(Math.max(0, elapsed - 0.012), tempPrev);
         const after = serpentPosition(Math.min(approachDuration + orbitDuration, elapsed + 0.012), tempNext);
-        tangent.subVectors(after, before).normalize();
-        if (tangent.lengthSq() < 0.0001) tangent.set(1, 0, 0);
+        headTangent.subVectors(after, before).normalize();
+        if (headTangent.lengthSq() < 0.0001) headTangent.set(1, 0, 0);
 
         const position = bodyGeometry.attributes.position as THREE.BufferAttribute;
         for (let i = 0; i <= bodySegments; i++) {
@@ -645,7 +643,7 @@ export default function CinematicIntroScene() {
         bodyGeometry.computeVertexNormals();
         serpentMaterial.opacity = serpentOpacity * 0.98;
         head.position.copy(current);
-        head.quaternion.setFromUnitVectors(axisX, tangent);
+        head.quaternion.setFromUnitVectors(axisX, headTangent);
         head.scale.setScalar(serpentOpacity);
       }
 
