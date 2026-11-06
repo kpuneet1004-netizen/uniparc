@@ -61,6 +61,31 @@ export default function App() {
   };
 
   useEffect(() => {
+    const nav = navDockRef.current;
+    if (!nav) return;
+    let frame = 0;
+    const updateIndicator = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const active = nav.querySelector<HTMLElement>('.dock-active');
+        if (!active) return;
+        nav.style.setProperty('--dock-indicator-x', active.offsetLeft + 'px');
+        nav.style.setProperty('--dock-indicator-width', active.offsetWidth + 'px');
+        if (window.matchMedia('(max-width: 760px)').matches) {
+          const navBounds = nav.getBoundingClientRect();
+          const itemBounds = active.getBoundingClientRect();
+          if (itemBounds.left < navBounds.left + 10 || itemBounds.right > navBounds.right - 10) active.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
+        }
+      });
+    };
+    updateIndicator();
+    const observer = new ResizeObserver(updateIndicator);
+    observer.observe(nav);
+    window.addEventListener('resize', updateIndicator);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener('resize', updateIndicator); };
+  }, [activeDock]);
+
+  useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9, anchors: { offset: -88 } });
     lenisRef.current = lenis;
@@ -303,6 +328,7 @@ export default function App() {
         </div>
       </article></div>}
       <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
+        <span className="dock-indicator" aria-hidden="true" />
         <a className={activeDock === 'home' ? 'dock-home dock-active' : 'dock-home'} href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
         <a href="#manifesto" className={activeDock === 'manifesto' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'manifesto')} aria-current={activeDock === 'manifesto' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">IDEA</span></a>
