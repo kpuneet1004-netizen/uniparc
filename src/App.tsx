@@ -34,7 +34,7 @@ export default function App() {
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
-  const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
+  const [activeChapter, setActiveChapter] = useState('00 / THE UNIVERSE');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
   const [waitlistNotice, setWaitlistNotice] = useState('');
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
