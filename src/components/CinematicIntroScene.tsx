@@ -1,11 +1,80 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-/**
- * UNIPARC origin sequence.
- * All visual material is procedural: geometry, typography, linework and canvas
- * animation. No stock stills or pre-rendered video are used.
- */
+const vertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const panelFragmentShader = `
+  varying vec2 vUv;
+  uniform float uTime;
+  uniform float uSeed;
+  uniform float uStyle;
+  uniform float uOpacity;
+  uniform vec3 uAccent;
+  uniform sampler2D uVideo;
+  uniform float uHasVideo;
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+  float line(float v, float width) { return 1.0 - smoothstep(width, width + 0.012, abs(v)); }
+  void main() {
+    vec2 uv = vUv;
+    vec2 p = uv - 0.5;
+    float t = uTime;
+    vec3 base = mix(vec3(0.012, 0.016, 0.021), vec3(0.075, 0.085, 0.092), uv.y);
+    float vignette = 1.0 - smoothstep(0.12, 0.82, length(p * vec2(0.9, 1.25)));
+    float sweep = 0.0;
+    if (uStyle < 0.5) {
+      float a = atan(p.y, p.x);
+      float r = length(p);
+      sweep = line(sin(a * 17.0 + r * 18.0 - t * 2.8 + uSeed), 0.025) * (1.0 - smoothstep(0.08, 0.58, r));
+      sweep += line(p.y - sin(p.x * 7.0 - t * 1.6) * 0.09, 0.018) * 0.8;
+    } else if (uStyle < 1.5) {
+      float r = length(p * vec2(0.9, 1.3));
+      sweep = line(fract(r * 13.0 - t * 0.32 + uSeed) - 0.5, 0.035);
+      sweep *= 0.45 + 0.55 * sin(t * 1.4 + uSeed);
+      sweep += exp(-abs(p.x - sin(t * 0.4 + uSeed) * 0.25) * 16.0) * 0.35;
+    } else if (uStyle < 2.5) {
+      float bars = step(0.0, sin(uv.x * 110.0 + sin(uv.y * 13.0 + t) * 2.0));
+      sweep = bars * (1.0 - smoothstep(0.0, 0.44, abs(uv.y - 0.5))) * 0.34;
+      sweep += line(p.y - 0.22 * sin(p.x * 9.0 + t * 2.0), 0.014);
+    } else if (uStyle < 3.5) {
+      vec2 grid = abs(fract(uv * vec2(13.0, 7.0) - t * 0.06) - 0.5);
+      sweep = (1.0 - smoothstep(0.47, 0.5, max(grid.x, grid.y))) * 0.28;
+      sweep += exp(-length(p - vec2(sin(t * 0.8) * 0.22, cos(t * 0.6) * 0.18)) * 13.0) * 0.8;
+    } else if (uStyle < 4.5) {
+      float wave = sin(uv.x * 39.0 - t * 2.2 + sin(uv.x * 8.0) * 2.0);
+      sweep = line(uv.y - 0.5 - wave * 0.12, 0.018) * 0.9;
+      sweep += line(uv.y - 0.5 - sin(uv.x * 15.0 - t) * 0.2, 0.008) * 0.55;
+    } else {
+      float rays = line(sin(atan(p.y, p.x) * 23.0 + t * 0.7), 0.025);
+      sweep = rays * (1.0 - smoothstep(0.05, 0.6, length(p))) * 0.5;
+      sweep += exp(-abs(length(p) - (0.2 + 0.12 * sin(t * 0.7))) * 28.0) * 0.55;
+    }
+    float grain = hash(floor(uv * vec2(480.0, 270.0)) + floor(t * 12.0)) * 0.035;
+    vec3 motionDesign = base + uAccent * sweep * 0.82 + vec3(grain);
+    motionDesign += uAccent * exp(-abs(uv.x - fract(t * 0.055 + uSeed)) * 38.0) * 0.12;
+    motionDesign *= vignette;
+    vec3 footage = texture2D(uVideo, uv).rgb;
+    vec3 color = mix(motionDesign, footage, uHasVideo);
+    gl_FragColor = vec4(color, uOpacity);
+  }
+`;
+
+type FilmPanel = {
+  group: THREE.Group;
+  material: THREE.ShaderMaterial;
+  border: THREE.LineSegments;
+  video: HTMLVideoElement;
+  videoTexture: THREE.VideoTexture;
+  videoSource: string;
+  videoRequested: boolean;
+  index: number;
+};
+
 export default function CinematicIntroScene() {
   const host = useRef<HTMLDivElement>(null);
 
@@ -14,7 +83,7 @@ export default function CinematicIntroScene() {
     if (!root || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
     camera.position.set(0, 0, 18);
 
     let renderer: THREE.WebGLRenderer;
@@ -31,380 +100,209 @@ export default function CinematicIntroScene() {
       return;
     }
 
-    const isSmall = window.innerWidth < 700;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isSmall ? 1.15 : 1.4));
+    const small = window.innerWidth < 700;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.1 : 1.35));
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.toneMapping = THREE.NoToneMapping;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
     root.appendChild(renderer.domElement);
 
-    const ambient = new THREE.AmbientLight(0xb8c0a6, 0.32);
-    scene.add(ambient);
-    const starLight = new THREE.PointLight(0xe8f1cb, 0, 26);
-    scene.add(starLight);
+    scene.add(new THREE.AmbientLight(0x9ca8b0, 0.28));
+    const keyLight = new THREE.PointLight(0xe9f0e6, 0, 34);
+    keyLight.position.set(0, 0, 4);
+    scene.add(keyLight);
+    const rimLight = new THREE.PointLight(0xb6d98a, 0, 24);
+    rimLight.position.set(-5, 3, -1);
+    scene.add(rimLight);
 
-    // Deep space: a restrained, fixed point field rather than a noisy particle cloud.
-    const starCount = isSmall ? 520 : 1050;
+    // Quiet, deep star field. One draw call keeps the opening light on mobile GPUs.
+    const starCount = small ? 360 : 760;
     const starPositions = new Float32Array(starCount * 3);
-    const starSizes = new Float32Array(starCount);
     for (let i = 0; i < starCount; i++) {
-      starPositions[i * 3] = (Math.random() - 0.5) * 54;
-      starPositions[i * 3 + 1] = (Math.random() - 0.5) * 32;
-      starPositions[i * 3 + 2] = -28 + Math.random() * 34;
-      starSizes[i] = 0.35 + Math.random() * 0.65;
+      starPositions[i * 3] = (Math.random() - 0.5) * 48;
+      starPositions[i * 3 + 1] = (Math.random() - 0.5) * 28;
+      starPositions[i * 3 + 2] = -26 + Math.random() * 32;
     }
-    const starFieldGeo = new THREE.BufferGeometry();
-    starFieldGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    const starFieldMat = new THREE.PointsMaterial({
-      color: 0xdce3d0,
-      size: 0.032,
+    const starGeometry = new THREE.BufferGeometry();
+    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starMaterial = new THREE.PointsMaterial({
+      color: 0xdde4e8,
+      size: 0.026,
       transparent: true,
-      opacity: 0.38,
+      opacity: 0.28,
       depthWrite: false,
       sizeAttenuation: true,
     });
-    const starField = new THREE.Points(starFieldGeo, starFieldMat);
-    scene.add(starField);
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
 
-    // The ignition point: a hot white core with a soft, physical falloff.
-    const starGroup = new THREE.Group();
-    scene.add(starGroup);
+    // A single white star with a soft optical bloom, not a glowing cartoon orb.
+    const star = new THREE.Group();
+    scene.add(star);
     const starCore = new THREE.Mesh(
-      new THREE.SphereGeometry(0.16, 32, 24),
+      new THREE.SphereGeometry(0.075, 24, 16),
       new THREE.MeshBasicMaterial({ color: 0xffffff })
     );
-    starGroup.add(starCore);
-    const starHalo = new THREE.Mesh(
-      new THREE.SphereGeometry(0.58, 32, 24),
-      new THREE.MeshBasicMaterial({
-        color: 0xe5f5c0,
-        transparent: true,
-        opacity: 0.12,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    starGroup.add(starHalo);
-    const starOuter = new THREE.Mesh(
-      new THREE.SphereGeometry(1.15, 32, 24),
-      new THREE.MeshBasicMaterial({
-        color: 0xb4d879,
-        transparent: true,
-        opacity: 0.045,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    starGroup.add(starOuter);
-
-    // Soft radial glow texture, generated once and reused.
+    star.add(starCore);
     const glowCanvas = document.createElement('canvas');
-    glowCanvas.width = 128;
-    glowCanvas.height = 128;
-    const glowCtx = glowCanvas.getContext('2d')!;
-    const glowGradient = glowCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
-    glowGradient.addColorStop(0, 'rgba(255,255,244,0.92)');
-    glowGradient.addColorStop(0.08, 'rgba(235,248,202,0.56)');
-    glowGradient.addColorStop(0.28, 'rgba(190,220,133,0.16)');
-    glowGradient.addColorStop(1, 'rgba(170,205,120,0)');
-    glowCtx.fillStyle = glowGradient;
-    glowCtx.fillRect(0, 0, 128, 128);
+    glowCanvas.width = glowCanvas.height = 128;
+    const glowContext = glowCanvas.getContext('2d')!;
+    const glow = glowContext.createRadialGradient(64, 64, 0, 64, 64, 64);
+    glow.addColorStop(0, 'rgba(255,255,255,0.95)');
+    glow.addColorStop(0.08, 'rgba(245,250,239,0.42)');
+    glow.addColorStop(0.28, 'rgba(210,231,190,0.12)');
+    glow.addColorStop(1, 'rgba(190,220,170,0)');
+    glowContext.fillStyle = glow;
+    glowContext.fillRect(0, 0, 128, 128);
     const glowTexture = new THREE.CanvasTexture(glowCanvas);
-    const starGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+    const starHalo = new THREE.Sprite(new THREE.SpriteMaterial({
       map: glowTexture,
-      color: 0xe8f3ce,
+      color: 0xffffff,
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     }));
-    starGlow.scale.set(8.5, 8.5, 1);
-    starGroup.add(starGlow);
+    starHalo.scale.set(7.5, 7.5, 1);
+    star.add(starHalo);
 
-    // Big-bang shock rings.
-    const shockRings: THREE.Mesh[] = [];
+    // Controlled shockwave and fine energy filaments.
+    const shockwaves: THREE.Mesh[] = [];
     for (let i = 0; i < 3; i++) {
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(1, 0.009, 6, 128),
+      const wave = new THREE.Mesh(
+        new THREE.TorusGeometry(1, 0.012, 5, 112),
         new THREE.MeshBasicMaterial({
-          color: i === 1 ? 0xf5f4e8 : 0xd7e9b0,
+          color: i === 1 ? 0xffffff : 0xdce8cf,
           transparent: true,
           opacity: 0,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
         })
       );
-      ring.rotation.set(i * 0.54, i * 0.71, i * 0.32);
-      scene.add(ring);
-      shockRings.push(ring);
+      wave.rotation.set(i * 0.46, i * 0.31, i * 0.58);
+      scene.add(wave);
+      shockwaves.push(wave);
     }
 
-    // Short, directional energy burst. It decays quickly and never becomes confetti.
-    const burstCount = isSmall ? 520 : 980;
-    const burstGeo = new THREE.BufferGeometry();
-    const burstPositions = new Float32Array(burstCount * 3);
-    const burstVelocity = new Float32Array(burstCount * 3);
-    const burstColors = new Float32Array(burstCount * 3);
-    for (let i = 0; i < burstCount; i++) {
-      const v = new THREE.Vector3(
+    const filamentCount = small ? 260 : 520;
+    const filamentGeometry = new THREE.BufferGeometry();
+    const filamentPositions = new Float32Array(filamentCount * 3);
+    const filamentVelocity = new Float32Array(filamentCount * 3);
+    for (let i = 0; i < filamentCount; i++) {
+      const direction = new THREE.Vector3(
         Math.random() * 2 - 1,
         Math.random() * 2 - 1,
-        (Math.random() * 2 - 1) * 0.55
+        (Math.random() * 2 - 1) * 0.42
       ).normalize();
-      const speed = 3.5 + Math.random() * 7.5;
-      burstVelocity.set([v.x * speed, v.y * speed, v.z * speed], i * 3);
-      burstColors.set([0.86 + Math.random() * 0.14, 0.9 + Math.random() * 0.1, 0.72 + Math.random() * 0.2], i * 3);
+      const speed = 2.8 + Math.random() * 6.2;
+      filamentVelocity.set([direction.x * speed, direction.y * speed, direction.z * speed], i * 3);
     }
-    burstGeo.setAttribute('position', new THREE.BufferAttribute(burstPositions, 3));
-    burstGeo.setAttribute('color', new THREE.BufferAttribute(burstColors, 3));
-    const burstMat = new THREE.PointsMaterial({
-      size: isSmall ? 0.038 : 0.046,
-      vertexColors: true,
+    filamentGeometry.setAttribute('position', new THREE.BufferAttribute(filamentPositions, 3));
+    const filamentMaterial = new THREE.PointsMaterial({
+      color: 0xe4ebdc,
+      size: small ? 0.025 : 0.032,
       transparent: true,
       opacity: 0,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      sizeAttenuation: true,
     });
-    const burst = new THREE.Points(burstGeo, burstMat);
-    scene.add(burst);
+    const filaments = new THREE.Points(filamentGeometry, filamentMaterial);
+    scene.add(filaments);
 
-    // Each rectangle is a miniature motion-design shot, not a still image.
-    // Artwork is drawn into a canvas texture: anime energy, cinema, meme type,
-    // game HUD, sound and comic-book halftone language.
-    type Panel = {
-      group: THREE.Group;
-      texture: THREE.CanvasTexture;
-      canvas: HTMLCanvasElement;
-      ctx: CanvasRenderingContext2D;
-      material: THREE.MeshBasicMaterial;
-      frameMaterial: THREE.MeshBasicMaterial;
-      index: number;
-    };
-
-    const themes = [
-      { name: 'anime', base: '#17131c', accent: '#f0d9c9', hot: '#dc654c' },
-      { name: 'cinema', base: '#101619', accent: '#e7e2d3', hot: '#d1a96e' },
-      { name: 'meme', base: '#1a1721', accent: '#f4efff', hot: '#b7a0ee' },
-      { name: 'game', base: '#0b1a1a', accent: '#d9f36a', hot: '#74c9b0' },
-      { name: 'music', base: '#171316', accent: '#f2d7c2', hot: '#d47b63' },
-      { name: 'comic', base: '#191710', accent: '#f4e9c8', hot: '#e0b34e' },
+    // Six animated motion-design frames. Their content is shader-driven geometry/light,
+    // never a stack of still images or illustrated cards.
+    const panelPalettes = [
+      new THREE.Color('#d8e7ef'),
+      new THREE.Color('#c9d8c1'),
+      new THREE.Color('#d6c7e8'),
+      new THREE.Color('#d7e2c8'),
+      new THREE.Color('#e7d4c4'),
+      new THREE.Color('#c7d5df'),
     ];
-    const panelLayout = [
-      [-4.7, 2.05, -1.5],
-      [-1.55, 2.72, -0.6],
-      [2.0, 2.0, -1.4],
-      [4.85, 0.35, -2.1],
-      [-3.8, -2.0, -1.25],
-      [0.0, -2.55, -0.7],
+    const panelTargets = [
+      [-3.75, 0.25, -1.2],
+      [-1.55, 2.7, -0.5],
+      [2.0, 2.0, -1.3],
+      [4.55, 0.0, -1.8],
+      [-3.65, -2.05, -1.2],
+      [0.0, -2.55, -0.4],
     ];
-
-    const panels: Panel[] = [];
-    themes.forEach((theme, i) => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 640;
-      canvas.height = 360;
-      const ctx = canvas.getContext('2d')!;
-      const texture = new THREE.CanvasTexture(canvas);
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-
-      const frameMaterial = new THREE.MeshBasicMaterial({
-        color: 0xdfe4d6,
-        transparent: true,
-        opacity: 0,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-      });
-      const frame = new THREE.Mesh(new THREE.PlaneGeometry(3.35, 1.91), frameMaterial);
-      const material = new THREE.MeshBasicMaterial({
-        map: texture,
-        transparent: true,
-        opacity: 0,
-        side: THREE.DoubleSide,
-        toneMapped: false,
-        depthWrite: false,
-      });
-      const screen = new THREE.Mesh(new THREE.PlaneGeometry(3.29, 1.85), material);
-      screen.position.z = 0.012;
+    const panels: FilmPanel[] = [];
+    // Drop licensed, muted MP4 clips into public/media/pop-culture using these names.
+    // Missing files gracefully retain the shader-driven motion-design placeholder.
+    const footageSources = [
+      '/media/pop-culture/anime-action.mp4',
+      '/media/pop-culture/movie-moment.mp4',
+      '/media/pop-culture/music-video.mp4',
+      '/media/pop-culture/meme-reaction.mp4',
+      '/media/pop-culture/anime-impact.mp4',
+      '/media/pop-culture/cinema-trailer.mp4',
+    ];
+    const panelWidth = small ? 2.05 : 2.75;
+    const panelHeight = panelWidth * 0.5625;
+    panelTargets.forEach((_, index) => {
       const group = new THREE.Group();
-      group.add(frame, screen);
+      const isPortraitFootage = index === 0;
+      const frameWidth = isPortraitFootage ? panelHeight * (9 / 16) : panelWidth;
+      const frameHeight = panelHeight;
+      const video = document.createElement('video');
+      video.loop = true;
+      video.muted = true;
+      video.defaultMuted = true;
+      video.playsInline = true;
+      video.preload = 'none';
+      video.crossOrigin = 'anonymous';
+      const videoTexture = new THREE.VideoTexture(video);
+      videoTexture.colorSpace = THREE.SRGBColorSpace;
+      videoTexture.minFilter = THREE.LinearFilter;
+      videoTexture.magFilter = THREE.LinearFilter;
+      const material = new THREE.ShaderMaterial({
+        vertexShader,
+        fragmentShader: panelFragmentShader,
+        transparent: true,
+        uniforms: {
+          uTime: { value: 0 },
+          uSeed: { value: index * 1.73 },
+          uStyle: { value: index },
+          uOpacity: { value: 0 },
+          uAccent: { value: panelPalettes[index] },
+          uVideo: { value: videoTexture },
+          uHasVideo: { value: 0 },
+        },
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      });
+      video.addEventListener('canplay', () => {
+        material.uniforms.uHasVideo.value = 1;
+        video.play().catch(() => { /* Muted playback may still be blocked by browser policy. */ });
+      });
+      video.addEventListener('error', () => {
+        material.uniforms.uHasVideo.value = 0;
+      });
+      const screen = new THREE.Mesh(new THREE.PlaneGeometry(frameWidth, frameHeight), material);
+      group.add(screen);
+
+      const borderGeometry = new THREE.EdgesGeometry(new THREE.PlaneGeometry(frameWidth + 0.045, frameHeight + 0.045));
+      const borderMaterial = new THREE.LineBasicMaterial({
+        color: 0xdce5df,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+      });
+      const border = new THREE.LineSegments(borderGeometry, borderMaterial);
+      border.position.z = 0.012;
+      group.add(border);
+      group.position.set(0, 0, 1.2);
       group.scale.setScalar(0.001);
       scene.add(group);
-      panels.push({ group, texture, canvas, ctx, material, frameMaterial, index: i });
+      panels.push({ group, material, border, video, videoTexture, videoSource: footageSources[index], videoRequested: false, index });
     });
 
-    const drawPanel = (panel: Panel, time: number) => {
-      const { ctx, canvas, index } = panel;
-      const theme = themes[index];
-      const w = canvas.width;
-      const h = canvas.height;
-      const pulse = 0.5 + Math.sin(time * 2.2 + index) * 0.5;
-
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = theme.base;
-      ctx.fillRect(0, 0, w, h);
-
-      if (index === 0) {
-        // Anime-inspired impact shot: speed lines, eclipse and a single energy slash.
-        const cx = 420 + Math.sin(time * 0.7) * 28;
-        const cy = 170 + Math.cos(time * 0.9) * 15;
-        ctx.strokeStyle = theme.accent;
-        ctx.globalAlpha = 0.22;
-        ctx.lineWidth = 2;
-        for (let n = 0; n < 38; n++) {
-          const a = (n / 38) * Math.PI * 2;
-          ctx.beginPath();
-          ctx.moveTo(cx + Math.cos(a) * 95, cy + Math.sin(a) * 65);
-          ctx.lineTo(cx + Math.cos(a) * (260 + pulse * 40), cy + Math.sin(a) * (190 + pulse * 30));
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 0.95;
-        ctx.fillStyle = theme.hot;
-        ctx.beginPath();
-        ctx.arc(cx, cy, 72 + pulse * 8, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#17131c';
-        ctx.beginPath();
-        ctx.arc(cx - 25, cy - 15, 64, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.save();
-        ctx.translate(260, 175);
-        ctx.rotate(-0.48 + Math.sin(time * 1.1) * 0.025);
-        const slash = ctx.createLinearGradient(-220, 0, 220, 0);
-        slash.addColorStop(0, 'rgba(255,255,255,0)');
-        slash.addColorStop(0.48, '#fff6e8');
-        slash.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = slash;
-        ctx.fillRect(-240, -3, 480, 6);
-        ctx.restore();
-      } else if (index === 1) {
-        // Abstract cinema frame with moving practical light and film-gate marks.
-        const glow = ctx.createRadialGradient(380 + Math.sin(time) * 80, 145, 2, 380, 145, 250);
-        glow.addColorStop(0, 'rgba(237,214,168,0.65)');
-        glow.addColorStop(1, 'rgba(237,214,168,0)');
-        ctx.fillStyle = glow;
-        ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#080b0c';
-        ctx.fillRect(0, 0, w, 36);
-        ctx.fillRect(0, h - 36, w, 36);
-        ctx.fillStyle = theme.accent;
-        for (let x = 14; x < w; x += 34) {
-          ctx.fillRect(x, 10, 16, 7);
-          ctx.fillRect(x, h - 17, 16, 7);
-        }
-        ctx.globalAlpha = 0.6;
-        ctx.strokeStyle = theme.hot;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(80, 280);
-        ctx.lineTo(245, 112);
-        ctx.lineTo(340, 280);
-        ctx.stroke();
-      } else if (index === 2) {
-        // Kinetic meme / internet typography. Large, legible and deliberately simple.
-        ctx.fillStyle = theme.hot;
-        ctx.fillRect(0, 0, 14, h);
-        ctx.fillStyle = theme.accent;
-        ctx.font = '900 64px Arial, sans-serif';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('POV:', 48, 105);
-        ctx.font = '900 54px Arial, sans-serif';
-        ctx.fillText('YOU FOUND', 48, 178);
-        ctx.fillText('YOUR PEOPLE.', 48, 242 + Math.sin(time * 2) * 5);
-        ctx.globalAlpha = 0.62;
-        ctx.font = '18px monospace';
-        ctx.fillText('NO CONTEXT REQUIRED  /  001', 50, 315);
-      } else if (index === 3) {
-        // Arcade / game HUD with a moving reticle and perspective grid.
-        ctx.strokeStyle = theme.hot;
-        ctx.globalAlpha = 0.34;
-        ctx.lineWidth = 2;
-        for (let x = -200; x < 900; x += 54) {
-          ctx.beginPath();
-          ctx.moveTo(320 + (x - 320) * 0.12, 100);
-          ctx.lineTo(x + Math.sin(time + x) * 8, 360);
-          ctx.stroke();
-        }
-        for (let y = 110; y < 390; y += 30) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        }
-        const x = 320 + Math.sin(time * 1.4) * 100;
-        const y = 178 + Math.cos(time * 1.1) * 42;
-        ctx.globalAlpha = 0.95;
-        ctx.strokeStyle = theme.accent;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(x, y, 48 + pulse * 5, 0, Math.PI * 2);
-        ctx.moveTo(x - 72, y); ctx.lineTo(x + 72, y);
-        ctx.moveTo(x, y - 72); ctx.lineTo(x, y + 72);
-        ctx.stroke();
-        ctx.fillStyle = theme.accent;
-        ctx.font = '16px monospace';
-        ctx.fillText('PLAYER 01', 30, 42);
-        ctx.fillText('LEVEL ∞', 500, 42);
-      } else if (index === 4) {
-        // Music visualizer: a moving waveform and a rotating record.
-        ctx.strokeStyle = theme.hot;
-        ctx.lineWidth = 3;
-        ctx.globalAlpha = 0.9;
-        ctx.beginPath();
-        for (let x = 0; x < w; x += 4) {
-          const y = 180 + Math.sin(x * 0.025 + time * 2.8) * (20 + 58 * Math.sin(x * 0.008 + time));
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        ctx.globalAlpha = 0.7;
-        ctx.strokeStyle = theme.accent;
-        for (let x = 28; x < w; x += 38) {
-          const bar = 16 + Math.abs(Math.sin(x * 0.023 + time * 2)) * 76;
-          ctx.fillRect(x, 300 - bar, 7, bar);
-        }
-        ctx.strokeStyle = theme.accent;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(500, 105, 54, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(500, 105, 8, 0, Math.PI * 2);
-        ctx.stroke();
-      } else {
-        // Comic language: halftone field, panel gutters and a kinetic impact word.
-        ctx.fillStyle = '#d7b66e';
-        for (let y = 12; y < h; y += 12) {
-          for (let x = 12; x < w; x += 12) {
-            const d = Math.hypot(x - 320, y - 180);
-            if (d > 95 + pulse * 10) ctx.fillRect(x, y, 2, 2);
-          }
-        }
-        ctx.save();
-        ctx.translate(320, 180);
-        ctx.rotate(-0.08 + Math.sin(time * 1.5) * 0.025);
-        ctx.fillStyle = theme.hot;
-        ctx.font = '900 112px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('BAM!', 0, 0);
-        ctx.restore();
-      }
-
-      // A restrained film-gate edge gives every panel a cinematic frame.
-      ctx.globalAlpha = 0.48;
-      ctx.strokeStyle = theme.accent;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(5, 5, w - 10, h - 10);
-      ctx.globalAlpha = 1;
-      panel.texture.needsUpdate = true;
-    };
-
-    // An organic, continuous serpent. The head follows a designed flight path;
-    // every body ring samples the same path at an earlier time, producing natural lag.
-    const bodySegments = isSmall ? 104 : 148;
-    const radialSegments = 12;
+    // A continuous, tapered metallic body follows one smooth flight path.
+    // No cartoon head, eyes, scales or segmented joints: the silhouette is the snake.
+    const bodySegments = small ? 92 : 132;
+    const radialSegments = 10;
     const bodyPositions = new Float32Array((bodySegments + 1) * (radialSegments + 1) * 3);
     const bodyIndices: number[] = [];
     for (let i = 0; i < bodySegments; i++) {
@@ -414,118 +312,60 @@ export default function CinematicIntroScene() {
         bodyIndices.push(a, b, a + 1, b, b + 1, a + 1);
       }
     }
-    const bodyGeo = new THREE.BufferGeometry();
-    bodyGeo.setAttribute('position', new THREE.BufferAttribute(bodyPositions, 3).setUsage(THREE.DynamicDrawUsage));
-    bodyGeo.setIndex(bodyIndices);
-    const bodyMat = new THREE.MeshStandardMaterial({
-      color: 0x8f9a78,
-      metalness: 0.68,
-      roughness: 0.34,
-      emissive: 0x151d10,
-      emissiveIntensity: 0.16,
+    const bodyGeometry = new THREE.BufferGeometry();
+    bodyGeometry.setAttribute('position', new THREE.BufferAttribute(bodyPositions, 3).setUsage(THREE.DynamicDrawUsage));
+    bodyGeometry.setIndex(bodyIndices);
+    const bodyMaterial = new THREE.MeshStandardMaterial({
+      color: 0xc2c9bd,
+      metalness: 0.86,
+      roughness: 0.23,
+      emissive: 0x182018,
+      emissiveIntensity: 0.12,
       transparent: true,
       opacity: 0,
       side: THREE.DoubleSide,
     });
-    const serpent = new THREE.Mesh(bodyGeo, bodyMat);
+    const serpent = new THREE.Mesh(bodyGeometry, bodyMaterial);
     scene.add(serpent);
 
-    const head = new THREE.Group();
-    const headMat = new THREE.MeshStandardMaterial({
-      color: 0xaab394,
-      metalness: 0.62,
-      roughness: 0.3,
-    });
-    const skull = new THREE.Mesh(new THREE.SphereGeometry(1, 32, 24), headMat);
-    skull.scale.set(0.43, 0.19, 0.235);
-    head.add(skull);
-    const muzzle = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), headMat);
-    muzzle.position.set(0.31, -0.035, 0);
-    muzzle.scale.set(0.25, 0.125, 0.18);
-    head.add(muzzle);
-    const jaw = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 24, 16),
-      new THREE.MeshStandardMaterial({ color: 0x667453, metalness: 0.48, roughness: 0.4 })
-    );
-    jaw.position.set(0.19, -0.105, 0);
-    jaw.scale.set(0.31, 0.055, 0.16);
-    head.add(jaw);
-    const eyeMat = new THREE.MeshStandardMaterial({
-      color: 0x1d2517,
-      metalness: 0.45,
-      roughness: 0.2,
-    });
-    const eyeGlintMat = new THREE.MeshBasicMaterial({ color: 0xe4edc9 });
-    [-1, 1].forEach((side) => {
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 10), eyeMat);
-      eye.position.set(0.015, 0.135, side * 0.155);
-      head.add(eye);
-      const glint = new THREE.Mesh(new THREE.SphereGeometry(0.009, 8, 8), eyeGlintMat);
-      glint.position.set(0.028, 0.153, side * 0.171);
-      head.add(glint);
-    });
-    head.visible = false;
-    scene.add(head);
-
-    const startPoint = new THREE.Vector3(-7.4, 2.65, 2.0);
-    const p0 = new THREE.Vector3(-7.4, 2.65, 2.0);
-    const p1 = new THREE.Vector3(-4.0, 2.8, 2.4);
-    const p2 = new THREE.Vector3(-0.2, -1.32, 0.18);
-    const p3 = new THREE.Vector3(0, -1.32, 0.18);
-    const headDirection = new THREE.Vector3();
-    const vA = new THREE.Vector3();
-    const vB = new THREE.Vector3();
-    const vTangent = new THREE.Vector3();
-    const vNormal = new THREE.Vector3();
-    const vBinormal = new THREE.Vector3();
-    const vUp = new THREE.Vector3(0, 1, 0);
-    const axisX = new THREE.Vector3(1, 0, 0);
-    let aspectFit = 1;
-    const headPosition = (time: number, target: THREE.Vector3) => {
-      const local = time - 12.25;
-      if (local <= 0) return target.set(startPoint.x * aspectFit, startPoint.y, startPoint.z);
-      if (local < 2.35) {
-        const u = THREE.MathUtils.smoothstep(local, 0, 2.35);
+    const start = new THREE.Vector3(-7.7, 2.65, 1.7);
+    const c1 = new THREE.Vector3(-4.8, 3.15, 2.1);
+    const c2 = new THREE.Vector3(-2.4, 2.0, 0.35);
+    const arrival = new THREE.Vector3(0, 2.0, 0.15);
+    const pointAt = (time: number, target: THREE.Vector3) => {
+      const local = time - 9.65;
+      if (local <= 0) return target.copy(start);
+      if (local < 2.8) {
+        const u = THREE.MathUtils.clamp(local / 2.8, 0, 1);
         const inv = 1 - u;
         return target.set(
-          (inv * inv * inv * p0.x + 3 * inv * inv * u * p1.x + 3 * inv * u * u * p2.x + u * u * u * p3.x) * aspectFit,
-          inv * inv * inv * p0.y + 3 * inv * inv * u * p1.y + 3 * inv * u * u * p2.y + u * u * u * p3.y,
-          inv * inv * inv * p0.z + 3 * inv * inv * u * p1.z + 3 * inv * u * u * p2.z + u * u * u * p3.z
+          inv * inv * inv * start.x + 3 * inv * inv * u * c1.x + 3 * inv * u * u * c2.x + u * u * u * arrival.x,
+          inv * inv * inv * start.y + 3 * inv * inv * u * c1.y + 3 * inv * u * u * c2.y + u * u * u * arrival.y,
+          inv * inv * inv * start.z + 3 * inv * inv * u * c1.z + 3 * inv * u * u * c2.z + u * u * u * arrival.z
         );
       }
-      if (local < 5.9) {
-        const u = THREE.MathUtils.clamp((local - 2.35) / 3.55, 0, 1);
-        const eased = u * u * (3 - 2 * u);
-        const angle = -Math.PI * 0.5 + eased * Math.PI * 2.2;
-        const radius = 1.62 - 0.55 * eased;
-        return target.set(
-          Math.cos(angle) * radius * Math.max(0.78, aspectFit),
-          Math.sin(angle) * radius * 0.82,
-          0.32 + Math.sin(angle * 1.5) * 0.2
-        );
-      }
-      if (local < 6.55) {
-        const u = THREE.MathUtils.smoothstep(local, 5.9, 6.55);
-        const eased = u * u * (3 - 2 * u);
-        return target.set(
-          THREE.MathUtils.lerp(0.63 * Math.max(0.78, aspectFit), 0, eased),
-          THREE.MathUtils.lerp(-0.71, 0, eased),
-          THREE.MathUtils.lerp(0.52, 0.05, eased)
-        );
-      }
-      // After the star is consumed, the serpent closes into a living ouroboros.
-      // A full 3.1-second body delay lets the head meet the tail without a hard cut.
-      const loopTime = local - 6.55;
-      const radiusIn = THREE.MathUtils.smoothstep(loopTime, 0, 0.65);
-      const angle = -Math.PI * 0.5 + loopTime * 2.03 + Math.max(0, loopTime - 3.0) * 0.22;
-      const radius = 2.28 * radiusIn + Math.sin(loopTime * 0.65) * 0.045 * radiusIn;
+      const orbitTime = local - 2.8;
+      const angle = Math.PI * 0.5 - orbitTime * (Math.PI * 2 / 4.8);
+      const radius = orbitTime < 4.8
+        ? THREE.MathUtils.lerp(2.0, 1.3, THREE.MathUtils.smoothstep(orbitTime, 0, 4.8))
+        : orbitTime < 9.6
+          ? THREE.MathUtils.lerp(1.3, 2.15, THREE.MathUtils.smoothstep(orbitTime, 4.8, 9.6))
+          : 2.15 + Math.sin(orbitTime * 0.5) * 0.025;
       return target.set(
-        Math.cos(angle) * radius * Math.max(0.78, aspectFit),
-        Math.sin(angle) * radius * 0.86,
-        Math.sin(angle * 2.0) * 0.22
+        Math.cos(angle) * radius,
+        Math.sin(angle) * radius,
+        0.18 + Math.sin(angle * 2.0 + orbitTime * 0.22) * 0.2
       );
     };
 
+    const tangent = new THREE.Vector3();
+    const bodyCenter = new THREE.Vector3();
+    const previous = new THREE.Vector3();
+    const next = new THREE.Vector3();
+    const normal = new THREE.Vector3();
+    const binormal = new THREE.Vector3();
+    const up = new THREE.Vector3(0, 0, 1);
+    const axisX = new THREE.Vector3(1, 0, 0);
     const resize = () => {
       const width = Math.max(1, root.clientWidth);
       const height = Math.max(1, root.clientHeight);
@@ -533,12 +373,10 @@ export default function CinematicIntroScene() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       const aspect = width / height;
-      aspectFit = THREE.MathUtils.clamp(aspect / 1.28, 0.43, 1);
-      const horizontalFit = aspectFit;
-      panels.forEach((panel, i) => {
-        const [x, y, z] = panelLayout[i];
-        panel.group.position.set(x * horizontalFit, y * (isSmall ? 0.88 : 1), z);
-        panel.group.scale.setScalar(0.001);
+      const fitX = THREE.MathUtils.clamp(aspect / 1.3, 0.42, 1);
+      panels.forEach((panel) => {
+        const [x, y, z] = panelTargets[panel.index];
+        panel.group.position.set(x * fitX, y * (small ? 0.86 : 1), z);
       });
     };
     const observer = new ResizeObserver(resize);
@@ -547,152 +385,133 @@ export default function CinematicIntroScene() {
 
     const clock = new THREE.Clock();
     let raf = 0;
-    let lastPanelDraw = -1;
-
+    let lastTime = 0;
     const render = () => {
       raf = requestAnimationFrame(render);
       const time = clock.getElapsedTime();
+      const delta = Math.min(time - lastTime || 0.016, 0.04);
+      lastTime = time;
 
-      starField.rotation.y = time * 0.003;
-      starField.rotation.x = Math.sin(time * 0.08) * 0.006;
+      stars.rotation.y = time * 0.002;
+      stars.rotation.x = Math.sin(time * 0.07) * 0.004;
 
-      // A quiet ignition grows out of the void before the single bright detonation.
-      const ignition = THREE.MathUtils.smoothstep(time, 1.35, 4.0);
-      const afterglow = 1 - THREE.MathUtils.smoothstep(time, 18.15, 19.0);
-      const starPulse = 1 + Math.sin(time * 2.8) * 0.035;
-      starGroup.scale.setScalar(Math.max(0.001, ignition * starPulse * afterglow));
-      starHalo.material.opacity = 0.07 + ignition * 0.11;
-      starOuter.material.opacity = 0.02 + ignition * 0.045;
-      starGlow.material.opacity = ignition * 0.8 * afterglow;
-      starLight.intensity = ignition * 2.4 * afterglow;
-      const flash = Math.max(0, 1 - Math.abs(time - 5.05) / 0.34);
-      starCore.scale.setScalar(1 + flash * 5.5);
-      starGlow.scale.setScalar(8.5 + ignition * 2.0 + flash * 13);
+      // 0–3.5s: a distant star quietly gathers light.
+      const ignition = THREE.MathUtils.smoothstep(time, 0.85, 3.2);
+      const fadeStar = 1 - THREE.MathUtils.smoothstep(time, 19.8, 21.0);
+      star.scale.setScalar(Math.max(0.001, ignition * fadeStar * (1 + Math.sin(time * 2.1) * 0.025)));
+      starHalo.material.opacity = ignition * 0.82 * fadeStar;
+      keyLight.intensity = ignition * 2.2 * fadeStar;
+      rimLight.intensity = ignition * 0.65 * fadeStar;
 
-      const bang = THREE.MathUtils.smoothstep(time, 4.95, 5.18);
-      shockRings.forEach((ring, i) => {
-        const p = THREE.MathUtils.clamp((time - 5.0 - i * 0.13) / 1.25, 0, 1);
-        ring.scale.setScalar(0.06 + p * 10.5);
-        (ring.material as THREE.MeshBasicMaterial).opacity = (1 - p) * 0.62 * bang;
+      // 3.45s: one white detonation, followed by a fast optical shockwave.
+      const bang = THREE.MathUtils.smoothstep(time, 3.38, 3.58);
+      const flash = Math.max(0, 1 - Math.abs(time - 3.52) / 0.27);
+      starCore.scale.setScalar(1 + flash * 5.8);
+      starHalo.scale.setScalar(7.5 + flash * 17);
+      shockwaves.forEach((wave, index) => {
+        const age = THREE.MathUtils.clamp((time - 3.48 - index * 0.12) / 1.45, 0, 1);
+        wave.scale.setScalar(0.05 + age * 10.5);
+        (wave.material as THREE.MeshBasicMaterial).opacity = bang * (1 - age) * 0.48;
       });
-      const burstAge = Math.max(0, time - 5.02);
-      for (let i = 0; i < burstCount; i++) {
+      const burstAge = Math.max(0, time - 3.48);
+      for (let i = 0; i < filamentCount; i++) {
         const k = i * 3;
-        const age = Math.min(2.1, burstAge);
-        burstPositions[k] = burstVelocity[k] * age;
-        burstPositions[k + 1] = burstVelocity[k + 1] * age - age * age * 0.32;
-        burstPositions[k + 2] = burstVelocity[k + 2] * age;
+        const age = Math.min(1.9, burstAge);
+        filamentPositions[k] = filamentVelocity[k] * age;
+        filamentPositions[k + 1] = filamentVelocity[k + 1] * age;
+        filamentPositions[k + 2] = filamentVelocity[k + 2] * age;
       }
-      burstGeo.attributes.position.needsUpdate = true;
-      burstMat.opacity = bang * (1 - THREE.MathUtils.smoothstep(time, 6.55, 7.6)) * 0.74;
+      filamentGeometry.attributes.position.needsUpdate = true;
+      filamentMaterial.opacity = bang * (1 - THREE.MathUtils.smoothstep(time, 5.35, 6.25)) * 0.58;
 
-      // Panels emerge from the detonation, resolve into a composed wall of frames,
-      // then drift past camera as one continuous montage.
-      const panelIn = THREE.MathUtils.smoothstep(time, 5.45, 7.05);
-      const panelOut = 1 - THREE.MathUtils.smoothstep(time, 11.9, 13.2);
-      const panelVisible = panelIn * panelOut;
-      const redraw = lastPanelDraw < 0 || time - lastPanelDraw >= 1 / 24;
-      if (redraw) lastPanelDraw = time;
-      panels.forEach((panel, i) => {
-        if (redraw) drawPanel(panel, time + i * 0.24);
-        const [targetX, targetY, targetZ] = panelLayout[i];
-        const stagger = i * 0.075;
-        const appear = THREE.MathUtils.smoothstep(time, 5.5 + stagger, 7.0 + stagger);
-        const vanish = THREE.MathUtils.smoothstep(time, 11.85 + stagger * 0.4, 13.25 + stagger * 0.4);
-        const visibility = appear * (1 - vanish);
-        const fromCenter = 1 - appear;
+      // 4.1–9.4s: frames burst from the star, turn in depth, then sweep away.
+      panels.forEach((panel, index) => {
+        const stagger = index * 0.14;
+        const appear = THREE.MathUtils.smoothstep(time, 4.05 + stagger, 5.35 + stagger);
+        const clear = THREE.MathUtils.smoothstep(time, 8.0 + stagger * 0.2, 9.55 + stagger * 0.2);
+        const visible = appear * (1 - clear);
+        if (appear > 0.02 && !panel.videoRequested) {
+          panel.videoRequested = true;
+          panel.video.src = panel.videoSource;
+          panel.video.load();
+        }
+        const [x, y, z] = panelTargets[index];
         const aspect = root.clientWidth / Math.max(1, root.clientHeight);
-        const horizontalFit = THREE.MathUtils.clamp(aspect / 1.28, 0.43, 1);
-        const targetXFit = targetX * horizontalFit;
-        const fly = 1 - THREE.MathUtils.smoothstep(time, 9.6, 13.0);
-        const drift = Math.sin(time * 0.38 + i * 1.7) * 0.08;
+        const fitX = THREE.MathUtils.clamp(aspect / 1.3, 0.42, 1);
+        const drift = Math.sin(time * 0.34 + index * 1.3) * 0.045;
         panel.group.position.set(
-          THREE.MathUtils.lerp(0, targetXFit, appear) * (1 + (1 - fly) * 0.08),
-          THREE.MathUtils.lerp(0, targetY, appear) + drift,
-          THREE.MathUtils.lerp(1.35, targetZ, appear) + Math.sin(time * 0.22 + i) * 0.12
+          THREE.MathUtils.lerp(0, x * fitX, appear),
+          THREE.MathUtils.lerp(0, y, appear) + drift,
+          THREE.MathUtils.lerp(1.5, z, appear) + Math.sin(time * 0.26 + index) * 0.08
         );
         panel.group.rotation.set(
-          (i % 2 ? -1 : 1) * (0.025 + fromCenter * 0.06),
-          (i % 2 ? -1 : 1) * (0.06 + fromCenter * 0.12),
-          (i % 2 ? -1 : 1) * (0.025 + fromCenter * 0.08)
+          (index % 2 ? -1 : 1) * (0.035 + (1 - appear) * 0.15),
+          (index % 2 ? 1 : -1) * (0.055 + (1 - appear) * 0.2),
+          (index % 2 ? -1 : 1) * (0.018 + (1 - appear) * 0.11)
         );
-        const size = (isSmall ? 0.72 : 0.92) * visibility;
-        panel.group.scale.setScalar(Math.max(0.001, size));
-        panel.material.opacity = visibility;
-        panel.frameMaterial.opacity = visibility * 0.62;
+        const scale = (small ? 0.72 : 0.9) * visible;
+        panel.group.scale.setScalar(Math.max(0.001, scale));
+        panel.material.uniforms.uTime.value = time;
+        panel.material.uniforms.uOpacity.value = visible;
+        if (panel.video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          panel.material.uniforms.uHasVideo.value = 1;
+        }
+        (panel.border.material as THREE.LineBasicMaterial).opacity = visible * 0.72;
       });
 
-      // The serpent enters with intent, flies to the star, circles it, consumes it,
-      // then keeps moving as its body catches up and forms a seamless living loop.
-      const snakeIn = THREE.MathUtils.smoothstep(time, 11.95, 13.1);
-      const snakeOut = 1 - THREE.MathUtils.smoothstep(time, 22.05, 22.55);
+      // 9.65s onward: the serpent accelerates in, circles the star and closes a
+      // seamless orbit. The delayed body samples the same path, so its motion flows.
+      const snakeIn = THREE.MathUtils.smoothstep(time, 9.35, 10.15);
+      const snakeOut = 1 - THREE.MathUtils.smoothstep(time, 20.1, 21.25);
       const snakeOpacity = snakeIn * snakeOut;
       serpent.visible = snakeOpacity > 0.001;
-      head.visible = serpent.visible;
       if (serpent.visible) {
-        const current = headPosition(time, vA);
-        const before = headPosition(time - 0.025, vB);
-        const after = headPosition(time + 0.025, vTangent);
-        headDirection.subVectors(after, before).normalize();
-        if (headDirection.lengthSq() < 0.0001) headDirection.set(1, 0, 0);
-
-        const position = bodyGeo.attributes.position as THREE.BufferAttribute;
-        const bodyDelay = 3.1;
+        const position = bodyGeometry.attributes.position as THREE.BufferAttribute;
+        const bodyDelay = 4.8;
         for (let i = 0; i <= bodySegments; i++) {
           const u = i / bodySegments;
           const sampleTime = time - u * bodyDelay;
-          const center = headPosition(sampleTime, vA);
-          const prev = headPosition(sampleTime - 0.018, vB);
-          const next = headPosition(sampleTime + 0.018, vTangent);
-          const tangent = next.sub(prev).normalize();
+          const center = pointAt(sampleTime, bodyCenter);
+          pointAt(sampleTime - 0.012, previous);
+          pointAt(sampleTime + 0.012, next);
+          tangent.subVectors(next, previous).normalize();
           if (tangent.lengthSq() < 0.0001) tangent.set(1, 0, 0);
-          vNormal.crossVectors(tangent, vUp).normalize();
-          if (vNormal.lengthSq() < 0.0001) vNormal.set(0, 0, 1);
-          vBinormal.crossVectors(tangent, vNormal).normalize();
-          const radius = 0.155 * Math.pow(1 - u, 0.82) + 0.012;
+          normal.crossVectors(tangent, up).normalize();
+          if (normal.lengthSq() < 0.0001) normal.set(0, 1, 0);
+          binormal.crossVectors(tangent, normal).normalize();
+          const taper = 0.012 + 0.112 * Math.sin(Math.PI * Math.pow(u, 0.72));
+          const breathing = 1 + Math.sin(time * 1.15 - u * 5.5) * 0.018;
+          const radius = taper * breathing;
           for (let j = 0; j <= radialSegments; j++) {
             const angle = (j / radialSegments) * Math.PI * 2;
             const cos = Math.cos(angle) * radius;
             const sin = Math.sin(angle) * radius;
-            const x = center.x + vNormal.x * cos + vBinormal.x * sin;
-            const y = center.y + vNormal.y * cos + vBinormal.y * sin;
-            const z = center.z + vNormal.z * cos + vBinormal.z * sin;
-            position.setXYZ(i * (radialSegments + 1) + j, x, y, z);
+            position.setXYZ(
+              i * (radialSegments + 1) + j,
+              center.x + normal.x * cos + binormal.x * sin,
+              center.y + normal.y * cos + binormal.y * sin,
+              center.z + normal.z * cos + binormal.z * sin
+            );
           }
         }
         position.needsUpdate = true;
-        bodyGeo.computeVertexNormals();
-        bodyMat.opacity = snakeOpacity * 0.96;
-
-        head.position.copy(current);
-        head.quaternion.setFromUnitVectors(axisX, headDirection);
-        const headScale = snakeIn * snakeOut;
-        head.scale.setScalar(headScale);
-        // The coil gains a subtle rotational momentum after the star disappears.
-        // The delayed flight path itself carries the coil's rotation, keeping
-        // the head and body locked together without a detached mesh spin.
-        serpent.rotation.set(0, 0, 0);
-        head.rotation.z = 0;
+        bodyGeometry.computeVertexNormals();
+        bodyMaterial.opacity = snakeOpacity * 0.98;
       }
 
-      const consume = THREE.MathUtils.smoothstep(time, 18.0, 18.9);
-      if (time < 19.0) {
-        const keep = 1 - consume;
-        starGroup.scale.multiplyScalar(keep);
-        starGlow.material.opacity = ignition * 0.8 * afterglow * keep;
-        starLight.intensity = ignition * 2.4 * afterglow * keep;
-      }
+      // The star is consumed into the orbit; the serpent and light resolve together.
+      const consume = THREE.MathUtils.smoothstep(time, 18.7, 19.7);
+      star.scale.multiplyScalar(1 - consume * delta * 2.2);
+      starHalo.material.opacity = ignition * 0.82 * fadeStar * (1 - consume);
+      keyLight.intensity = ignition * 2.2 * fadeStar * (1 - consume);
 
-      // Camera movement is nearly imperceptible: depth comes from the artwork,
-      // not a restless camera or constant zoom.
-      const cameraMove = THREE.MathUtils.smoothstep(time, 4.7, 8.5);
-      camera.position.x = Math.sin(time * 0.12) * 0.08;
-      camera.position.y = Math.cos(time * 0.1) * 0.055;
-      camera.position.z = 18 - cameraMove * 0.28;
+      // Keep the camera composed and steady; no perpetual zoom or noisy movement.
+      camera.position.x = Math.sin(time * 0.09) * 0.035;
+      camera.position.y = Math.cos(time * 0.08) * 0.025;
       camera.lookAt(0, 0, 0);
-
       renderer.render(scene, camera);
-      if (time > 23.2) {
+
+      if (time > 22.2) {
         cancelAnimationFrame(raf);
         raf = 0;
       }
@@ -703,17 +522,22 @@ export default function CinematicIntroScene() {
     return () => {
       cancelAnimationFrame(raf);
       observer.disconnect();
-      starFieldGeo.dispose();
-      starFieldMat.dispose();
-      burstGeo.dispose();
-      burstMat.dispose();
-      bodyGeo.dispose();
-      bodyMat.dispose();
+      starGeometry.dispose();
+      starMaterial.dispose();
+      filamentGeometry.dispose();
+      filamentMaterial.dispose();
+      bodyGeometry.dispose();
+      bodyMaterial.dispose();
       glowTexture.dispose();
       panels.forEach((panel) => {
-        panel.texture.dispose();
+        panel.video.pause();
+        panel.video.removeAttribute('src');
+        panel.video.load();
+        panel.videoTexture.dispose();
         panel.material.dispose();
-        panel.frameMaterial.dispose();
+        panel.border.geometry.dispose();
+        (panel.border.material as THREE.Material).dispose();
+        (panel.group.children[0] as THREE.Mesh).geometry.dispose();
       });
       scene.traverse((object) => {
         if (object instanceof THREE.Mesh) {
