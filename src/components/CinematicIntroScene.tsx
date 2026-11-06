@@ -274,7 +274,7 @@ export default function CinematicIntroScene() {
           vec3 base = vec3(0.24, 0.27, 0.22);
           vec3 metal = mix(base * 0.45, vec3(0.76, 0.81, 0.69), diffuse * 0.76 + spec * 0.85);
           metal += vec3(0.34, 0.4, 0.27) * fresnel * 0.52;
-          float tailFade = smoothstep(1.0, 0.86, vAlong);
+          float tailFade = 1.0 - smoothstep(0.86, 1.0, vAlong);
           gl_FragColor = vec4(metal, uOpacity * tailFade);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
