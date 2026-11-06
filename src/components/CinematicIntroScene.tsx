@@ -289,13 +289,13 @@ export default function CinematicIntroScene() {
 
     const start = new THREE.Vector3(-7.7, 2.65, 1.7);
     const c1 = new THREE.Vector3(-4.8, 3.15, 2.1);
-    const c2 = new THREE.Vector3(-1.8, 2.0, 0.35);
+    const c2 = new THREE.Vector3(-2.4, 2.0, 0.35);
     const arrival = new THREE.Vector3(0, 2.0, 0.15);
     const pointAt = (time: number, target: THREE.Vector3) => {
       const local = time - 9.65;
       if (local <= 0) return target.copy(start);
       if (local < 2.8) {
-        const u = THREE.MathUtils.smoothstep(local, 0, 2.8);
+        const u = THREE.MathUtils.clamp(local / 2.8, 0, 1);
         const inv = 1 - u;
         return target.set(
           inv * inv * inv * start.x + 3 * inv * inv * u * c1.x + 3 * inv * u * u * c2.x + u * u * u * arrival.x,
@@ -304,11 +304,11 @@ export default function CinematicIntroScene() {
         );
       }
       const orbitTime = local - 2.8;
-      const angle = Math.PI * 0.5 - orbitTime * (Math.PI * 2 / 3.2);
-      const radius = orbitTime < 3.2
-        ? THREE.MathUtils.lerp(2.0, 1.3, THREE.MathUtils.smoothstep(orbitTime, 0, 3.2))
-        : orbitTime < 6.4
-          ? THREE.MathUtils.lerp(1.3, 2.15, THREE.MathUtils.smoothstep(orbitTime, 3.2, 6.4))
+      const angle = Math.PI * 0.5 - orbitTime * (Math.PI * 2 / 4.8);
+      const radius = orbitTime < 4.8
+        ? THREE.MathUtils.lerp(2.0, 1.3, THREE.MathUtils.smoothstep(orbitTime, 0, 4.8))
+        : orbitTime < 9.6
+          ? THREE.MathUtils.lerp(1.3, 2.15, THREE.MathUtils.smoothstep(orbitTime, 4.8, 9.6))
           : 2.15 + Math.sin(orbitTime * 0.5) * 0.025;
       return target.set(
         Math.cos(angle) * radius,
@@ -418,7 +418,7 @@ export default function CinematicIntroScene() {
       serpent.visible = snakeOpacity > 0.001;
       if (serpent.visible) {
         const position = bodyGeometry.attributes.position as THREE.BufferAttribute;
-        const bodyDelay = 3.2;
+        const bodyDelay = 4.8;
         for (let i = 0; i <= bodySegments; i++) {
           const u = i / bodySegments;
           const sampleTime = time - u * bodyDelay;
