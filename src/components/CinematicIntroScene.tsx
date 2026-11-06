@@ -28,7 +28,7 @@ const panelFragmentShader = \`
     if (uStyle < 0.5) {
       float a = atan(p.y, p.x);
       float r = length(p);
-      sweep = line(sin(a * 17.0 + r * 18.0 - t * 2.8 + uSeed), 0.025) * smoothstep(0.58, 0.08, r);
+      sweep = line(sin(a * 17.0 + r * 18.0 - t * 2.8 + uSeed), 0.025) * (1.0 - smoothstep(0.08, 0.58, r));
       sweep += line(p.y - sin(p.x * 7.0 - t * 1.6) * 0.09, 0.018) * 0.8;
     } else if (uStyle < 1.5) {
       float r = length(p * vec2(0.9, 1.3));
@@ -49,7 +49,7 @@ const panelFragmentShader = \`
       sweep += line(uv.y - 0.5 - sin(uv.x * 15.0 - t) * 0.2, 0.008) * 0.55;
     } else {
       float rays = line(sin(atan(p.y, p.x) * 23.0 + t * 0.7), 0.025);
-      sweep = rays * smoothstep(0.6, 0.05, length(p)) * 0.5;
+      sweep = rays * (1.0 - smoothstep(0.05, 0.6, length(p))) * 0.5;
       sweep += exp(-abs(length(p) - (0.2 + 0.12 * sin(t * 0.7))) * 28.0) * 0.55;
     }
     float grain = hash(floor(uv * vec2(480.0, 270.0)) + floor(t * 12.0)) * 0.035;
