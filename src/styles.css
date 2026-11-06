@@ -1777,3 +1777,9 @@ body:before{
   .world-card img,.piece-image img{clip-path:none!important;will-change:auto}
 }
 
+
+
+/* Keep fixed UI layers anchored to the viewport (the site child stacking rule is for content sections only). */
+.site>.cursor-aura,.site>.cursor-dot,.site>.scroll-progress,.site>.chapter-index,.site>.nav-dock{position:fixed}
+.site>.cursor-aura,.site>.cursor-dot{top:0;left:0}
+.site>.scroll-progress{top:0;left:0;right:0}
