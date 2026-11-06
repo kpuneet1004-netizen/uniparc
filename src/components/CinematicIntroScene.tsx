@@ -12,6 +12,9 @@ export default function CinematicIntroScene() {
   useEffect(() => {
     const root = host.current;
     if (!root) return;
+    // The parent intro is skipped for reduced-motion users; avoid creating a WebGL
+    // context or running a hidden animation loop for them.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x020303, 0.018);
     const camera = new THREE.PerspectiveCamera(42, 1, .1, 180);
@@ -153,6 +156,7 @@ export default function CinematicIntroScene() {
     const observer = new ResizeObserver(resize); observer.observe(root); resize();
 
     const clock = new THREE.Clock();
+    let lastPanelDraw = -1;
     const drawPanel = (p: typeof panels[number], t: number) => {
       const { ctx, canvas } = p; const theme = themes[panels.indexOf(p)];
       ctx.fillStyle = theme.bg; ctx.fillRect(0, 0, 640, 400);
@@ -175,7 +179,8 @@ export default function CinematicIntroScene() {
       raf = requestAnimationFrame(render);
       const t = clock.getElapsedTime();
       stars.rotation.y = t * .008; stars.rotation.x = Math.sin(t * .12) * .012;
-      const starIn = THREE.MathUtils.smoothstep(t, 1.0, 3.2) * (1 - THREE.MathUtils.smoothstep(t, 5.0, 5.8));
+      // The core survives the Big Bang as the object the serpent eventually consumes.
+      const starIn = THREE.MathUtils.smoothstep(t, 1.0, 3.2) * (1 - THREE.MathUtils.smoothstep(t, 20.0, 21.2));
       starGroup.scale.setScalar(.01 + starIn * (.9 + Math.sin(t * 3) * .035));
       starGroup.position.z = 0;
       starLight.intensity = starIn * (2 + Math.max(0, Math.sin(t * 4)) * 5);
@@ -195,8 +200,10 @@ export default function CinematicIntroScene() {
       burstGeo.attributes.position.needsUpdate = true;
       burstMat.opacity = Math.min(1, bang * 2.2) * (1 - THREE.MathUtils.smoothstep(t, 8.4, 9.6)) * .9;
       const montage = THREE.MathUtils.smoothstep(t, 6.0, 7.3) * (1 - THREE.MathUtils.smoothstep(t, 10.9, 12.1));
+      const shouldRedrawPanels = lastPanelDraw < 0 || t - lastPanelDraw >= 1 / 24;
+      if (shouldRedrawPanels) lastPanelDraw = t;
       panels.forEach((p, i) => {
-        drawPanel(p, t);
+        if (shouldRedrawPanels) drawPanel(p, t);
         const target = panelLayout[i];
         const appear = THREE.MathUtils.smoothstep(t, 6.0 + i * .07, 7.2 + i * .07);
         const vanish = THREE.MathUtils.smoothstep(t, 10.6 + i * .045, 11.8 + i * .045);
@@ -242,7 +249,10 @@ export default function CinematicIntroScene() {
         serpent.scale.setScalar(snakeIn * snakeOut);
         head.scale.setScalar(snakeIn * snakeOut);
         serpent.rotation.z = Math.sin(t * .35) * .025;
-        starGroup.scale.multiplyScalar(1 - THREE.MathUtils.smoothstep(t, 19.8, 20.8) * .98);
+        const consume = THREE.MathUtils.smoothstep(t, 19.8, 21.0);
+        starGroup.scale.setScalar(.01 + starIn * (.9 + Math.sin(t * 3) * .035));
+        starGroup.scale.multiplyScalar(1 - consume * .98);
+        starLight.intensity = starIn * (1 - consume) * (2 + Math.max(0, Math.sin(t * 4)) * 5);
       }
       camera.position.x = Math.sin(t * .16) * .18;
       camera.position.y = Math.cos(t * .13) * .12;
