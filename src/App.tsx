@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import * as THREE from 'three';
 import CinematicIntroScene from './components/CinematicIntroScene';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -47,7 +46,6 @@ export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
-  const cosmicCanvasRef = useRef<HTMLCanvasElement>(null);
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
@@ -82,54 +80,6 @@ export default function App() {
       window.scrollTo({ top: destination, behavior: 'smooth' });
     }
   };
-
-  useEffect(() => {
-    const canvas = cosmicCanvasRef.current;
-    if (!canvas || isLoaded || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 120);
-    camera.position.z = 24;
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    renderer.setSize(window.innerWidth, window.innerHeight, false);
-    const mobile = window.matchMedia('(max-width: 700px)').matches;
-    const starCount = mobile ? 520 : 1250;
-    const starPositions = new Float32Array(starCount * 3);
-    const starColors = new Float32Array(starCount * 3);
-    for (let i = 0; i < starCount; i++) {
-      const n = i * 3;
-      starPositions[n] = (Math.random() - .5) * 58;
-      starPositions[n + 1] = (Math.random() - .5) * 36;
-      starPositions[n + 2] = (Math.random() - .5) * 34;
-      const tint = .72 + Math.random() * .28;
-      starColors[n] = tint * .82; starColors[n + 1] = tint; starColors[n + 2] = tint * .58;
-    }
-    const starGeometry = new THREE.BufferGeometry();
-    starGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
-    starGeometry.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-    const starMaterial = new THREE.PointsMaterial({ size: .045, vertexColors: true, transparent: true, opacity: .48, sizeAttenuation: true, depthWrite: false });
-    const stars = new THREE.Points(starGeometry, starMaterial);
-    scene.add(stars);
-    const resize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight, false);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    };
-    let frame = 0;
-    const render = () => {
-      stars.rotation.y += .000035;
-      stars.rotation.x = Math.sin(performance.now() * .00008) * .012;
-      renderer.render(scene, camera);
-      frame = requestAnimationFrame(render);
-    };
-    render();
-    window.addEventListener('resize', resize);
-    return () => {
-      cancelAnimationFrame(frame); window.removeEventListener('resize', resize);
-      starGeometry.dispose(); starMaterial.dispose(); renderer.dispose();
-    };
-  }, [isLoaded]);
 
   useEffect(() => {
     setShowSkipIntro(readIntroSeen());
