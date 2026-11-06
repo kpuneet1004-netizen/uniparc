@@ -221,7 +221,7 @@ export default function CinematicIntroScene() {
       new THREE.Color('#c7d5df'),
     ];
     const panelTargets = [
-      [-4.55, 2.0, -1.2],
+      [-3.75, 0.25, -1.2],
       [-1.55, 2.7, -0.5],
       [2.0, 2.0, -1.3],
       [4.55, 0.0, -1.8],
@@ -243,6 +243,9 @@ export default function CinematicIntroScene() {
     const panelHeight = panelWidth * 0.5625;
     panelTargets.forEach((_, index) => {
       const group = new THREE.Group();
+      const isPortraitFootage = index === 0;
+      const frameWidth = isPortraitFootage ? panelHeight * (9 / 16) : panelWidth;
+      const frameHeight = panelHeight;
       const video = document.createElement('video');
       video.loop = true;
       video.muted = true;
@@ -277,10 +280,10 @@ export default function CinematicIntroScene() {
       video.addEventListener('error', () => {
         material.uniforms.uHasVideo.value = 0;
       });
-      const screen = new THREE.Mesh(new THREE.PlaneGeometry(panelWidth, panelHeight), material);
+      const screen = new THREE.Mesh(new THREE.PlaneGeometry(frameWidth, frameHeight), material);
       group.add(screen);
 
-      const borderGeometry = new THREE.EdgesGeometry(new THREE.PlaneGeometry(panelWidth + 0.045, panelHeight + 0.045));
+      const borderGeometry = new THREE.EdgesGeometry(new THREE.PlaneGeometry(frameWidth + 0.045, frameHeight + 0.045));
       const borderMaterial = new THREE.LineBasicMaterial({
         color: 0xdce5df,
         transparent: true,
