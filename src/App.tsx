@@ -19,9 +19,7 @@ const pieces = [
 ];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return <svg aria-hidden="true" className={diagonal ? 'arrow arrow-diagonal' : 'arrow'} viewBox="0 0 20 20" fill="none">
-    <path d={diagonal ? 'M5 15 15 5M6 5h9v9' : 'M5 5 15 15M6 15h9V6'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>;
+  return <span aria-hidden="true" className="arrow">{diagonal ? '↗' : '↘'}</span>;
 }
 
 export default function App() {
