@@ -87,6 +87,10 @@ export default function App() {
   }, [activeDock]);
 
   useEffect(() => {
+    // A fresh visit always starts at the hero, never at a browser-restored scroll position or old hash.
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    window.scrollTo(0, 0);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
@@ -101,7 +105,13 @@ export default function App() {
     }
 
     const ctx = gsap.context(() => {
-      const intro = gsap.timeline({ defaults: { ease: 'power4.inOut' }, onComplete: () => setIsLoaded(true) });
+      const finishIntro = () => {
+        window.scrollTo(0, 0);
+        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+        setActiveDock('home');
+        setIsLoaded(true);
+      };
+      const intro = gsap.timeline({ defaults: { ease: 'power4.inOut' }, onComplete: finishIntro });
       if (reduceMotion) {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
