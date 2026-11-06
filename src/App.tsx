@@ -28,11 +28,13 @@ export default function App() {
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
+  const modalCloseRef = useRef<HTMLButtonElement>(null);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
-  const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
+  const [activeChapter, setActiveChapter] = useState('00 / THE UNIVERSE');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
   const [waitlistNotice, setWaitlistNotice] = useState('');
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
@@ -63,12 +65,13 @@ export default function App() {
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.085, smoothWheel: true, wheelMultiplier: 0.9, anchors: { offset: -88 } });
     lenisRef.current = lenis;
     let lenisTick: ((time: number) => void) | undefined;
+    let onRefresh: (() => void) | undefined;
     if (lenis) {
       lenis.on('scroll', ScrollTrigger.update);
       lenisTick = (time: number) => lenis.raf(time * 1000);
       gsap.ticker.add(lenisTick);
       gsap.ticker.lagSmoothing(0);
-      const onRefresh = () => lenis.resize();
+      onRefresh = () => lenis.resize();
       ScrollTrigger.addEventListener('refresh', onRefresh);
     }
 
@@ -77,12 +80,27 @@ export default function App() {
       if (reduceMotion) {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
-        intro.fromTo('.preloader-mark', { yPercent: 120, rotate: 8 }, { yPercent: 0, rotate: 0, duration: 0.85 })
+        intro.fromTo('.preloader-logo', { yPercent: 120, rotate: 8 }, { yPercent: 0, rotate: 0, duration: 0.85 })
           .fromTo('.preloader-rule', { scaleX: 0, transformOrigin: 'left' }, { scaleX: 1, duration: 0.65 }, '-=0.45')
-          .to('.preloader-mark', { yPercent: -120, rotate: -5, duration: 0.65, delay: 0.12 })
+          .to('.preloader-logo', { yPercent: -120, rotate: -5, duration: 0.65, delay: 0.12 })
           .to('.preloader', { yPercent: -100, duration: 0.85, ease: 'power4.inOut' }, '-=0.18')
           .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.85, stagger: 0.09, ease: 'power3.out' }, '-=0.45');
       }
+
+      const chapters = [
+        { selector: '.hero', label: '00 / THE UNIVERSE' },
+        { selector: '.manifesto', label: '01 / THE IDEA' },
+        { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' },
+        { selector: '.drop', label: '03 / THE UNIPARC EDIT' },
+        { selector: '.campaign', label: '04 / CULTURE IS A WAY OF LIFE' },
+        { selector: '.about', label: '05 / OUR POINT OF VIEW' },
+        { selector: '.closing', label: '06 / FIND YOUR PEOPLE' },
+        { selector: '.footer', label: '07 / THE DETAILS' },
+      ];
+      chapters.forEach(({ selector, label }) => {
+        const section = rootRef.current?.querySelector<HTMLElement>(selector);
+        if (section) ScrollTrigger.create({ trigger: section, start: 'top 45%', end: 'bottom 45%', onEnter: () => setActiveChapter(label), onEnterBack: () => setActiveChapter(label) });
+      });
 
       if (!reduceMotion) {
         gsap.to('.hero-visual img', { yPercent: 13, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero-visual', start: 'top top', end: 'bottom top', scrub: true } });
@@ -103,8 +121,6 @@ export default function App() {
         gsap.fromTo('.campaign-image', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
         gsap.fromTo('.closing-title', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: '.closing', start: 'top 75%', once: true } });
         gsap.utils.toArray<HTMLElement>('.masked-reveal').forEach((el) => gsap.fromTo(el, { clipPath: 'inset(0 0 100% 0)', y: 34 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.15, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 86%', once: true } }));
-        const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.drop', label: '03 / THE UNIPARC EDIT' }, { selector: '.campaign', label: '04 / CULTURE IS A WAY OF LIFE' }, { selector: '.about', label: '05 / OUR POINT OF VIEW' }];
-        chapters.forEach(({ selector, label }) => ScrollTrigger.create({ trigger: selector, start: 'top 45%', end: 'bottom 45%', onEnter: () => setActiveChapter(label), onEnterBack: () => setActiveChapter(label) }));
         gsap.to('.manifesto-ghost', { yPercent: 16, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
       }
     }, rootRef);
@@ -114,9 +130,9 @@ export default function App() {
       lenisRef.current = null;
       if (lenis) {
         if (lenisTick) gsap.ticker.remove(lenisTick);
+        if (onRefresh) ScrollTrigger.removeEventListener('refresh', onRefresh);
         lenis.destroy();
       }
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
 
@@ -188,9 +204,36 @@ export default function App() {
     if (!selectedPiece) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setSelectedPiece(null); };
+    modalCloseRef.current?.focus();
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedPiece(null);
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const panel = document.querySelector<HTMLElement>('.object-modal-panel');
+      if (!panel) return;
+      const focusable = Array.from(panel.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter((element) => element.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
     window.addEventListener('keydown', onKeyDown);
-    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+      lastFocusedElementRef.current?.focus();
+    };
   }, [selectedPiece]);
 
   return (
@@ -246,7 +289,7 @@ export default function App() {
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
@@ -265,7 +308,7 @@ export default function App() {
         </section>
       </main>
 
-      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>This concept explores how the things you love can become part of what you wear. Final product images, materials and specifications will be published with the official release.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("This is a preview only. Your email has not been saved or sent."); }}><label htmlFor="object-email">DROP UPDATES</label><div><input id="object-email" type="email" placeholder="Email address (preview only)" required /><button type="submit">PREVIEW RESPONSE ↗</button></div><small>{waitlistNotice || "Demo form only — email collection is not active. Your details will not be stored."}</small></form></div></div></div>}
+      {selectedPiece && <div className="object-modal" role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><div className="object-modal-panel"><button ref={modalCloseRef} className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE ×</button><div className="object-modal-image"><img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} /><span>UNIPARC / OBJECT STUDY {selectedPiece.id}</span></div><div className="object-modal-copy"><span className="eyebrow dark-eyebrow">{selectedPiece.category} / {selectedPiece.label}</span><h2 id="object-title">{selectedPiece.name}</h2><p>This concept explores how the things you love can become part of what you wear. Final product images, materials and specifications will be published with the official release.</p><div className="object-specs"><span>DESIGN INTENT<strong>IDENTITY / EXPRESSION</strong></span><span>MATERIAL<strong>DETAILS TO BE ANNOUNCED</strong></span><span>RELEASE<strong>FIRST DROP / 2026</strong></span></div><form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("This is a preview only. Your email has not been saved or sent."); }}><label htmlFor="object-email">DROP UPDATES</label><div><input id="object-email" type="email" placeholder="Email address (preview only)" required /><button type="submit">PREVIEW RESPONSE ↗</button></div><small>{waitlistNotice || "Demo form only — email collection is not active. Your details will not be stored."}</small></form></div></div></div>}
       <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
         <a className={activeDock === 'home' ? 'dock-home dock-active' : 'dock-home'} href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
         <span className="dock-divider" aria-hidden="true" />
