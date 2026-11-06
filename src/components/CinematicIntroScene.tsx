@@ -319,7 +319,14 @@ export default function CinematicIntroScene() {
       const t = time - 11.55;
       const fit = aspectFit.value;
       const startX = -8.2 * fit;
-      if (t <= 0) return target.set(startX, 2.55, 1.8);
+      if (t <= 0) {
+        const leadIn = THREE.MathUtils.smoothstep(t, -2.7, 0);
+        return target.set(
+          THREE.MathUtils.lerp(-11.2 * fit, startX, leadIn),
+          2.45 + Math.sin(leadIn * Math.PI) * 0.15,
+          1.7 + leadIn * 0.1
+        );
+      }
       if (t < 2.1) {
         const u = THREE.MathUtils.smoothstep(t, 0, 2.1);
         const inv = 1 - u;
