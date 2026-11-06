@@ -871,3 +871,18 @@ html{scroll-padding-top:24px}
  .cosmic-caption{bottom:18px;font-size:5px;letter-spacing:.1em}
 }
 @media(prefers-reduced-motion:reduce){.cosmic-stage{display:none}.preloader{display:none}}
+
+/* UNIPARC cinematic WebGL layer and returning-visitor skip control */
+.cosmic-stage{isolation:isolate;overflow:hidden}
+.cosmic-webgl{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.cosmic-starfield{z-index:0}.cosmic-star{z-index:2}
+.burst-ring,.burst-rays{z-index:3}.culture-burst{z-index:4}
+.ouroboros{width:min(78vw,760px);z-index:5;overflow:visible;filter:drop-shadow(0 0 22px #c8e87555) drop-shadow(0 0 90px #c8e87528)}
+.ouro-body{stroke-dasharray:1500;stroke-dashoffset:1500;stroke-width:48;filter:drop-shadow(0 0 14px #d9f36a88)}
+.ouro-body-shadow{stroke-width:62;opacity:.8}.ouro-scale-overlay{stroke-width:39;opacity:.7;mix-blend-mode:screen}
+.ouro-head{stroke-width:2;filter:drop-shadow(0 0 10px #d9f36a88)}.ouro-tail{stroke-width:23;opacity:.95}
+.ouro-eye{filter:drop-shadow(0 0 8px #eaff9e)}
+.skip-intro{position:absolute;z-index:30;top:clamp(22px,4vh,44px);right:clamp(22px,4vw,52px);display:flex;align-items:center;gap:16px;padding:12px 15px;border:1px solid #eaff9e44;background:#080b08b8;color:#e9f5d4;font:9px var(--mono);letter-spacing:.18em;cursor:pointer;transition:background .25s ease,border-color .25s ease,color .25s ease}
+.skip-intro:hover{background:#d9f36a;color:#090b06;border-color:#d9f36a}.skip-intro span{font-size:14px;line-height:1}
+@media(max-width:640px){.ouroboros{width:min(112vw,600px)}.skip-intro{top:18px;right:16px;padding:10px 11px;font-size:8px}}
+@media(prefers-reduced-motion:reduce){.cosmic-webgl{display:none}}
