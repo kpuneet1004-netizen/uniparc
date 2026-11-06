@@ -23,7 +23,7 @@ const introCulture = [
   { label: 'COLLECTIBLES', glyph: '◇' }, { label: 'SERIES', glyph: '▤' },
   { label: 'SOUND', glyph: '∿' }, { label: 'ART', glyph: '⌖' },
 ];
-const introFragments = Array.from({ length: 112 }, (_, index) => {
+const introFragments = Array.from({ length: 220 }, (_, index) => {
   const angle = index * 2.399963229728653;
   const radius = .12 + ((index * 37) % 83) / 100;
   const category = introCulture[index % introCulture.length];
