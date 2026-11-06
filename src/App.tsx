@@ -119,7 +119,7 @@ export default function App() {
           .fromTo('.cosmic-star', { scale: .08, rotation: -24, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: .9, ease: 'back.out(2)' })
           .to('.cosmic-star', { scale: 1.16, duration: .5, repeat: 2, yoyo: true, ease: 'sine.inOut' })
           .to('.cosmic-star', { scale: 1.8, autoAlpha: 0, duration: .18, ease: 'power2.in' })
-          .fromTo('.culture-token', { x: 0, y: 0, scale: .2, rotation: () => gsap.utils.random(-70, 70), autoAlpha: 0 }, { x: (i, el) => parseFloat(getComputedStyle(el).getPropertyValue('--tx')) || 0, y: (i, el) => parseFloat(getComputedStyle(el).getPropertyValue('--ty')) || 0, scale: 1, autoAlpha: 1, duration: .62, stagger: .018, ease: 'power4.out' }, '-=.08')
+          .fromTo('.culture-token', { x: 0, y: 0, scale: .2, rotation: () => gsap.utils.random(-70, 70), autoAlpha: 0 }, { x: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--tx').trim(); const n = parseFloat(v) || 0; return v.endsWith('vw') ? n * window.innerWidth / 100 : n; }, y: (i, el) => { const v = getComputedStyle(el).getPropertyValue('--ty').trim(); const n = parseFloat(v) || 0; return v.endsWith('vh') ? n * window.innerHeight / 100 : n; }, scale: 1, autoAlpha: 1, duration: .62, stagger: .018, ease: 'power4.out' }, '-=.08')
           .to('.culture-token', { scale: .72, autoAlpha: 0, duration: .55, stagger: .012, ease: 'power2.in' }, '+=.28')
           .fromTo('.ouro-body', { strokeDashoffset: 1180 }, { strokeDashoffset: 0, duration: .95, ease: 'power2.out' })
           .fromTo('.ouroboros', { scale: 1.55, rotation: -85, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: .95, ease: 'power3.out' }, '<')
