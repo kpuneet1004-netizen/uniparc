@@ -502,20 +502,10 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 @media(prefers-reduced-motion:reduce){.worlds::after,.world-card,.world-selection-mark,.world-atmosphere-label strong{transition:none}}
 
 
-/* Object-card polish — unified directional icon and a deliberate final-card finish */
-.arrow{
-  display:block;
-  width:17px;
-  height:17px;
-  flex:0 0 auto;
-  overflow:visible;
-  transition:transform .35s var(--ease);
-}
-.arrow-diagonal{transform:none}
-.piece-arrow .arrow{width:17px;height:17px}
-.piece-card:hover .piece-arrow .arrow{transform:translate(1px,-1px)}
+/* Keep the site-wide arrow typography intact; center the object-card glyph locally. */
+.piece-arrow .arrow{margin-left:0;line-height:1}
 .piece-hover-label{display:inline-flex;align-items:center;gap:9px}
-.piece-hover-label .arrow{width:12px;height:12px}
+.piece-hover-label .arrow{margin-left:0;font-size:12px;line-height:1}
 .piece-image img.piece-image-failed{display:none}
 .piece-card-featured .piece-image{
   background:
@@ -553,6 +543,3 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 .piece-card-featured .piece-arrow{background:var(--ink);color:var(--acid)}
 .piece-card-featured:hover .piece-arrow{background:var(--acid);color:var(--ink)}
 .piece-arrow:focus-visible{outline:2px solid var(--acid);outline-offset:4px}
-@media(prefers-reduced-motion:reduce){
-  .arrow,.piece-arrow .arrow{transition:none}
-}
