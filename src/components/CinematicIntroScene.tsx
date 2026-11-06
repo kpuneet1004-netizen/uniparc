@@ -469,14 +469,14 @@ export default function CinematicIntroScene() {
     const trailDuration = orbitDuration;
     const serpentStart = 8.15;
     let horizontalFit = 1;
+    const p0 = new THREE.Vector3(-8.2, -2.35, 1.2);
+    const p1 = new THREE.Vector3(-5.5, -2.65, 0.85);
+    const p2 = new THREE.Vector3(-2.0, -1.2, 0.2);
+    const p3 = new THREE.Vector3(-2.0, 0, 0.2);
 
     // The flight curve and orbital path share the same tangent at their join.
     // One complete orbit brings the head back to the tail, closing the Ouroboros.
     const serpentPosition = (elapsed: number, target: THREE.Vector3) => {
-      const p0 = new THREE.Vector3(-8.2 * horizontalFit, -2.35, 1.2);
-      const p1 = new THREE.Vector3(-5.5 * horizontalFit, -2.65, 0.85);
-      const p2 = new THREE.Vector3(-2.0 * horizontalFit, -1.2, 0.2);
-      const p3 = new THREE.Vector3(-2.0 * horizontalFit, 0, 0.2);
       if (elapsed <= 0) return target.copy(p0);
       if (elapsed < approachDuration) {
         const u = elapsed / approachDuration;
@@ -498,6 +498,7 @@ export default function CinematicIntroScene() {
     };
 
     const tempCenter = new THREE.Vector3();
+    const headCenter = new THREE.Vector3();
     const tempPrev = new THREE.Vector3();
     const tempNext = new THREE.Vector3();
     const tangent = new THREE.Vector3();
@@ -514,6 +515,10 @@ export default function CinematicIntroScene() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       horizontalFit = THREE.MathUtils.clamp((width / height) / 1.28, 0.42, 1);
+      p0.x = -8.2 * horizontalFit;
+      p1.x = -5.5 * horizontalFit;
+      p2.x = -2.0 * horizontalFit;
+      p3.x = -2.0 * horizontalFit;
       const compactScale = small ? 0.68 : 0.92;
       panels.forEach((panel, index) => {
         const [x, y, z] = panelPositions[index];
@@ -608,6 +613,7 @@ export default function CinematicIntroScene() {
       if (serpent.visible) {
         const elapsed = Math.max(0, Math.min(approachDuration + orbitDuration, serpentElapsed));
         const current = serpentPosition(elapsed, tempCenter);
+        headCenter.copy(current);
         const before = serpentPosition(Math.max(0, elapsed - 0.012), tempPrev);
         const after = serpentPosition(Math.min(approachDuration + orbitDuration, elapsed + 0.012), tempNext);
         headTangent.subVectors(after, before).normalize();
@@ -642,7 +648,7 @@ export default function CinematicIntroScene() {
         position.needsUpdate = true;
         bodyGeometry.computeVertexNormals();
         serpentMaterial.opacity = serpentOpacity * 0.98;
-        head.position.copy(current);
+        head.position.copy(headCenter);
         head.quaternion.setFromUnitVectors(axisX, headTangent);
         head.scale.setScalar(serpentOpacity);
       }
