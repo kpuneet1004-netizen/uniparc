@@ -832,3 +832,42 @@ html{scroll-padding-top:24px}
 .cosmic-caption{position:absolute;left:4.5vw;right:4.5vw;bottom:30px;display:flex;justify-content:space-between;color:#74796d;font:7px var(--mono);letter-spacing:.2em;z-index:5}
 @media(max-width:640px){.culture-token{font-size:6px;padding:8px 9px;letter-spacing:.13em}.token-manga{--tx:-28vw;--ty:-22vh}.token-game{--tx:25vw;--ty:-27vh}.token-cinema{--tx:-31vw;--ty:4vh}.token-meme{--tx:28vw;--ty:7vh}.token-music{--tx:-24vw;--ty:27vh}.token-comic{--tx:19vw;--ty:29vh}.token-anime{--tx:-7vw;--ty:-34vh}.token-internet{--tx:8vw;--ty:35vh}.token-style{--tx:-32vw;--ty:-15vh}.token-toy{--tx:33vw;--ty:-12vh}.token-tv{--tx:-30vw;--ty:22vh}.token-art{--tx:29vw;--ty:23vh}.ouroboros{width:min(100vw,500px)}.cosmic-caption{bottom:18px;font-size:6px;letter-spacing:.1em}}
 @media(prefers-reduced-motion:reduce){.cosmic-stage{display:none}.preloader{display:none}}
+
+
+/* UNIPARC origin sequence — cinematic scale, negative space and dimensional culture fragments */
+.preloader{background:#020302;color:#f5f4ed}
+.cosmic-stage{background:radial-gradient(ellipse at 50% 50%,#11170e 0%,#080b08 24%,#030504 62%,#010202 100%)}
+.cosmic-stage:before{background:radial-gradient(ellipse at center,transparent 5%,rgba(0,0,0,.22) 48%,#000 100%);z-index:8}
+.cosmic-starfield{opacity:.08;background-size:100% 100%;filter:drop-shadow(0 0 2px #eaffc1)}
+.cosmic-star{width:clamp(72px,9vw,118px);z-index:2;filter:drop-shadow(0 0 36px #d9f36a80)}
+.star-corona{inset:-210%;background:radial-gradient(circle,rgba(238,255,186,.2) 0%,rgba(190,226,94,.13) 18%,rgba(160,192,79,.045) 43%,transparent 68%);filter:blur(16px)}
+.star-sphere{inset:12%;background:radial-gradient(circle at 34% 27%,#fff 0%,#ffffe8 5%,#edffb7 12%,#d4f77d 24%,#91b448 42%,#3c5120 64%,#0a1008 82%,#020302 100%);box-shadow:inset -18px -22px 42px #000c,0 0 38px #d9f36a88,0 0 120px #d9f36a48,0 0 240px #d9f36a20}
+.star-flare{width:260%;height:2px;box-shadow:0 0 25px #e4ff9a,0 0 70px #d9f36a}
+.burst-ring{position:absolute;z-index:2;width:12vmin;height:12vmin;border:1px solid #e9ffb6;border-radius:50%;box-shadow:0 0 28px #d9f36a55,inset 0 0 20px #d9f36a25;opacity:0;transform:scale(.1)}
+.burst-rays{position:absolute;z-index:2;width:min(80vmin,780px);aspect-ratio:1;border-radius:50%;opacity:0;background:repeating-conic-gradient(from 0deg,rgba(229,255,170,.8) 0deg .22deg,transparent .22deg 8deg);mask-image:radial-gradient(circle,transparent 0 9%,#000 16%,transparent 68%);filter:blur(1px)}
+.culture-burst{z-index:4;perspective:1000px}
+.culture-token{left:50%;top:50%;width:clamp(112px,13vw,174px);min-height:70px;padding:11px 13px 10px;display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;align-content:center;column-gap:10px;border:1px solid #d9e6b54a;background:linear-gradient(140deg,rgba(32,39,27,.96),rgba(7,10,7,.96));color:#f1f1e8;box-shadow:0 16px 50px #000b,0 0 24px #d9f36a0d;backdrop-filter:blur(12px);transform-style:preserve-3d;white-space:normal;opacity:0}
+.culture-token:before{display:none}
+.culture-token i{grid-row:1 / 3;display:grid;place-items:center;width:34px;height:34px;border:1px solid #d9f36a65;color:#d9f36a;font:17px/1 var(--display);font-style:normal}
+.culture-token b{align-self:end;color:#f4f3e9;font:9px/1.1 var(--mono);letter-spacing:.12em;font-weight:500}
+.culture-token small{align-self:start;margin-top:5px;color:#929889;font:6px/1.2 var(--mono);letter-spacing:.12em}
+.token-manga{--tx:-32vw;--ty:-23vh}.token-game{--tx:31vw;--ty:-27vh}.token-cinema{--tx:-38vw;--ty:4vh}.token-meme{--tx:36vw;--ty:7vh}.token-music{--tx:-25vw;--ty:31vh}.token-comic{--tx:23vw;--ty:32vh}.token-anime{--tx:-7vw;--ty:-38vh}.token-internet{--tx:8vw;--ty:38vh}.token-style{--tx:-43vw;--ty:-15vh}.token-toy{--tx:42vw;--ty:-12vh}.token-tv{--tx:-39vw;--ty:25vh}.token-art{--tx:39vw;--ty:25vh}
+.ouroboros{width:min(76vw,680px);z-index:5;filter:drop-shadow(0 0 24px #b8d85b55) drop-shadow(0 0 80px #b8d85b20)}
+.ouro-body{stroke-width:27;filter:drop-shadow(0 0 14px #d9f36a70)}
+.ouro-head{stroke-width:2}
+.cosmic-core{width:clamp(110px,14vw,176px);z-index:4;box-shadow:0 0 80px #d9f36a30}
+.cosmic-wordmark{z-index:9;gap:24px}
+.cosmic-wordmark .preloader-logo{width:clamp(230px,38vw,470px);filter:brightness(0) invert(1) drop-shadow(0 0 26px #d9f36a35)}
+.cosmic-wordmark>span{font:8px var(--mono);letter-spacing:.42em;color:#d9f36a}
+.cosmic-caption{z-index:10;color:#777d70;font-size:7px;letter-spacing:.22em}
+@media(max-width:640px){
+ .culture-token{width:104px;min-height:58px;padding:8px;grid-template-columns:25px 1fr;column-gap:7px}
+ .culture-token i{width:25px;height:25px;font-size:13px}
+ .culture-token b{font-size:7px;letter-spacing:.08em}
+ .culture-token small{font-size:5px;letter-spacing:.06em}
+ .token-manga{--tx:-27vw;--ty:-22vh}.token-game{--tx:25vw;--ty:-26vh}.token-cinema{--tx:-31vw;--ty:3vh}.token-meme{--tx:28vw;--ty:7vh}.token-music{--tx:-24vw;--ty:27vh}.token-comic{--tx:19vw;--ty:29vh}.token-anime{--tx:-7vw;--ty:-34vh}.token-internet{--tx:8vw;--ty:35vh}.token-style{--tx:-32vw;--ty:-15vh}.token-toy{--tx:33vw;--ty:-12vh}.token-tv{--tx:-30vw;--ty:22vh}.token-art{--tx:29vw;--ty:23vh}
+ .ouroboros{width:min(100vw,520px)}
+ .cosmic-wordmark .preloader-logo{width:min(76vw,350px)}
+ .cosmic-caption{bottom:18px;font-size:5px;letter-spacing:.1em}
+}
+@media(prefers-reduced-motion:reduce){.cosmic-stage{display:none}.preloader{display:none}}
