@@ -1,18 +1,16 @@
-# UNIPARC — Culture Without Category
+# UNIPARC — A Universe for Every Side of You
 
-A complete visual rebuild of the UNIPARC brand experience.
+A cinematic, culture-first brand experience built around UNIPARC's pop-culture multiverse identity.
 
-## Experience
-- High-contrast black, white and electric-neon identity.
-- Editorial, oversized typography and asymmetric campaign composition.
-- Culture index for anime, gaming, film and music.
-- Filterable concept edit with accessible detail modal.
-- Responsive navigation and mobile-first layouts.
-- GSAP entrance/reveal motion with reduced-motion support.
-- Existing official UNIPARC logo retained.
+## Creative direction
+- Cosmic void, starfield, dimensional portals and a neon-lime signal.
+- Original abstract visual language for anime, gaming, film, sound and internet culture.
+- Cinematic opening sequence and interactive Three.js orbit core.
+- High-contrast typography, editorial pacing and responsive layouts.
+- Reduced-motion support and keyboard-accessible navigation/dialogs.
 
 ## Stack
-React, TypeScript, Vite, GSAP + ScrollTrigger, custom CSS.
+React, TypeScript, Vite, Three.js, GSAP + ScrollTrigger.
 
 ## Local development
 ```bash
@@ -24,12 +22,9 @@ npm run dev
 ```bash
 npm run build
 ```
-Vite output: `dist/`.
 
 ## Cloudflare Pages
-Framework: Vite; build command: `npm run build`; output directory: `dist`; production branch: `main`.
+Build command: `npm run build`; output directory: `dist`; production branch: `main`.
 
-## Content notes
-- Product imagery in The UNIPARC Edit is illustrative concept photography, not live inventory.
-- Replace concept imagery with approved campaign/product assets before commerce launch.
-- No purchase, checkout, mailing-list or social destinations are represented as live until their endpoints are confirmed.
+## Content
+World cards use original typographic/abstract artwork rather than unrelated stock fashion imagery. The experience introduces UNIPARC's culture categories and brand point of view; it does not imply live product inventory or checkout functionality.
