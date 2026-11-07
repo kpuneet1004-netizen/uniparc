@@ -260,3 +260,43 @@ body{font-family:var(--type-body);font-size:16px;line-height:1.65;letter-spacing
 .hero-bottom>p,.manifesto-copy>p:not(.eyebrow),.section-heading>p,.world-bottom small,.campaign-content>p:not(.eyebrow),.about-copy>p:not(.eyebrow),.footer-brand p,.footer-note p,.modal-copy>p:not(.eyebrow){letter-spacing:.005em}
 @media(max-width:760px){.hero h1,.manifesto-title h2,.section-heading h2,.campaign h2,.about-copy h2,.first-drop h2{letter-spacing:-.025em}}
 @media(max-width:420px){.hero h1,.manifesto-title h2,.section-heading h2,.campaign h2,.about-copy h2,.first-drop h2{letter-spacing:-.02em}}
+
+
+/* Type refinement — optical tracking, corrected after visual review */
+:root{
+  font-kerning:normal;
+  font-feature-settings:"kern" 1,"liga" 1;
+}
+.hero h1,
+.manifesto-title h2,
+.section-heading h2,
+.campaign h2,
+.about-copy h2,
+.first-drop h2{
+  letter-spacing:-.058em;
+  font-kerning:normal;
+  font-feature-settings:"kern" 1,"liga" 1;
+  text-wrap:balance;
+}
+.hero h1{letter-spacing:-.062em}
+.hero-outline{letter-spacing:-.055em}
+.world-bottom b{letter-spacing:-.025em}
+.modal-copy h2{letter-spacing:-.045em}
+.manifesto-copy h3,.about-copy h3{letter-spacing:-.025em}
+.hero-bottom>p,.manifesto-copy>p:not(.eyebrow),.about-copy>p:not(.eyebrow),.campaign-content>p:not(.eyebrow){
+  letter-spacing:-.012em;
+  line-height:1.9;
+}
+.hero-topline,.eyebrow,.section-meta,.image-index,.image-caption,.world-top,.worlds-foot,.filter-row,.piece-meta,.edit-note,.campaign-side,.campaign-index,.manifesto-foot,.footer-column>b,.footer-note>b,.footer-bottom,.modal-top,.modal-detail{
+  letter-spacing:.16em;
+}
+@media(max-width:760px){
+  .hero h1,.manifesto-title h2,.section-heading h2,.campaign h2,.about-copy h2,.first-drop h2{
+    letter-spacing:-.05em;
+  }
+  .hero-outline{letter-spacing:-.045em}
+  .world-bottom b{letter-spacing:-.025em}
+}
+@media(max-width:420px){
+  .hero h1{letter-spacing:-.045em}
+}
