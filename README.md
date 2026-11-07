@@ -1,15 +1,18 @@
-# UNIPARC — Cinematic Interactive Experience
+# UNIPARC — Culture Without Category
 
-React + TypeScript + Vite foundation for the approved homepage.
+A complete visual rebuild of the UNIPARC brand experience.
 
-## Direction
-- Cinematic motion and maximum interaction
-- Mobile experience parity, adapted for touch
-- Strict black, white and neutral-grey identity
-- Official UNIPARC logo
+## Experience
+- High-contrast black, white and electric-neon identity.
+- Editorial, oversized typography and asymmetric campaign composition.
+- Culture index for anime, gaming, film and music.
+- Filterable concept edit with accessible detail modal.
+- Responsive navigation and mobile-first layouts.
+- GSAP entrance/reveal motion with reduced-motion support.
+- Existing official UNIPARC logo retained.
 
 ## Stack
-React, TypeScript, Vite, GSAP + ScrollTrigger, Three.js, Lucide React, custom CSS.
+React, TypeScript, Vite, GSAP + ScrollTrigger, custom CSS.
 
 ## Local development
 ```bash
@@ -26,11 +29,7 @@ Vite output: `dist/`.
 ## Cloudflare Pages
 Framework: Vite; build command: `npm run build`; output directory: `dist`; production branch: `main`.
 
-## Pre-launch checklist
-- Replace illustrative product photography with approved UNIPARC catalogue assets.
-- Add verified product marketplace URLs; none are fabricated in this build.
-- Confirm final product copy, FAQ, social links and legal policies.
-- Connect CMS after schemas and content ownership are finalized.
-- Test performance, accessibility and touch interactions across target devices.
-
-This repository contains a frontend foundation; it is not deployed to Cloudflare yet.
+## Content notes
+- Product imagery in The UNIPARC Edit is illustrative concept photography, not live inventory.
+- Replace concept imagery with approved campaign/product assets before commerce launch.
+- No purchase, checkout, mailing-list or social destinations are represented as live until their endpoints are confirmed.
