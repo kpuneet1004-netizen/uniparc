@@ -53,11 +53,20 @@ export default function App() {
     }
     const ctx = gsap.context(() => {
       if (!reduced) {
+        const heroIntro = gsap.timeline({ defaults: { ease: 'power4.out' } });
+        heroIntro
+          .fromTo('.hero-topline', { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.65 })
+          .fromTo('.hero-copy .eyebrow', { y: 18, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55 }, '-=0.2')
+          .fromTo('.hero h1', { y: 42, autoAlpha: 0, clipPath: 'inset(0 0 18% 0)' }, { y: 0, autoAlpha: 1, clipPath: 'inset(0 0 0% 0)', duration: 1.05 }, '-=0.12')
+          .fromTo('.hero-bottom', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.7 }, '-=0.35')
+          .fromTo('.hero-image', { clipPath: 'inset(10% 0 10% 0)', autoAlpha: 0.6 }, { clipPath: 'inset(0% 0 0% 0)', autoAlpha: 1, duration: 1.1 }, '-=0.2');
         gsap.to('.hero-image img', { yPercent: 12, scale: 1.08, ease: 'none', scrollTrigger: { trigger: '.hero-image', start: 'top top', end: 'bottom top', scrub: true } });
         gsap.to('.hero-outline', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.7 } });
         gsap.utils.toArray<HTMLElement>('.reveal').forEach((el) => gsap.fromTo(el, { y: 52, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }));
         gsap.utils.toArray<HTMLElement>('.world-card').forEach((el, i) => {
+          const image = el.querySelector('img');
           gsap.fromTo(el, { y: 65, rotate: i % 2 ? 1.5 : -1.5, autoAlpha: 0 }, { y: 0, rotate: 0, autoAlpha: 1, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+          if (image) gsap.fromTo(image, { scale: 1.12, clipPath: 'inset(8% 0 8% 0)' }, { scale: 1, clipPath: 'inset(0% 0 0% 0)', duration: 1.25, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
         });
         gsap.utils.toArray<HTMLElement>('.piece-card').forEach((el) => gsap.fromTo(el, { y: 45, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true } }));
         gsap.fromTo('.manifesto-word', { xPercent: 9 }, { xPercent: -8, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1 } });
@@ -69,7 +78,6 @@ export default function App() {
       if (lenis && tick) gsap.ticker.remove(tick);
       lenis?.destroy();
       lenisRef.current = null;
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
 
