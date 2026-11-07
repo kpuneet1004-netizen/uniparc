@@ -1,16 +1,15 @@
-# UNIPARC — A Universe for Every Side of You
+# UNIPARC — Cinematic Interactive Experience
 
-A cinematic, culture-first brand experience built around UNIPARC's pop-culture multiverse identity.
+React + TypeScript + Vite foundation for the approved homepage.
 
-## Creative direction
-- Cosmic void, starfield, dimensional portals and a neon-lime signal.
-- Original abstract visual language for anime, gaming, film, sound and internet culture.
-- Cinematic opening sequence and interactive Three.js orbit core.
-- High-contrast typography, editorial pacing and responsive layouts.
-- Reduced-motion support and keyboard-accessible navigation/dialogs.
+## Direction
+- Cinematic motion and maximum interaction
+- Mobile experience parity, adapted for touch
+- Strict black, white and neutral-grey identity
+- Official UNIPARC logo
 
 ## Stack
-React, TypeScript, Vite, Three.js, GSAP + ScrollTrigger.
+React, TypeScript, Vite, GSAP + ScrollTrigger, Three.js, Lucide React, custom CSS.
 
 ## Local development
 ```bash
@@ -22,9 +21,16 @@ npm run dev
 ```bash
 npm run build
 ```
+Vite output: `dist/`.
 
 ## Cloudflare Pages
-Build command: `npm run build`; output directory: `dist`; production branch: `main`.
+Framework: Vite; build command: `npm run build`; output directory: `dist`; production branch: `main`.
 
-## Content
-World cards use original typographic/abstract artwork rather than unrelated stock fashion imagery. The experience introduces UNIPARC's culture categories and brand point of view; it does not imply live product inventory or checkout functionality.
+## Pre-launch checklist
+- Replace illustrative product photography with approved UNIPARC catalogue assets.
+- Add verified product marketplace URLs; none are fabricated in this build.
+- Confirm final product copy, FAQ, social links and legal policies.
+- Connect CMS after schemas and content ownership are finalized.
+- Test performance, accessibility and touch interactions across target devices.
+
+This repository contains a frontend foundation; it is not deployed to Cloudflare yet.

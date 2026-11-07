@@ -1,166 +1,400 @@
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import OrbitScene from './components/OrbitScene';
+import Lenis from 'lenis';
+import CinematicIntroScene from './components/CinematicIntroScene';
 
 gsap.registerPlugin(ScrollTrigger);
 
-type World = { id: string; number: string; name: string; sub: string; glyph: string; className: string; copy: string };
-const worlds: World[] = [
-  { id: 'anime', number: '01', name: 'ANIME', sub: 'DRAWN WORLDS. REAL FEELINGS.', glyph: '漫', className: 'world-anime', copy: 'For the stories that stay with you long after the credits.' },
-  { id: 'gaming', number: '02', name: 'GAMING', sub: 'PRESS START. BE YOURSELF.', glyph: '↗', className: 'world-gaming', copy: 'For the quests, the lore and the worlds you call home.' },
-  { id: 'screen', number: '03', name: 'SCREEN', sub: 'EVERY FRAME HAS A WORLD.', glyph: '▣', className: 'world-screen', copy: 'For the films, series and scenes that become part of you.' },
-  { id: 'sound', number: '04', name: 'SOUND', sub: 'FEEL IT. REPEAT IT.', glyph: '♫', className: 'world-sound', copy: 'For the tracks, artists and frequencies that define a moment.' },
-  { id: 'culture', number: '05', name: 'CULTURE', sub: 'THE INTERNET NEVER SLEEPS.', glyph: '✳', className: 'world-culture', copy: 'For the niche interests, deep cuts and unexpected obsessions.' },
+const worlds = [
+  { id: 'anime', number: '01', name: 'ANIME / MANGA', note: 'Stories that stay with you', image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=88', tag: 'THE ART OF OBSESSION' },
+  { id: 'gaming', number: '02', name: 'GAMES / PLAY', note: 'Your next life starts here', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1400&q=88', tag: 'PRESS START / REPEAT' },
+  { id: 'screen', number: '03', name: 'FILM / SCREEN', note: 'For the ones who know the lore', image: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1400&q=88', tag: 'STAY FOR THE CREDITS' },
+  { id: 'sound', number: '04', name: 'MUSIC / SOUND', note: 'Wear your soundtrack', image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1400&q=88', tag: 'FEEL EVERY FREQUENCY' },
 ];
 
-function Arrow({ diagonal = true }: { diagonal?: boolean }) {
-  return <svg viewBox="0 0 24 24" aria-hidden="true"><path d={diagonal ? 'M5 19 19 5M7 5h12v12' : 'M4 12h15m-6-6 6 6-6 6'} /></svg>;
+const pieces = [
+  { id: '01', name: 'SIGNAL / 001', category: 'APPAREL', label: 'THE FIRST FREQUENCY', color: 'lime', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1100&q=88' },
+  { id: '02', name: 'AFTERIMAGE / 002', category: 'APPAREL', label: 'A MEMORY IN MOTION', color: 'violet', image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=1100&q=88' },
+  { id: '03', name: 'SIDE QUEST / 003', category: 'CULTURE', label: 'TAKE THE LONG WAY', color: 'orange', image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd5?auto=format&fit=crop&w=1100&q=88' },
+];
+
+function Arrow({ diagonal = false }: { diagonal?: boolean }) {
+  return <svg aria-hidden="true" className="arrow" viewBox="0 0 20 20" fill="none">
+    <path d={diagonal ? 'M5 15 15 5M6 5h9v9' : 'M5 5 15 15M6 15h9V6'} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>;
 }
 
-function WorldArtwork({ world }: { world: World }) {
-  return <div className={'world-art ' + world.className} aria-hidden="true">
-    <div className="art-grid" />
-    <div className="art-orbit art-orbit-a" />
-    <div className="art-orbit art-orbit-b" />
-    <span className="art-glyph">{world.glyph}</span>
-    <span className="art-cross">✳</span>
-    <span className="art-coordinate">UP / {world.number}</span>
-  </div>;
+function readIntroSeen() {
+  try {
+    return window.localStorage.getItem('uniparc-intro-seen') === '1';
+  } catch {
+    // Storage can be unavailable in private browsing or restricted webviews.
+    return false;
+  }
+}
+
+function persistIntroSeen() {
+  try {
+    window.localStorage.setItem('uniparc-intro-seen', '1');
+  } catch {
+    // The intro must still finish when storage is blocked.
+  }
 }
 
 export default function App() {
-  const root = useRef<HTMLDivElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [introDone, setIntroDone] = useState(false);
-  const [activeWorld, setActiveWorld] = useState<World | null>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const cursorDotRef = useRef<HTMLDivElement>(null);
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+  const navDockRef = useRef<HTMLElement | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [activeDock, setActiveDock] = useState('home');
+  const [activeFilter, setActiveFilter] = useState('ALL');
+  const [activeWorld, setActiveWorld] = useState(worlds[0]);
+  const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
+  const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
+  const [waitlistNotice, setWaitlistNotice] = useState('');
+  const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
 
-  const navigate = (id: string) => {
-    setMenuOpen(false);
-    document.getElementById(id)?.scrollIntoView({
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-      block: 'start',
-    });
+  const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    event.preventDefault();
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const topOffset = 24;
+    if (reduceMotion) {
+      window.scrollTo({ top: Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset), behavior: 'auto' });
+      return;
+    }
+    const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - topOffset);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(destination, {
+        duration: 1.2,
+        easing: (time) => 1 - Math.pow(1 - time, 4),
+        force: true,
+      });
+    } else {
+      window.scrollTo({ top: destination, behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const ctx = gsap.context(() => {
-      if (reduced) { setIntroDone(true); return; }
-      const intro = gsap.timeline({ onComplete: () => setIntroDone(true) });
-      intro.set('.intro-mark', { scale: .2, rotation: -40, autoAlpha: 0 })
-        .set('.intro-word', { y: 24, autoAlpha: 0 })
-        .to('.intro-mark', { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.05, ease: 'expo.out' })
-        .to('.intro-ring', { scale: 1.8, autoAlpha: 0, duration: .9, ease: 'power2.out' }, '-=.65')
-        .to('.intro-word', { y: 0, autoAlpha: 1, duration: .65, ease: 'power3.out' }, '-=.55')
-        .to('.intro-screen', { autoAlpha: 0, duration: .7, ease: 'power2.inOut', delay: .25, onComplete: () => setIntroDone(true) });
-      gsap.fromTo('.hero-copy > *', { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .9, stagger: .12, delay: .45, ease: 'power3.out' });
-      gsap.fromTo('.hero-orbit-ui', { scale: .84, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1.2, delay: .5, ease: 'expo.out' });
-      gsap.utils.toArray<HTMLElement>('.reveal').forEach((el) => {
-        gsap.fromTo(el, { y: 42, autoAlpha: 0 }, {
-          y: 0, autoAlpha: 1, duration: .85, ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 86%', once: true },
-        });
-      });
-      gsap.to('.signal-beam', { rotate: 360, duration: 22, repeat: -1, ease: 'none' });
-      gsap.to('.ticker-track', { xPercent: -25, ease: 'none', scrollTrigger: { trigger: '.ticker', start: 'top bottom', end: 'bottom top', scrub: 1 } });
-    }, root);
-    return () => ctx.revert();
+    setShowSkipIntro(readIntroSeen());
   }, []);
 
   useEffect(() => {
-    if (!activeWorld) return;
-    const previous = document.body.style.overflow;
+    const nav = navDockRef.current;
+    if (!nav) return;
+    let frame = 0;
+    const updateIndicator = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const active = nav.querySelector<HTMLElement>('.dock-active');
+        if (!active) return;
+        nav.style.setProperty('--dock-indicator-x', active.offsetLeft + 'px');
+        nav.style.setProperty('--dock-indicator-width', active.offsetWidth + 'px');
+        if (window.matchMedia('(max-width: 760px)').matches) {
+          const navBounds = nav.getBoundingClientRect();
+          const itemBounds = active.getBoundingClientRect();
+          if (itemBounds.left < navBounds.left + 10 || itemBounds.right > navBounds.right - 10) active.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'});
+        }
+      });
+    };
+    updateIndicator();
+    const observer = new ResizeObserver(updateIndicator);
+    observer.observe(nav);
+    window.addEventListener('resize', updateIndicator);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener('resize', updateIndicator); };
+  }, [activeDock]);
+
+  useEffect(() => {
+    // A fresh visit always starts at the hero, never at a browser-restored scroll position or old hash.
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    window.scrollTo(0, 0);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
+    lenisRef.current = lenis;
+    let lenisTick: ((time: number) => void) | undefined;
+    if (lenis) {
+      lenis.on('scroll', ScrollTrigger.update);
+      lenisTick = (time: number) => lenis.raf(time * 1000);
+      gsap.ticker.add(lenisTick);
+      gsap.ticker.lagSmoothing(0);
+      const onRefresh = () => lenis.resize();
+      ScrollTrigger.addEventListener('refresh', onRefresh);
+    }
+
+    const ctx = gsap.context(() => {
+      const finishIntro = () => {
+        window.scrollTo(0, 0);
+        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+        setActiveDock('home');
+        persistIntroSeen();
+        setIsLoaded(true);
+      };
+      const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
+      introTimelineRef.current = intro;
+      if (reduceMotion) {
+        intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
+      } else {
+        intro.set('.cosmic-stage', { autoAlpha: 1 })
+          .to({}, { duration: 22.4, ease: 'none' })
+          .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
+          .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
+          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
+      }
+
+      if (!reduceMotion) {
+        gsap.to('.hero-visual img', { yPercent: 13, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero-visual', start: 'top top', end: 'bottom top', scrub: true } });
+        gsap.to('.hero-title .outline-word', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
+        gsap.to('.orbit-stamp', { rotate: 360, duration: 22, repeat: -1, ease: 'none' });
+        gsap.to('.manifesto-ghost', { xPercent: -18, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1 } });
+        gsap.utils.toArray<HTMLElement>('.reveal-up').forEach((el) => {
+          gsap.fromTo(el, { y: 72, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.05, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+        });
+        gsap.utils.toArray<HTMLElement>('.world-card').forEach((card, i) => {
+          gsap.fromTo(card, { y: 100, rotate: i % 2 ? 3 : -3, autoAlpha: 0 }, { y: 0, rotate: 0, autoAlpha: 1, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 90%', once: true } });
+          const image = card.querySelector('img');
+          if (image) gsap.to(image, { yPercent: 10, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true } });
+        });
+        gsap.utils.toArray<HTMLElement>('.piece-card').forEach((card, i) => {
+          gsap.fromTo(card, { y: 90, autoAlpha: 0, rotate: i === 1 ? 2 : -1 }, { y: 0, autoAlpha: 1, rotate: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
+        });
+        gsap.fromTo('.campaign-image', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
+        gsap.fromTo('.closing-title', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: '.closing', start: 'top 75%', once: true } });
+        gsap.utils.toArray<HTMLElement>('.masked-reveal').forEach((el) => gsap.fromTo(el, { clipPath: 'inset(0 0 100% 0)', y: 34 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.15, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 86%', once: true } }));
+        const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.drop', label: '03 / THE UNIPARC EDIT' }, { selector: '.campaign', label: '04 / CULTURE IS A WAY OF LIFE' }, { selector: '.about', label: '05 / OUR POINT OF VIEW' }];
+        chapters.forEach(({ selector, label }) => ScrollTrigger.create({ trigger: selector, start: 'top 45%', end: 'bottom 45%', onEnter: () => setActiveChapter(label), onEnterBack: () => setActiveChapter(label) }));
+        gsap.to('.manifesto-ghost', { yPercent: 16, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
+      }
+    }, rootRef);
+
+    return () => {
+      ctx.revert();
+      lenisRef.current = null;
+      if (lenis) {
+        if (lenisTick) gsap.ticker.remove(lenisTick);
+        lenis.destroy();
+      }
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, []);
+
+  useEffect(() => {
+    const targets = ['home', 'manifesto', 'worlds', 'drop', 'campaign', 'about', 'closing', 'footer']
+      .map((id) => document.getElementById(id))
+      .filter((node): node is HTMLElement => Boolean(node));
+    if (!targets.length) return;
+
+    let frame = 0;
+    const updateActiveSection = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // The section crossing this fixed reading line is the section the user is in.
+        const readingLine = Math.min(180, window.innerHeight * 0.28);
+        let current = targets[0];
+        for (const section of targets) {
+          if (section.getBoundingClientRect().top <= readingLine) current = section;
+          else break;
+        }
+        setActiveDock(current.id);
+      });
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    window.addEventListener('resize', updateActiveSection);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', updateActiveSection);
+      window.removeEventListener('resize', updateActiveSection);
+    };
+  }, []);
+
+  useEffect(() => {
+    const dock = navDockRef.current;
+    if (!dock) return;
+    const activeLink = dock.querySelector<HTMLAnchorElement>(`a[href="#${activeDock}"]`);
+    if (!activeLink) return;
+    const targetLeft = activeLink.offsetLeft - (dock.clientWidth - activeLink.clientWidth) / 2;
+    const maxLeft = dock.scrollWidth - dock.clientWidth;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    dock.scrollTo({
+      left: Math.max(0, Math.min(maxLeft, targetLeft)),
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+  }, [activeDock]);
+
+  useEffect(() => {
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!finePointer || reduceMotion || !cursorRef.current || !cursorDotRef.current) return;
+    const moveX = gsap.quickTo(cursorRef.current, 'x', { duration: 0.42, ease: 'power3' });
+    const moveY = gsap.quickTo(cursorRef.current, 'y', { duration: 0.42, ease: 'power3' });
+    const dotX = gsap.quickTo(cursorDotRef.current, 'x', { duration: 0.12, ease: 'power2' });
+    const dotY = gsap.quickTo(cursorDotRef.current, 'y', { duration: 0.12, ease: 'power2' });
+    const onMove = (event: PointerEvent) => { moveX(event.clientX); moveY(event.clientY); dotX(event.clientX); dotY(event.clientY); };
+    const onOver = (event: PointerEvent) => {
+      const target = (event.target as HTMLElement).closest('a, button, .world-card, .piece-card');
+      if (target) { cursorRef.current?.classList.add('cursor-active'); cursorRef.current?.setAttribute('data-label', target.getAttribute('data-cursor-label') || (target.closest('.piece-card') ? 'VIEW OBJECT' : 'EXPLORE')); }
+      else { cursorRef.current?.classList.remove('cursor-active'); cursorRef.current?.removeAttribute('data-label'); }
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerover', onOver);
+    return () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerover', onOver); };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedPiece) return;
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setActiveWorld(null); };
-    window.addEventListener('keydown', close);
-    return () => { document.body.style.overflow = previous; window.removeEventListener('keydown', close); };
-  }, [activeWorld]);
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setSelectedPiece(null); };
+    window.addEventListener('keydown', onKeyDown);
+    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+  }, [selectedPiece]);
 
-  return <div className="uniparc-site" ref={root}>
-    <div className="grain" aria-hidden="true" />
-    <div className="starfield starfield-one" aria-hidden="true" />
-    <div className="starfield starfield-two" aria-hidden="true" />
+  return (
+    <div className="site" ref={rootRef}>
+      <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
+        <div className="cosmic-stage">
+          <CinematicIntroScene />
+          <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
+          <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
+          {showSkipIntro && <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>}
+        </div>
+      </div>
+      <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
+      <div className="scroll-progress" aria-hidden="true"><span /></div>
+      <aside className="chapter-index" aria-live="polite"><span className="chapter-index-dot" /><span>{activeChapter}</span><span className="chapter-index-rule" /></aside>
 
-    {!introDone && <div className="intro-screen" aria-label="UNIPARC opening sequence">
-      <div className="intro-ring" />
-      <div className="intro-mark">U<span>✳</span></div>
-      <p className="intro-word">A UNIVERSE FOR EVERY SIDE OF YOU.</p>
-      <button className="intro-skip" onClick={() => setIntroDone(true)}>SKIP INTRO ↗</button>
-    </div>}
+      <header className="topbar">
+        <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
+        <span className="topbar-note">A HOME FOR WHAT YOU LOVE</span>
+        <span className="topbar-edition">INDEPENDENT CULTURE LABEL / 2026</span>
+      </header>
 
-    <header className="topbar">
-      <a href="#home" className="wordmark" onClick={(e) => { e.preventDefault(); navigate('home'); }} aria-label="UNIPARC home"><img src="/Uniparc.svg" alt="UNIPARC" /></a>
-      <div className="topbar-center"><span className="pulse" /> CULTURE WITHOUT CATEGORY</div>
-      <button className="menu-trigger" aria-expanded={menuOpen} aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} onClick={() => setMenuOpen(!menuOpen)}><span /><span /></button>
-      <nav className={menuOpen ? 'top-nav is-open' : 'top-nav'} aria-label="Main navigation">
-        <button onClick={() => navigate('universes')}>THE UNIVERSES</button>
-        <button onClick={() => navigate('manifesto')}>THE IDEA</button>
-        <button onClick={() => navigate('signal')}>THE SIGNAL</button>
-        <button className="nav-enter" onClick={() => navigate('universes')}>EXPLORE <Arrow /></button>
-      </nav>
-    </header>
-
-    <main>
-      <section className="hero" id="home">
-        <div className="hero-topline"><span>INDEPENDENT CULTURE LABEL <i> / </i> EST. 2026</span><span>NO. 001 — THE BEGINNING</span></div>
-        <div className="hero-main">
+      <main>
+        <section className="hero" id="home">
+          <div className="hero-meta hero-kicker"><span><i className="status-dot" /> A CULTURE-FIRST LIFESTYLE LABEL</span><span>BUILT AROUND WHAT YOU LOVE <b>IND / 2026</b></span></div>
           <div className="hero-copy">
-            <p className="eyebrow"><span className="pulse" /> THIS IS YOUR UNIVERSE.</p>
-            <h1><span>YOUR WORLD.</span><span className="hollow">YOUR RULES<span className="neon">.</span></span></h1>
-            <p className="hero-description">Anime. Games. Music. Movies. All the worlds you love, colliding in one place. This is UNIPARC — made for every side of you.</p>
-            <div className="hero-actions"><button className="button-neon" onClick={() => navigate('universes')}>ENTER THE UNIVERSE <Arrow /></button><span className="hero-side-note">NO BOXES. NO GATEKEEPING.<br />JUST PURE YOU.</span></div>
+            <p className="eyebrow hero-kicker">ALL THE THINGS THAT MAKE YOU, YOU.</p>
+            <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
+            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
           </div>
-          <div className="hero-orbit-ui">
-            <div className="orbit-halo orbit-halo-one" /><div className="orbit-halo orbit-halo-two" />
-            <div className="signal-beam"><i /><i /><i /></div>
-            <div className="orbit-core"><OrbitScene /><span className="core-label">U✳</span></div>
-            <span className="orbit-tag orbit-tag-top">YOUR INTERESTS / YOUR IDENTITY</span>
-            <span className="orbit-tag orbit-tag-left">ANIME ↗</span>
-            <span className="orbit-tag orbit-tag-right">GAMING ↗</span>
-            <span className="orbit-tag orbit-tag-bottom">MUSIC / FILM / EVERYTHING</span>
-            <span className="orbit-coord">35° 41' 22.2" N<br />139° 41' 30.1" E</span>
+          <div className="hero-visual">
+            <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2200&q=90" alt="Streetwear editorial campaign" fetchPriority="high" decoding="async" />
+            <div className="hero-visual-wash" /><span className="visual-coordinate">FIG. 001 — THE EVERYDAY UNIVERSE</span>
+            <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>MADE TO FEEL LIKE YOU.</span></div>
+            <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
           </div>
+          <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
+        </section>
+
+        <section className="manifesto section" id="manifesto">
+          <div className="section-label"><span>01 / THE IDEA</span><span>A PLACE WHERE CULTURE BELONGS</span></div>
+          <div className="manifesto-ghost" aria-hidden="true">MULTIDIMENSIONAL</div>
+          <div className="manifesto-grid">
+            <div className="manifesto-heading reveal-up"><span className="eyebrow dark-eyebrow">YOU DON'T HAVE TO PICK JUST ONE</span><h2 className="masked-reveal">YOU ARE<br />NOT <em>ONE</em><br />THING<span className="period">.</span></h2></div>
+            <div className="manifesto-text reveal-up"><p className="lead">Your style can hold every side of you.</p><p>Maybe it's a manga you grew up with. A game you lose hours to. A lyric that says what you couldn't. A film you return to. The things you love are part of your story — and they deserve a place in it.</p><p>UNIPARC brings those worlds together in one place. Explore what you love, find familiar energy and make room for something new. No gatekeeping. No need to choose just one.</p><a className="text-link" href="#about">WHY UNIPARC EXISTS <Arrow diagonal /></a></div>
+          </div>
+          <div className="manifesto-foot"><span>ONE PERSON. MANY UNIVERSES.</span><span>WEAR WHAT DEFINES YOU.®</span><span>SCROLL / 001</span></div>
+        </section>
+
+        <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties & { "--ambient-tint": string }}>
+          <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Different interests. One place to explore.<br />Find your world — or discover a new one.</p></div>
+          <div className="world-atmosphere-label"><span>YOU'RE EXPLORING</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
+            {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} data-cursor-label="ENTER WORLD" onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)} onMouseLeave={() => setActiveWorld(worlds[0])}><img src={world.image} alt="" loading="lazy" decoding="async" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
+          </div>
+          <p className="worlds-note">THAT'S ONLY THE START. THERE'S ALWAYS MORE TO DISCOVER. <span>↘</span></p>
+        </section>
+
+        <section className="drop section" id="drop">
+          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
+          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
+        </section>
+
+        <section className="campaign" id="campaign">
+          <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
+          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>The stories that shape you. The people who get your references. The interests that never really leave. That's culture — and it's part of everyday life.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
+        </section>
+
+        <section className="about section" id="about">
+          <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
+          <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A place for every interest, influence and side of you.</p><p>UNIPARC is a culture-first lifestyle label for people who don't fit into just one category. We bring fandoms, niche interests and everyday inspirations into a shared space for self-expression and belonging.</p><p>Our first pieces are graphic T-shirts — understated from a distance, full of meaning up close. It's the beginning of a wider world built around the things you love.</p><strong>NO GATEKEEPING. NO BOXES TO FIT. JUST ROOM TO BE YOU.</strong></div>
+        </section>
+
+        <section className="closing section" id="closing">
+          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><span className="closing-orbit" aria-hidden="true">U✳</span>
+        </section>
+      </main>
+
+      {selectedPiece && <div className="object-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
+        <div className="object-modal-visual">
+          <img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} />
+          <span className="object-visual-index">UNIPARC® <i> / </i> OBJECT STUDY {selectedPiece.id}</span>
+          <span className="object-visual-note">THE UNIPARC EDIT <b>2026</b></span>
         </div>
-        <div className="hero-bottomline"><span>SCROLL TO EXPLORE <b>↓</b></span><span>ONE PERSON. INFINITE WORLDS.</span><span>UNIPARC®</span></div>
-      </section>
-
-      <div className="ticker"><div className="ticker-track">ANIME <b>✳</b> GAMING <b>✳</b> MUSIC <b>✳</b> FILM <b>✳</b> ART <b>✳</b> INTERNET CULTURE <b>✳</b> ANIME <b>✳</b> GAMING <b>✳</b> MUSIC <b>✳</b> FILM <b>✳</b> ART <b>✳</b></div></div>
-
-      <section className="manifesto" id="manifesto">
-        <div className="section-meta reveal"><span>01 / THE IDEA</span><span>WHY UNIPARC EXISTS</span></div>
-        <div className="manifesto-grid">
-          <div className="manifesto-title reveal"><p className="eyebrow">YOU WERE NEVER ONE THING.</p><h2>TOO MANY<br />WORLDS<span className="neon">.</span><br /><em>ONE YOU.</em></h2></div>
-          <div className="manifesto-copy reveal"><div className="mini-orbit">✳</div><p className="manifesto-lead">You don't have to pick a side to belong.</p><p>One day it's a late-night anime binge. The next, you're deep into a game universe. A film quote lives rent-free in your head. A song becomes your whole personality.</p><p>We get it. Your interests aren't separate boxes. They're different dimensions of the same person. UNIPARC brings them together — a home for what you love, and a space to wear it your way.</p><button className="text-link" onClick={() => navigate('universes')}>FIND YOUR WORLD <Arrow /></button></div>
+        <div className="object-modal-content" data-lenis-prevent>
+          <div className="object-modal-topline"><span>OBJECT FILE <b>{selectedPiece.id} / 03</b></span><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE <span>×</span></button></div>
+          <div className="object-modal-intro">
+            <span className="object-modal-kicker">{selectedPiece.category} <i>—</i> {selectedPiece.label}</span>
+            <h2 id="object-title">{selectedPiece.name}</h2>
+            <p>A wearable expression of the worlds, stories and details that stay with you. This concept is part of the evolving UNIPARC universe — made for every side of you.</p>
+          </div>
+          <div className="object-detail-block">
+            <div className="object-detail-heading"><span>01</span><b>THE DETAILS</b><i>CONCEPT PREVIEW</i></div>
+            <dl className="object-detail-list">
+              <div><dt>DESIGN INTENT</dt><dd>IDENTITY / EXPRESSION</dd></div>
+              <div><dt>COLLECTION</dt><dd>THE UNIPARC EDIT</dd></div>
+              <div><dt>MATERIAL & FIT</dt><dd>TO BE ANNOUNCED</dd></div>
+              <div><dt>RELEASE WINDOW</dt><dd>FIRST DROP / 2026</dd></div>
+            </dl>
+          </div>
+          <div className="object-modal-signup">
+            <span className="object-modal-kicker">BE THERE FROM THE FIRST DROP</span>
+            <h3>Get the signal.</h3>
+            <p>Release information will be shared here when the collection is ready.</p>
+            <form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Preview only — your email has not been saved or sent."); }}>
+              <label htmlFor="object-email">EMAIL ADDRESS</label>
+              <div className="object-email-row"><input id="object-email" type="email" placeholder="you@example.com" required /><button type="submit" aria-label="Preview signup response">NOTIFY ME <span>↗</span></button></div>
+              <small>{waitlistNotice || "Preview form only. Email collection is not active and no details are stored."}</small>
+            </form>
+          </div>
+          <div className="object-modal-foot"><span>WEAR WHAT DEFINES YOU.®</span><span>UNIPARC / 2026</span></div>
         </div>
-        <div className="manifesto-foot"><span>NO GATEKEEPING</span><span>NO LABELS</span><span>NO LIMITS</span><span>JUST YOU <b>✳</b></span></div>
-      </section>
-
-      <section className="universes" id="universes">
-        <div className="section-meta reveal"><span>02 / PICK YOUR PORTAL</span><span>THE MULTIVERSE STARTS HERE</span></div>
-        <div className="universe-heading reveal"><div><p className="eyebrow">WHAT ARE YOU INTO?</p><h2>CHOOSE A<br /><em>UNIVERSE.</em></h2></div><p>Every fandom has a frequency.<br />Every interest opens a new world.<br />Where are we going first?</p></div>
-        <div className="universe-grid">{worlds.map((world) => <button className="universe-card" key={world.id} onClick={() => setActiveWorld(world)}><WorldArtwork world={world} /><span className="universe-card-top"><small>{world.number} / PORTAL</small><small>OPEN ↗</small></span><span className="universe-card-bottom"><span><b>{world.name}</b><small>{world.sub}</small></span><i><Arrow /></i></span></button>)}</div>
-        <div className="universe-foot"><span>AND THE MULTIVERSE KEEPS EXPANDING.</span><span>MORE WORLDS. MORE STORIES. <b>✳</b></span></div>
-      </section>
-
-      <section className="signal" id="signal">
-        <div className="signal-bg-orbit" aria-hidden="true"><span /><span /><span /></div>
-        <div className="section-meta reveal"><span>03 / THE SIGNAL</span><span>THE UNIPARC STATE OF MIND</span></div>
-        <div className="signal-content reveal"><p className="eyebrow">THIS ISN'T JUST MERCH.</p><h2>IT'S A<br /><span>UNIVERSE</span><br />YOU CAN WEAR<span className="neon">.</span></h2><p>We turn the things you love into a language of your own. Starting with graphic streetwear, built around the worlds, details and references that make you feel something.</p><div className="signal-stats"><div><b>01</b><span>YOUR FANDOM</span></div><div><b>∞</b><span>WAYS TO EXPRESS IT</span></div><div><b>U✳</b><span>YOUR UNIVERSE</span></div></div><button className="button-neon" onClick={() => navigate('manifesto')}>GET THE IDEA <Arrow /></button></div>
-      </section>
-
-      <section className="final-portal">
-        <div className="portal-rings" aria-hidden="true"><i /><i /><i /><i /></div>
-        <div className="final-copy reveal"><p className="eyebrow"><span className="pulse" /> TRANSMISSION RECEIVED?</p><h2>WELCOME<br />TO YOUR<br /><em>UNIVERSE.</em></h2><p>We're just getting started. Stay curious. Stay weird. Stay you.</p><button onClick={() => navigate('home')}>BACK TO THE BEGINNING ↑</button></div>
-        <div className="portal-coordinate">UNIPARC / SIGNAL 001<br />ENDLESS WORLDS DETECTED</div>
-      </section>
-    </main>
-
-    <footer className="footer">
-      <div className="footer-top"><a href="#home" onClick={(e) => { e.preventDefault(); navigate('home'); }}><img src="/Uniparc.svg" alt="UNIPARC" /></a><p>A home for what you love.<br />A universe for every side of you.</p><button onClick={() => navigate('home')}>BACK TO TOP ↑</button></div>
-      <div className="footer-bottom"><span>© UNIPARC 2026. ALL WORLDS RESERVED.</span><span>BUILT FOR THE CULTURE.</span><span>WEAR WHAT DEFINES YOU.®</span></div>
-    </footer>
-
-    {activeWorld && <div className="world-modal-backdrop" role="presentation" onMouseDown={(e) => { if (e.target === e.currentTarget) setActiveWorld(null); }}><section className="world-modal" role="dialog" aria-modal="true" aria-labelledby="world-modal-title"><button className="modal-close" onClick={() => setActiveWorld(null)} aria-label="Close portal">CLOSE ×</button><WorldArtwork world={activeWorld} /><div className="world-modal-copy"><span className="eyebrow">PORTAL {activeWorld.number} / UNIPARC MULTIVERSE</span><h2 id="world-modal-title">{activeWorld.name}<span className="neon">.</span></h2><p>{activeWorld.copy}</p><span className="modal-status">SIGNAL LOCKED IN <i className="pulse" /></span><small>Explore the world. Find your people. Express your side of it.</small></div></section></div>}
-  </div>;
+      </article></div>}
+      <nav ref={navDockRef} className={selectedPiece ? 'nav-dock nav-dock-hidden' : 'nav-dock'} aria-label="Section navigation">
+        <span className="dock-indicator" aria-hidden="true" />
+        <a className={activeDock === 'home' ? 'dock-home dock-active' : 'dock-home'} href="#home" onClick={(event) => navigateToSection(event, 'home')} aria-label="Home" aria-current={activeDock === 'home' ? 'location' : undefined}><span className="dock-home-mark">U<span>✳</span></span><span className="dock-label">HOME</span></a>
+        <span className="dock-divider" aria-hidden="true" />
+        <a href="#manifesto" className={activeDock === 'manifesto' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'manifesto')} aria-current={activeDock === 'manifesto' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">IDEA</span></a>
+        <a href="#worlds" className={activeDock === 'worlds' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'worlds')} aria-current={activeDock === 'worlds' ? 'location' : undefined}><span className="dock-number">02</span><span className="dock-label">CULTURE</span></a>
+        <a href="#drop" className={activeDock === 'drop' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'drop')} aria-current={activeDock === 'drop' ? 'location' : undefined}><span className="dock-number">03</span><span className="dock-label">EDIT</span></a>
+        <a href="#campaign" className={activeDock === 'campaign' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'campaign')} aria-current={activeDock === 'campaign' ? 'location' : undefined}><span className="dock-number">04</span><span className="dock-label">LIFE</span></a>
+        <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'about')} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">05</span><span className="dock-label">ABOUT</span></a>
+        <a href="#closing" className={activeDock === 'closing' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'closing')} aria-current={activeDock === 'closing' ? 'location' : undefined}><span className="dock-number">06</span><span className="dock-label">JOIN</span></a>
+        <a href="#footer" className={activeDock === 'footer' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'footer')} aria-current={activeDock === 'footer' ? 'location' : undefined}><span className="dock-number">07</span><span className="dock-label">INFO</span></a>
+      </nav>
+      <footer className="footer" id="footer">
+        <div className="footer-main">
+          <div className="footer-brand-column">
+            <a className="footer-logo" href="#home" aria-label="UNIPARC home"><img className="brand-logo footer-brand-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
+            <p className="footer-manifesto">A culture-first label for every side of you.</p>
+            <span className="footer-signoff">WEAR WHAT DEFINES YOU.®</span>
+          </div>
+          <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>05</span></a></div>
+          <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
+          <div className="footer-note-column"><span className="footer-heading">A PLACE WHERE CULTURE BELONGS.</span><p>From the stories you follow to the worlds you explore, there's room for every side of you here.</p><a href="#drop" className="footer-discover">DISCOVER THE EDIT ↗</a></div>
+        </div>
+        <div className="footer-bottom"><span>© UNIPARC 2026. ALL RIGHTS RESERVED.</span><span>INDEPENDENT CULTURE / EST. 2026</span><a href="#home" className="footer-top">BACK TO TOP ↑</a></div>
+      </footer>
+    </div>
+  );
 }
