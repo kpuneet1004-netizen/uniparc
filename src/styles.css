@@ -1013,3 +1013,83 @@ html{scroll-padding-top:24px}
 .skip-intro{z-index:12}
 @media(max-width:700px){.cinematic-sequence{inset:0}.cosmic-caption{bottom:18px}}
 @media(prefers-reduced-motion:reduce){.cinematic-sequence{display:none}}
+
+/* TYPE RHYTHM — global tracking, leading and readable measure */
+:root {
+  --tracking-body: .008em;
+  --tracking-display: -.058em;
+  --leading-body: 1.72;
+  --leading-display: .94;
+}
+body {
+  font-size: 14px;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+p, li, blockquote {
+  line-height: var(--leading-body);
+  letter-spacing: .006em;
+}
+h1, h2, h3, h4, h5, h6,
+.hero-title, .manifesto h2, .section h2, .campaign h2, .closing h2,
+.world-info strong, .about-main h2 {
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  font-kerning: normal;
+}
+.hero-title {
+  letter-spacing: -.072em;
+  line-height: .88;
+}
+.manifesto h2, .section h2, .campaign h2, .closing h2 {
+  letter-spacing: -.062em;
+  line-height: .94;
+}
+.world-info strong {
+  letter-spacing: -.045em;
+  line-height: 1;
+}
+.eyebrow, .hero-meta, .hero-image-caption, .visual-coordinate,
+.section-label, .manifesto-foot, .world-number, .world-tag,
+.worlds-note, .filter-bar, .piece-index, .piece-caption,
+.piece-hover-label, .piece-meta, .drop-disclaimer,
+.about-side-note, .closing-link, .footer > span, .footer-top,
+.nav a, .nav-cta, .menu-toggle, .ticker, .scroll-cue,
+.preloader-overline, .preloader-bottom {
+  letter-spacing: .14em;
+  line-height: 1.55;
+}
+.nav a { letter-spacing: .12em; }
+.hero-foot p, .manifesto-text > p:not(.lead), .about-main > p:not(.lead),
+.campaign-content > p, .section-heading > p {
+  line-height: 1.82;
+  letter-spacing: .008em;
+}
+.lead {
+  line-height: 1.48;
+  letter-spacing: -.012em;
+}
+.text-link, .light-link, .closing-link {
+  line-height: 1.5;
+  letter-spacing: .13em;
+}
+@media (max-width: 760px) {
+  body { line-height: 1.68; }
+  .hero-title { letter-spacing: -.066em; line-height: .91; }
+  .manifesto h2, .section h2, .campaign h2, .closing h2,
+  .about-main h2 { letter-spacing: -.052em; line-height: .98; }
+  .world-info strong { letter-spacing: -.04em; line-height: 1.04; }
+  p, li, blockquote { line-height: 1.72; }
+  .eyebrow, .hero-meta, .hero-image-caption, .visual-coordinate,
+  .section-label, .manifesto-foot, .world-number, .world-tag,
+  .worlds-note, .filter-bar, .piece-index, .piece-caption,
+  .piece-hover-label, .piece-meta, .drop-disclaimer,
+  .about-side-note, .closing-link, .footer > span, .footer-top,
+  .nav a, .nav-cta, .menu-toggle, .ticker, .scroll-cue,
+  .preloader-overline, .preloader-bottom {
+    letter-spacing: .12em;
+    line-height: 1.6;
+  }
+}
