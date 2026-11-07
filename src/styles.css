@@ -196,3 +196,60 @@ button:hover .arrow{transform:translate(3px,-3px)}
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* Typography correction: restore optical spacing and a consistent reading rhythm. */
+:root{
+  --type-display:'Manrope', 'Arial', sans-serif;
+  --type-body:'Manrope', 'Arial', sans-serif;
+  --type-mono:'DM Mono', monospace;
+}
+body{font-family:var(--type-body);font-size:16px;line-height:1.65;letter-spacing:0}
+.hero h1,.manifesto-title h2,.section-heading h2,.campaign h2,.about-copy h2,.first-drop h2,.modal-copy h2{
+  font-family:var(--type-display);
+  font-weight:800;
+  font-optical-sizing:auto;
+  font-kerning:normal;
+  font-feature-settings:"kern" 1,"liga" 1;
+  text-wrap:balance;
+}
+.hero h1{
+  font-size:clamp(68px,11.8vw,176px);
+  line-height:.91;
+  letter-spacing:-.065em;
+}
+.hero-outline{-webkit-text-stroke-width:1.25px;letter-spacing:-.052em}
+.manifesto-title h2{font-size:clamp(62px,8.8vw,132px);line-height:.94;letter-spacing:-.072em}
+.manifesto-word{letter-spacing:-.075em}
+.section-heading h2{font-size:clamp(64px,8.2vw,120px);line-height:.96;letter-spacing:-.065em}
+.world-bottom b{font-family:var(--type-display);font-weight:800;letter-spacing:-.045em;line-height:1.02}
+.campaign h2{font-size:clamp(72px,9.4vw,138px);line-height:.94;letter-spacing:-.065em}
+.about-copy h2{font-size:clamp(58px,7.1vw,104px);line-height:.96;letter-spacing:-.065em}
+.first-drop h2{font-size:clamp(86px,13vw,190px);line-height:.9;letter-spacing:-.075em}
+.first-drop-orbit{letter-spacing:-.085em}
+.modal-copy h2{letter-spacing:-.055em;line-height:.98}
+.hero .eyebrow,.eyebrow{letter-spacing:.12em;line-height:1.5}
+.section-meta,.hero-topline,.image-index,.image-caption,.manifesto-foot,.world-top,.worlds-foot,.filter-row,.piece-meta,.edit-note,.campaign-side,.campaign-index,.first-drop-bottom button,.footer-column>b,.footer-note>b,.footer-bottom,.modal-top,.modal-detail,.modal-image>span{
+  letter-spacing:.105em;
+  line-height:1.6;
+}
+.header-nav button,.round-link,.text-link,.light-link,.filters button,.piece-number,.piece-caption,.piece-open,.footer-column button,.footer-note button{
+  letter-spacing:.075em;
+}
+.hero-bottom>p,.manifesto-copy>p:not(.eyebrow),.section-heading>p,.world-bottom small,.campaign-content>p:not(.eyebrow),.about-copy>p:not(.eyebrow),.footer-brand p,.footer-note p,.modal-copy>p:not(.eyebrow){
+  line-height:1.8;
+  letter-spacing:0;
+}
+.manifesto-copy h3,.about-copy h3{line-height:1.42;letter-spacing:-.025em}
+.piece-meta b{letter-spacing:.035em}
+@media(max-width:760px){
+  .hero h1{font-size:clamp(58px,12.4vw,94px);line-height:.94;letter-spacing:-.06em}
+  .manifesto-title h2,.section-heading h2{font-size:clamp(60px,11.5vw,88px);line-height:.98;letter-spacing:-.065em}
+  .campaign h2{font-size:clamp(64px,11.5vw,96px);letter-spacing:-.06em}
+  .about-copy h2{font-size:clamp(54px,9.6vw,80px);letter-spacing:-.06em}
+  .first-drop h2{font-size:clamp(74px,14vw,116px);letter-spacing:-.065em}
+}
+@media(max-width:420px){
+  .hero h1{font-size:clamp(50px,12vw,66px);letter-spacing:-.055em}
+  .manifesto-title h2,.section-heading h2{font-size:clamp(56px,11.7vw,68px)}
+  .first-drop h2{font-size:clamp(68px,14vw,84px)}
+}
