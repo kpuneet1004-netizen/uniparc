@@ -14,11 +14,9 @@ const worlds = [
 ];
 
 const pieces = [
-  { id: '01', name: 'SERIOUS NAHI LETA / 001', category: 'APPAREL', label: 'THE LONG WAY AROUND', color: 'lime', image: '/images/uniparc-editorial-01.webp' },
-  { id: '02', name: 'WATCHING / 002', category: 'APPAREL', label: 'SAME FACE. DIFFERENT MASK.', color: 'violet', image: '/images/uniparc-editorial-02.webp' },
-  { id: '03', name: 'HER BEAUTY / 003', category: 'CULTURE', label: 'EVEN THE CURSE COULDN’T HIDE', color: 'orange', image: '/images/uniparc-editorial-03.webp' },
-  { id: '04', name: 'UNIPARC / 004', category: 'APPAREL', label: 'THE EVERYDAY UNIFORM', color: 'lime', image: '/images/uniparc-editorial-04.webp' },
-  { id: '05', name: 'TSUKUMOGAMI / 005', category: 'CULTURE', label: 'A LITTLE STRANGE. ALWAYS YOURS.', color: 'violet', image: '/images/uniparc-editorial-05.webp' },
+  { id: '01', name: 'SIGNAL / 001', category: 'APPAREL', label: 'THE FIRST FREQUENCY', color: 'lime', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1100&q=88' },
+  { id: '02', name: 'AFTERIMAGE / 002', category: 'APPAREL', label: 'A MEMORY IN MOTION', color: 'violet', image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=1100&q=88' },
+  { id: '03', name: 'SIDE QUEST / 003', category: 'CULTURE', label: 'TAKE THE LONG WAY', color: 'orange', image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd5?auto=format&fit=crop&w=1100&q=88' },
 ];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
@@ -317,7 +315,7 @@ export default function App() {
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{String(filter === 'ALL' ? pieces.length : pieces.filter((piece) => piece.category === filter).length).padStart(2, '0')}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
@@ -344,7 +342,7 @@ export default function App() {
           <span className="object-visual-note">THE UNIPARC EDIT <b>2026</b></span>
         </div>
         <div className="object-modal-content" data-lenis-prevent>
-          <div className="object-modal-topline"><span>OBJECT FILE <b>{selectedPiece.id} / {String(pieces.length).padStart(2, '0')}</b></span><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE <span>×</span></button></div>
+          <div className="object-modal-topline"><span>OBJECT FILE <b>{selectedPiece.id} / 03</b></span><button className="object-close" onClick={() => setSelectedPiece(null)} aria-label="Close object preview">CLOSE <span>×</span></button></div>
           <div className="object-modal-intro">
             <span className="object-modal-kicker">{selectedPiece.category} <i>—</i> {selectedPiece.label}</span>
             <h2 id="object-title">{selectedPiece.name}</h2>
