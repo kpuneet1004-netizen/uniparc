@@ -238,6 +238,7 @@ export default function App() {
 
   return (
     <div className="site" ref={rootRef}>
+      <a className="skip-link" href="#main-content">SKIP TO CONTENT</a>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
       <aside className="chapter-index" aria-live="polite"><span className="chapter-index-dot" /><span>{activeChapter}</span><span className="chapter-index-rule" /></aside>
@@ -253,7 +254,7 @@ export default function App() {
         <span className="topbar-edition">INDEPENDENT CULTURE LABEL / 2026</span>
       </header>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="hero" id="home">
           <div className="hero-meta hero-kicker"><span><i className="status-dot" /> A CULTURE-FIRST LIFESTYLE LABEL</span><span>BUILT AROUND WHAT YOU LOVE <b>IND / 2026</b></span></div>
           <div className="hero-copy">
@@ -312,7 +313,7 @@ export default function App() {
             <p>The first UNIPARC drop is taking shape. Follow along for original design reveals, launch announcements and the moment the collection becomes available on our marketplace partners.</p>
             <div className="closing-actions">
               <a className="closing-primary" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW THE SIGNAL <Arrow diagonal /></a>
-              <a className="closing-link" href="mailto:hello@unparc.in">GET IN TOUCH <span>↗</span></a>
+              
             </div>
           </div>
           <span className="closing-orbit" aria-hidden="true">U✳</span>
@@ -374,7 +375,7 @@ export default function App() {
           </div>
           <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>05</span></a></div>
           <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
-          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in development. Follow UNIPARC for original design previews, release updates and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a><a href="mailto:hello@unparc.in" className="footer-discover">HELLO@UNPARC.IN ↗</a></div>
+          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in development. Follow UNIPARC for original design previews, release updates and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a></div>
         </div>
         <div className="footer-statement" aria-label="Culture lives here">CULTURE LIVES HERE<span>✳</span></div>
         <div className="footer-bottom"><span>© UNIPARC 2026. ALL RIGHTS RESERVED.</span><span>INDEPENDENT CULTURE / EST. 2026</span><a href="#home" className="footer-top">BACK TO TOP ↑</a></div>
