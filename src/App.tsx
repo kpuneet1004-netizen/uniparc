@@ -309,10 +309,10 @@ export default function App() {
           <div className="closing-kicker"><span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><span>UNIPARC® / OPEN INVITATION</span></div>
           <h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2>
           <div className="closing-bottom">
-            <p>The first UNIPARC drop is taking shape. Explore the edit, find your frequency, and stay close for what's next.</p>
+            <p>The first UNIPARC drop is taking shape. Follow the journey for launch announcements, first looks and marketplace availability.</p>
             <div className="closing-actions">
-              <a className="closing-primary" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a>
-              <a className="closing-link" href="#worlds">FIND YOUR FREQUENCY <span>↗</span></a>
+              <a className="closing-primary" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW THE SIGNAL <Arrow diagonal /></a>
+              <a className="closing-link" href="mailto:hello@unparc.in">GET IN TOUCH <span>↗</span></a>
             </div>
           </div>
           <span className="closing-orbit" aria-hidden="true">U✳</span>
@@ -344,10 +344,10 @@ export default function App() {
           <div className="object-modal-signup object-preview-note">
             <span className="object-modal-kicker">A FIRST LOOK / NOT YET FOR SALE</span>
             <h3>More to come.</h3>
-            <p>This is an early design preview. Product specifications, pricing and release dates will be published when the first drop is ready. No signup is collected on this preview.</p>
+            <p>This is an early design preview, not a product listing. Specifications, pricing and marketplace destinations will be shared when the first drop is ready. Follow UNIPARC for launch announcements.</p>
             <div className="object-preview-actions">
               <button type="button" onClick={() => setSelectedPiece(null)}>BACK TO THE EDIT <span>↗</span></button>
-              <a href="#worlds" onClick={() => setSelectedPiece(null)}>EXPLORE CULTURE <span>↗</span></a>
+              <a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW UNIPARC <span>↗</span></a>
             </div>
           </div>
           <div className="object-modal-foot"><span>WEAR WHAT DEFINES YOU.®</span><span>UNIPARC / 2026</span></div>
@@ -374,7 +374,7 @@ export default function App() {
           </div>
           <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>05</span></a></div>
           <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
-          <div className="footer-note-column"><span className="footer-heading">A PLACE WHERE CULTURE BELONGS.</span><p>From the stories you follow to the worlds you explore, there's room for every side of you here.</p><a href="#drop" className="footer-discover">DISCOVER THE EDIT ↗</a></div>
+          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in the works. Follow along for design previews, launch news and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a><a href="mailto:hello@unparc.in" className="footer-discover">HELLO@UNPARC.IN ↗</a></div>
         </div>
         <div className="footer-statement" aria-label="Culture lives here">CULTURE LIVES HERE<span>✳</span></div>
         <div className="footer-bottom"><span>© UNIPARC 2026. ALL RIGHTS RESERVED.</span><span>INDEPENDENT CULTURE / EST. 2026</span><a href="#home" className="footer-top">BACK TO TOP ↑</a></div>
