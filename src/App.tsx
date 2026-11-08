@@ -292,7 +292,7 @@ export default function App() {
         </section>
 
         <section className="difference section" aria-labelledby="difference-title">
-          <div className="section-label"><span>02 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
+          <div className="section-label"><span>03 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
           <div className="difference-heading reveal-up">
             <span className="eyebrow">THE REFERENCE IS ONLY THE BEGINNING</span>
             <h2 id="difference-title">QUIET BRAND.<br /><em>LOUD INTERESTS.</em></h2>
@@ -328,7 +328,7 @@ export default function App() {
         </section>
 
         <section className="drop section" id="drop">
-          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>THE FIRST EDIT / A STUDY IN SELF-EXPRESSION<br />shaping the UNIPARC universe.</p></div>
+          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">04 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>THE FIRST EDIT / A STUDY IN SELF-EXPRESSION<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>02</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">EARLY DESIGN PREVIEW. PRODUCT DETAILS, PRICING AND MARKETPLACE LINKS WILL ARRIVE WITH THE FIRST DROP.</p>
@@ -336,11 +336,11 @@ export default function App() {
 
         <section className="campaign" id="campaign">
           <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
-          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>Culture is more than what you watch, play or listen to. It's the references you share, the details you notice and the people who understand without an explanation.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
+          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">05 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>Culture is more than what you watch, play or listen to. It's the art you save, the teams you stand behind, the memes you send, and the people who understand without an explanation.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
         </section>
 
         <section className="about section" id="about">
-          <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
+          <div className="about-side"><span className="eyebrow dark-eyebrow">06 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
           <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A shared space for everything that makes you, you.</p><p>UNIPARC is a culture-led label for people shaped by more than one world. We turn fandoms, subcultures and everyday influences into a shared language for self-expression — with room for every side of you.</p><p>We’re beginning with graphic T-shirts: considered from a distance, expressive up close. Each design starts with a reference, a feeling or a world worth carrying with you. This is the first chapter, not the whole story.</p><strong>NO GATEKEEPING. NO SINGLE LANE. JUST MORE ROOM TO EXPRESS YOURSELF.</strong></div>
         </section>
 
