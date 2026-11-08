@@ -288,6 +288,42 @@ export default function App() {
           <p className="worlds-note">YOUR INTERESTS DON'T EXIST IN ISOLATION. NEITHER SHOULD YOUR STYLE. <span>↘</span></p>
         </section>
 
+        <section className="difference section" aria-labelledby="difference-title">
+          <div className="section-label"><span>02 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
+          <div className="difference-heading reveal-up">
+            <span className="eyebrow">THE REFERENCE IS ONLY THE BEGINNING</span>
+            <h2 id="difference-title">QUIET BRAND.<br /><em>LOUD INTERESTS.</em></h2>
+            <p>Culture gives each piece its meaning. Thoughtful design makes it something you want to live in.</p>
+          </div>
+          <div className="difference-grid">
+            <article className="difference-card reveal-up">
+              <span className="difference-number">01</span>
+              <span className="difference-kicker">IDENTITY</span>
+              <h3>MADE PERSONAL.</h3>
+              <p>Your interests aren't just things you follow. They're part of how you see the world — and how you express yourself.</p>
+            </article>
+            <article className="difference-card reveal-up">
+              <span className="difference-number">02</span>
+              <span className="difference-kicker">PHILOSOPHY</span>
+              <h3>CULTURE, NOT COSTUME.</h3>
+              <p>References should feel meaningful, not pasted on. Each idea starts with a story, a feeling or a detail worth recognising.</p>
+            </article>
+            <article className="difference-card reveal-up">
+              <span className="difference-number">03</span>
+              <span className="difference-kicker">PRODUCT STANDARD</span>
+              <h3>MADE TO BE WORN.</h3>
+              <p>Fit, fabric, print, comfort and durability matter. The graphic earns attention; the garment has to earn its place in your rotation.</p>
+            </article>
+            <article className="difference-card reveal-up">
+              <span className="difference-number">04</span>
+              <span className="difference-kicker">PERSPECTIVE</span>
+              <h3>ROOM FOR EVERY SIDE.</h3>
+              <p>No single lane. No gatekeeping. A culture-first world for people shaped by more than one thing.</p>
+            </article>
+          </div>
+          <div className="difference-footer"><span>REFERENCE → INSIGHT → TWIST</span><span>ONE IDENTITY. INFINITE INFLUENCES. <b>✳</b></span></div>
+        </section>
+
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>THE FIRST EDIT / A STUDY IN SELF-EXPRESSION<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>02</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
