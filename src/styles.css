@@ -1209,7 +1209,6 @@ img{height:auto}
   max-width:100%;overflow-wrap:anywhere
 }
 p,h1,h2,h3,h4,small,a,button{overflow-wrap:break-word}
-.world-grid,.piece-grid,.footer-main{grid-template-columns:repeat( min(3, var(--unused, 3)), minmax(0,1fr))}
 .piece-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .world-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .footer-main{grid-template-columns:repeat(4,minmax(0,1fr))}
