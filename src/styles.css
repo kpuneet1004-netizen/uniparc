@@ -1223,9 +1223,9 @@ body{background:var(--ink);color:var(--paper)}
 .topbar-edition{color:var(--acid);font:8px var(--mono);letter-spacing:.16em}
 .hero{min-height:100svh;padding:104px 5vw 0;justify-content:space-between}
 .hero-meta{border-bottom-color:rgba(255,255,255,.2);padding:12px 0 16px}
-.hero-layout{grid-template-columns:minmax(0,.82fr) minmax(0,1.18fr);gap:clamp(30px,5vw,88px);padding:clamp(28px,4vh,54px) 0 34px}
+.hero-layout{grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,4vw,68px);padding:clamp(28px,4vh,54px) 0 34px}
 .hero-copy{padding-left:1vw}
-.hero-title{font-size:clamp(4.3rem,8.1vw,10.4rem);line-height:.83;letter-spacing:-.085em;margin-top:28px}
+.hero-title{font-size:clamp(3.8rem,6.1vw,8rem);line-height:.86;letter-spacing:-.078em;margin-top:28px}
 .hero-title .hero-line{white-space:nowrap}
 .hero-title .outline-word{-webkit-text-stroke:1px var(--paper)}
 .hero-foot{margin-top:42px;gap:28px}
