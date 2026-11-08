@@ -259,7 +259,7 @@ export default function App() {
           <div className="hero-copy">
             <p className="eyebrow hero-kicker">ALL THE THINGS THAT MAKE YOU, YOU.</p>
             <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
-            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><div className="hero-actions"><a className="hero-primary" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><a className="hero-secondary" href="#worlds">FIND YOUR FREQUENCY <span>↓</span></a></div></div>
+            <div className="hero-foot hero-kicker"><p>The stories that stay with you. The games that pull you in. The music that says it all. UNIPARC brings the worlds you love into everyday expression.</p><div className="hero-actions"><a className="hero-primary" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><a className="hero-secondary" href="#worlds">FIND YOUR FREQUENCY <span>↓</span></a></div></div>
           </div>
           <div className="hero-visual">
             <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
@@ -275,41 +275,41 @@ export default function App() {
           <div className="manifesto-ghost" aria-hidden="true">MULTIDIMENSIONAL</div>
           <div className="manifesto-grid">
             <div className="manifesto-heading reveal-up"><span className="eyebrow dark-eyebrow">YOU DON'T HAVE TO PICK JUST ONE</span><h2 className="masked-reveal">YOU ARE<br />NOT JUST<br /><em>ONE THING</em><span className="period">.</span></h2></div>
-            <div className="manifesto-text reveal-up"><p className="lead">Your style can hold every side of you.</p><p>Maybe it's a manga you grew up with. A game you lose hours to. A lyric that says what you couldn't. A film you return to. The things you love are part of your story — and they deserve a place in it.</p><p>UNIPARC brings those worlds together in one place. Explore what you love, find familiar energy and make room for something new. No gatekeeping. No need to choose just one.</p><a className="text-link" href="#about">WHY UNIPARC EXISTS <Arrow diagonal /></a></div>
+            <div className="manifesto-text reveal-up"><p className="lead">One identity. Infinite influences.</p><p>Maybe it's the manga you grew up with, the game that kept you up, the lyric that found you at the right time, or the film you never get tired of. These aren't just interests. They're part of your point of view.</p><p>UNIPARC is a meeting point for the worlds that shape you. Find your people, revisit familiar favourites and discover something unexpected. No labels to fit. No interests to leave behind.</p><a className="text-link" href="#about">WHY UNIPARC EXISTS <Arrow diagonal /></a></div>
           </div>
           <div className="manifesto-foot"><span>ONE PERSON. MANY UNIVERSES.</span><span>WEAR WHAT DEFINES YOU.®</span><span>SCROLL / 001</span></div>
         </section>
 
         <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties & { "--ambient-tint": string }}>
-          <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Different interests. One place to explore.<br />Find your world — or discover a new one.</p></div>
+          <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Many worlds. One place to belong.<br />Start with what you love. Leave room for what’s next.</p></div>
           <div className="world-atmosphere-label"><span>YOU'RE EXPLORING</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
             {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} data-cursor-label="ENTER WORLD" onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)} onMouseLeave={() => setActiveWorld(worlds[0])}><img src={world.image} alt="" loading="lazy" decoding="async" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
           </div>
-          <p className="worlds-note">THAT'S ONLY THE START. THERE'S ALWAYS MORE TO DISCOVER. <span>↘</span></p>
+          <p className="worlds-note">YOUR INTERESTS DON'T EXIST IN ISOLATION. NEITHER SHOULD YOUR STYLE. <span>↘</span></p>
         </section>
 
         <section className="drop section" id="drop">
-          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
+          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>THE FIRST EDIT / A STUDY IN SELF-EXPRESSION<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>02</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
-          <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
+          <p className="drop-disclaimer">EARLY DESIGN PREVIEW. PRODUCT DETAILS, PRICING AND MARKETPLACE LINKS WILL ARRIVE WITH THE FIRST DROP.</p>
         </section>
 
         <section className="campaign" id="campaign">
           <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
-          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>The stories that shape you. The people who get your references. The interests that never really leave. That's culture — and it's part of everyday life.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
+          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>Culture is more than what you watch, play or listen to. It's the references you share, the details you notice and the people who understand without an explanation.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
         </section>
 
         <section className="about section" id="about">
           <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
-          <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A place for every interest, influence and side of you.</p><p>UNIPARC is a culture-first lifestyle label for people who don't fit into just one category. We bring fandoms, niche interests and everyday inspirations into a shared space for self-expression and belonging.</p><p>Our first pieces are graphic T-shirts — understated from a distance, full of meaning up close. It's the beginning of a wider world built around the things you love.</p><strong>NO GATEKEEPING. NO BOXES TO FIT. JUST ROOM TO BE YOU.</strong></div>
+          <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A shared space for everything that makes you, you.</p><p>UNIPARC is a culture-led label for people shaped by more than one world. We turn fandoms, subcultures and everyday influences into a shared language for self-expression — with room for every side of you.</p><p>We’re beginning with graphic T-shirts: considered from a distance, expressive up close. Each design starts with a reference, a feeling or a world worth carrying with you. This is the first chapter, not the whole story.</p><strong>NO GATEKEEPING. NO SINGLE LANE. JUST MORE ROOM TO EXPRESS YOURSELF.</strong></div>
         </section>
 
         <section className="closing section" id="closing">
           <div className="closing-kicker"><span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><span>UNIPARC® / OPEN INVITATION</span></div>
           <h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2>
           <div className="closing-bottom">
-            <p>The first UNIPARC drop is taking shape. Follow the journey for launch announcements, first looks and marketplace availability.</p>
+            <p>The first UNIPARC drop is taking shape. Follow along for original design reveals, launch announcements and the moment the collection becomes available on our marketplace partners.</p>
             <div className="closing-actions">
               <a className="closing-primary" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW THE SIGNAL <Arrow diagonal /></a>
               <a className="closing-link" href="mailto:hello@unparc.in">GET IN TOUCH <span>↗</span></a>
@@ -369,12 +369,12 @@ export default function App() {
         <div className="footer-main">
           <div className="footer-brand-column">
             <a className="footer-logo" href="#home" aria-label="UNIPARC home"><img className="brand-logo footer-brand-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
-            <p className="footer-manifesto">A culture-first label for every side of you.</p>
+            <p className="footer-manifesto">A culture-led world for every side of you.</p>
             <span className="footer-signoff">WEAR WHAT DEFINES YOU.®</span>
           </div>
           <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>05</span></a></div>
           <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
-          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in the works. Follow along for design previews, launch news and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a><a href="mailto:hello@unparc.in" className="footer-discover">HELLO@UNPARC.IN ↗</a></div>
+          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in development. Follow UNIPARC for original design previews, release updates and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a><a href="mailto:hello@unparc.in" className="footer-discover">HELLO@UNPARC.IN ↗</a></div>
         </div>
         <div className="footer-statement" aria-label="Culture lives here">CULTURE LIVES HERE<span>✳</span></div>
         <div className="footer-bottom"><span>© UNIPARC 2026. ALL RIGHTS RESERVED.</span><span>INDEPENDENT CULTURE / EST. 2026</span><a href="#home" className="footer-top">BACK TO TOP ↑</a></div>
