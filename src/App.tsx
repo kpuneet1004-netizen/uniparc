@@ -230,7 +230,12 @@ export default function App() {
 
       <header className="topbar">
         <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
-        <span className="topbar-note">A HOME FOR WHAT YOU LOVE</span>
+        <nav className="topbar-nav" aria-label="Main navigation">
+          <a href="#worlds">CULTURE</a>
+          <a href="#drop">THE EDIT</a>
+          <a href="#about">OUR STORY</a>
+        </nav>
+        <a className="topbar-cta" href="#drop">EXPLORE THE EDIT <Arrow diagonal /></a>
         <span className="topbar-edition">INDEPENDENT CULTURE LABEL / 2026</span>
       </header>
 
@@ -287,7 +292,16 @@ export default function App() {
         </section>
 
         <section className="closing section" id="closing">
-          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><span className="closing-orbit" aria-hidden="true">U✳</span>
+          <div className="closing-kicker"><span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><span>UNIPARC® / OPEN INVITATION</span></div>
+          <h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2>
+          <div className="closing-bottom">
+            <p>The first UNIPARC drop is taking shape. Explore the edit, find your frequency, and stay close for what's next.</p>
+            <div className="closing-actions">
+              <a className="closing-primary" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a>
+              <a className="closing-link" href="#worlds">FIND YOUR FREQUENCY <span>↗</span></a>
+            </div>
+          </div>
+          <span className="closing-orbit" aria-hidden="true">U✳</span>
         </section>
       </main>
 
@@ -349,6 +363,7 @@ export default function App() {
           <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
           <div className="footer-note-column"><span className="footer-heading">A PLACE WHERE CULTURE BELONGS.</span><p>From the stories you follow to the worlds you explore, there's room for every side of you here.</p><a href="#drop" className="footer-discover">DISCOVER THE EDIT ↗</a></div>
         </div>
+        <div className="footer-statement" aria-label="Culture lives here">CULTURE LIVES HERE<span>✳</span></div>
         <div className="footer-bottom"><span>© UNIPARC 2026. ALL RIGHTS RESERVED.</span><span>INDEPENDENT CULTURE / EST. 2026</span><a href="#home" className="footer-top">BACK TO TOP ↑</a></div>
       </footer>
     </div>
