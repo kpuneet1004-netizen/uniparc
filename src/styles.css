@@ -1182,3 +1182,20 @@ h1, h2, h3, h4, h5, h6,
  .hero-visual,.world-card,.piece-card,.piece-image,.piece-open,.nav-dock,.nav-dock a,.scroll-cue,.scroll-cue b,.object-modal-panel{transition:none!important;animation:none!important;transform:none!important}
  .hero-visual img,.world-card img,.piece-image img{transform:none!important}
 }
+
+/* CINEMATIC SCROLL CHAPTER — editorial storytelling, not motion for motion's sake */
+.campaign{min-height:100svh;display:flex;align-items:center}
+.campaign-image{transform-origin:center center;will-change:transform}
+.campaign-content{will-change:transform,opacity}
+.campaign-mark{will-change:transform,opacity}
+.chapter-index{transition:color .45s ease}
+.chapter-index-dot{transition:box-shadow .45s ease,background .45s ease}
+.world-atmosphere-label strong{transition:color .5s ease,text-shadow .5s ease}
+.worlds:before{transition:background 1s cubic-bezier(.2,.75,.25,1)}
+@media(max-width:999px){
+ .campaign{min-height:570px}
+ .campaign-content,.campaign-mark{will-change:auto}
+}
+@media(prefers-reduced-motion:reduce){
+ .campaign-image,.campaign-content,.campaign-mark{will-change:auto!important;transform:none!important}
+}
