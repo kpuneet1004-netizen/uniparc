@@ -14,10 +14,9 @@ const worlds = [
 ];
 
 const pieces = [
-  { id: '01', name: 'BLUFF / 001', category: 'APPAREL', label: 'PLAY YOUR HAND', color: 'lime', image: '/images/objects/bluff-001.webp' },
-  { id: '02', name: 'GORGON / 002', category: 'APPAREL', label: 'BEAUTY WITH A BITE', color: 'violet', image: '/images/objects/gorgon-002.webp' },
-  { id: '03', name: 'HELLBOY / 003', category: 'APPAREL', label: 'RESEARCH. CONTAIN. DEFEND.', color: 'orange', image: '/images/objects/hellboy-003.webp' },
-  { id: '04', name: 'SERIOUS / 004', category: 'APPAREL', label: 'NOT EVERYTHING IS THAT DEEP', color: 'lime', image: '/images/objects/serious-004.webp' },
+  { id: '01', name: 'GORGON / 001', category: 'APPAREL', label: 'BEAUTY WITH A BITE', color: 'violet', image: '/images/objects/gorgon-001.webp' },
+  { id: '02', name: 'HELLBOY / 002', category: 'APPAREL', label: 'RESEARCH. CONTAIN. DEFEND.', color: 'orange', image: '/images/objects/hellboy-002.webp' },
+  { id: '03', name: 'SERIOUS / 003', category: 'APPAREL', label: 'NOT EVERYTHING IS THAT DEEP', color: 'lime', image: '/images/objects/serious-003.webp' },
 ];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
@@ -288,7 +287,7 @@ export default function App() {
             <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
           </div>
           <div className="hero-visual">
-            <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2200&q=90" alt="Streetwear editorial campaign" fetchPriority="high" decoding="async" />
+            <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
             <div className="hero-visual-wash" /><span className="visual-coordinate">FIG. 001 — THE EVERYDAY UNIVERSE</span>
             <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>MADE TO FEEL LIKE YOU.</span></div>
             <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
@@ -316,7 +315,7 @@ export default function App() {
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>04</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>03</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
