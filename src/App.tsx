@@ -6,10 +6,13 @@ import Lenis from 'lenis';
 gsap.registerPlugin(ScrollTrigger);
 
 const worlds = [
-  { id: 'anime', number: '01', name: 'ANIME / MANGA', note: 'Stories that stay with you', image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=88', tag: 'THE ART OF OBSESSION' },
-  { id: 'gaming', number: '02', name: 'GAMES / PLAY', note: 'Your next life starts here', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1400&q=88', tag: 'PRESS START / REPEAT' },
-  { id: 'screen', number: '03', name: 'FILM / SCREEN', note: 'For the ones who know the lore', image: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1400&q=88', tag: 'STAY FOR THE CREDITS' },
-  { id: 'sound', number: '04', name: 'MUSIC / SOUND', note: 'Wear your soundtrack', image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1400&q=88', tag: 'FEEL EVERY FREQUENCY' },
+  { id: 'anime', number: '01', name: 'ANIME / MANGA', note: 'Stories that stay with you', image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1400&q=88', tag: 'THE ART OF OBSESSION', tint: '#b8a2ff' },
+  { id: 'gaming', number: '02', name: 'GAMES / PLAY', note: 'Your next life starts here', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1400&q=88', tag: 'PRESS START / REPEAT', tint: '#d9f36a' },
+  { id: 'screen', number: '03', name: 'FILM / SCREEN', note: 'For the ones who know the lore', image: 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=1400&q=88', tag: 'STAY FOR THE CREDITS', tint: '#ff8a68' },
+  { id: 'sound', number: '04', name: 'MUSIC / SOUND', note: 'Wear your soundtrack', image: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1400&q=88', tag: 'FEEL EVERY FREQUENCY', tint: '#8dbdff' },
+  { id: 'art', number: '05', name: 'ART / DESIGN', note: 'For the eye that notices everything', image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1400&q=88', tag: 'LOOK CLOSER', tint: '#ff8a68' },
+  { id: 'sport', number: '06', name: 'SPORT / MOVEMENT', note: 'The feeling beyond the final score', image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1400&q=88', tag: 'MADE OF MOMENTUM', tint: '#d9f36a' },
+  { id: 'internet', number: '07', name: 'INTERNET / MEMES', note: 'If you get it, you get it', image: 'https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&w=1400&q=88', tag: 'CHRONICALLY ONLINE', tint: '#b8a2ff' },
 ];
 
 const pieces = [
@@ -131,7 +134,7 @@ export default function App() {
         gsap.fromTo('.campaign-image', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
         gsap.fromTo('.closing-title', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: '.closing', start: 'top 75%', once: true } });
         gsap.utils.toArray<HTMLElement>('.masked-reveal').forEach((el) => gsap.fromTo(el, { clipPath: 'inset(0 0 100% 0)', y: 34 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.15, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 86%', once: true } }));
-        const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.drop', label: '03 / THE UNIPARC EDIT' }, { selector: '.campaign', label: '04 / CULTURE IS A WAY OF LIFE' }, { selector: '.about', label: '05 / OUR POINT OF VIEW' }];
+        const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.difference', label: '03 / THE UNIPARC DIFFERENCE' }, { selector: '.drop', label: '04 / THE UNIPARC EDIT' }, { selector: '.campaign', label: '05 / CULTURE IS A WAY OF LIFE' }, { selector: '.about', label: '06 / OUR POINT OF VIEW' }];
         chapters.forEach(({ selector, label }) => ScrollTrigger.create({ trigger: selector, start: 'top 45%', end: 'bottom 45%', onEnter: () => setActiveChapter(label), onEnterBack: () => setActiveChapter(label) }));
         gsap.to('.manifesto-ghost', { yPercent: 16, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
       }
@@ -267,7 +270,7 @@ export default function App() {
             <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>MADE TO FEEL LIKE YOU.</span></div>
             <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
           </div>
-          <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
+          <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> ART IS CULTURE <b>✳</b> SPORT IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> ART IS CULTURE <b>✳</b> SPORT IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
         </section>
 
         <section className="manifesto section" id="manifesto">
@@ -280,8 +283,8 @@ export default function App() {
           <div className="manifesto-foot"><span>ONE PERSON. MANY UNIVERSES.</span><span>WEAR WHAT DEFINES YOU.®</span><span>SCROLL / 001</span></div>
         </section>
 
-        <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties & { "--ambient-tint": string }}>
-          <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Many worlds. One place to belong.<br />Start with what you love. Leave room for what’s next.</p></div>
+        <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.tint } as React.CSSProperties & { "--ambient-tint": string }}>
+          <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Many worlds. One place to belong.<br />From anime and gaming to music, art, sport and internet culture — there’s room for every side of you.</p></div>
           <div className="world-atmosphere-label"><span>YOU'RE EXPLORING</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
             {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} data-cursor-label="ENTER WORLD" onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)} onMouseLeave={() => setActiveWorld(worlds[0])}><img src={world.image} alt="" loading="lazy" decoding="async" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
           </div>
@@ -289,7 +292,7 @@ export default function App() {
         </section>
 
         <section className="difference section" aria-labelledby="difference-title">
-          <div className="section-label"><span>02 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
+          <div className="section-label"><span>03 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
           <div className="difference-heading reveal-up">
             <span className="eyebrow">THE REFERENCE IS ONLY THE BEGINNING</span>
             <h2 id="difference-title">QUIET BRAND.<br /><em>LOUD INTERESTS.</em></h2>
@@ -325,7 +328,7 @@ export default function App() {
         </section>
 
         <section className="drop section" id="drop">
-          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>THE FIRST EDIT / A STUDY IN SELF-EXPRESSION<br />shaping the UNIPARC universe.</p></div>
+          <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">04 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>THE FIRST EDIT / A STUDY IN SELF-EXPRESSION<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>02</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">EARLY DESIGN PREVIEW. PRODUCT DETAILS, PRICING AND MARKETPLACE LINKS WILL ARRIVE WITH THE FIRST DROP.</p>
@@ -333,11 +336,11 @@ export default function App() {
 
         <section className="campaign" id="campaign">
           <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
-          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>Culture is more than what you watch, play or listen to. It's the references you share, the details you notice and the people who understand without an explanation.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
+          <div className="campaign-overlay" /><div className="campaign-content reveal-up"><span className="eyebrow">05 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>Culture is more than what you watch, play or listen to. It's the art you save, the teams you stand behind, the memes you send, and the people who understand without an explanation.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div><span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span>
         </section>
 
         <section className="about section" id="about">
-          <div className="about-side"><span className="eyebrow dark-eyebrow">05 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
+          <div className="about-side"><span className="eyebrow dark-eyebrow">06 / OUR POINT OF VIEW</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">A PLACE WHERE<br />CULTURE BELONGS.</span></div>
           <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A shared space for everything that makes you, you.</p><p>UNIPARC is a culture-led label for people shaped by more than one world. We turn fandoms, subcultures and everyday influences into a shared language for self-expression — with room for every side of you.</p><p>We’re beginning with graphic T-shirts: considered from a distance, expressive up close. Each design starts with a reference, a feeling or a world worth carrying with you. This is the first chapter, not the whole story.</p><strong>NO GATEKEEPING. NO SINGLE LANE. JUST MORE ROOM TO EXPRESS YOURSELF.</strong></div>
         </section>
 
@@ -348,7 +351,7 @@ export default function App() {
             <p>The first UNIPARC drop is taking shape. Follow along for original design reveals, launch announcements and the moment the collection becomes available on our marketplace partners.</p>
             <div className="closing-actions">
               <a className="closing-primary" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW THE SIGNAL <Arrow diagonal /></a>
-              <a className="closing-link" href="mailto:hello@unparc.in">GET IN TOUCH <span>↗</span></a>
+              <a className="closing-link" href="mailto:hello@uniparc.in">GET IN TOUCH <span>↗</span></a>
             </div>
           </div>
           <span className="closing-orbit" aria-hidden="true">U✳</span>
@@ -410,7 +413,7 @@ export default function App() {
           </div>
           <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>05</span></a></div>
           <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
-          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in development. Follow UNIPARC for original design previews, release updates and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a><a href="mailto:hello@unparc.in" className="footer-discover">HELLO@UNPARC.IN ↗</a></div>
+          <div className="footer-note-column"><span className="footer-heading">STAY CLOSE TO THE SIGNAL.</span><p>The first drop is in development. Follow UNIPARC for original design previews, release updates and marketplace availability.</p><a href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" className="footer-discover">INSTAGRAM ↗</a><a href="mailto:hello@uniparc.in" className="footer-discover">HELLO@UNPARC.IN ↗</a></div>
         </div>
         <div className="footer-statement" aria-label="Culture lives here">CULTURE LIVES HERE<span>✳</span></div>
         <div className="footer-bottom"><span>© UNIPARC 2026. ALL RIGHTS RESERVED.</span><span>INDEPENDENT CULTURE / EST. 2026</span><a href="#home" className="footer-top">BACK TO TOP ↑</a></div>
