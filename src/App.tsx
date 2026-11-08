@@ -313,7 +313,6 @@ export default function App() {
             <p>The first UNIPARC drop is taking shape. Follow along for original design reveals, launch announcements and the moment the collection becomes available on our marketplace partners.</p>
             <div className="closing-actions">
               <a className="closing-primary" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW THE SIGNAL <Arrow diagonal /></a>
-              
             </div>
           </div>
           <span className="closing-orbit" aria-hidden="true">U✳</span>
