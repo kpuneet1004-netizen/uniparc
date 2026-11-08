@@ -289,7 +289,7 @@ export default function App() {
         </section>
 
         <section className="difference section" aria-labelledby="difference-title">
-          <div className="section-label"><span>03 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
+          <div className="section-label"><span>02 / THE UNIPARC DIFFERENCE</span><span>IDENTITY → PERSPECTIVE</span></div>
           <div className="difference-heading reveal-up">
             <span className="eyebrow">THE REFERENCE IS ONLY THE BEGINNING</span>
             <h2 id="difference-title">QUIET BRAND.<br /><em>LOUD INTERESTS.</em></h2>
