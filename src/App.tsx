@@ -121,23 +121,47 @@ export default function App() {
         gsap.utils.toArray<HTMLElement>('.reveal-up').forEach((el) => {
           gsap.fromTo(el, { y: 72, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.05, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
         });
-        gsap.utils.toArray<HTMLElement>('.world-card').forEach((card, i) => {
-          gsap.fromTo(card, { y: 100, rotate: i % 2 ? 3 : -3, autoAlpha: 0 }, { y: 0, rotate: 0, autoAlpha: 1, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 90%', once: true } });
+        gsap.utils.toArray<HTMLElement>('.world-card').forEach((card) => {
+          gsap.fromTo(card, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.85, ease: 'power3.out', scrollTrigger: { trigger: '.worlds', start: 'top 65%', once: true } });
           const image = card.querySelector('img');
-          if (image) gsap.to(image, { yPercent: 10, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true } });
+          if (image) gsap.to(image, { scale: 1.12, yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.worlds', start: 'top bottom', end: 'bottom top', scrub: 1 } });
+        });
+        gsap.utils.toArray<HTMLElement>('.section-label, .manifesto-grid, .filter-bar, .about-side, .about-main').forEach((el) => {
+          gsap.fromTo(el, { y: 42, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+        });
+        gsap.utils.toArray<HTMLElement>('.piece-image').forEach((el) => {
+          gsap.fromTo(el, { clipPath: 'inset(12% 0 12% 0)' }, { clipPath: 'inset(0% 0 0% 0)', ease: 'none', scrollTrigger: { trigger: el, start: 'top 88%', end: 'top 42%', scrub: 0.7 } });
         });
         gsap.utils.toArray<HTMLElement>('.piece-card').forEach((card, i) => {
           gsap.fromTo(card, { y: 90, autoAlpha: 0, rotate: i === 1 ? 2 : -1 }, { y: 0, autoAlpha: 1, rotate: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
         });
         const cinematicScroll = gsap.matchMedia();
         cinematicScroll.add('(min-width: 1000px)', () => {
+          const worldTrack = document.querySelector<HTMLElement>('.world-grid');
+          const worldSection = document.querySelector<HTMLElement>('.worlds');
+          let horizontalTween: gsap.core.Tween | undefined;
+          if (worldTrack && worldSection) {
+            horizontalTween = gsap.to(worldTrack, {
+              x: () => -(worldTrack.scrollWidth - window.innerWidth + window.innerWidth * 0.08),
+              ease: 'none',
+              scrollTrigger: {
+                trigger: worldSection,
+                start: 'top top',
+                end: () => '+=' + Math.max(900, worldTrack.scrollWidth - window.innerWidth + window.innerWidth * 0.08),
+                pin: true,
+                scrub: 1,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+              },
+            });
+          }
           const chapter = gsap.timeline({
             scrollTrigger: { trigger: '.campaign', start: 'top top', end: '+=95%', pin: true, scrub: 1, anticipatePin: 1 },
           });
           chapter.fromTo('.campaign-image', { scale: 1.28 }, { scale: 1, ease: 'none' }, 0)
             .fromTo('.campaign-content', { y: 80, autoAlpha: 0.65 }, { y: -18, autoAlpha: 1, ease: 'none' }, 0)
             .fromTo('.campaign-mark', { y: 34, autoAlpha: 0.25 }, { y: -24, autoAlpha: 1, ease: 'none' }, 0);
-          return () => chapter.scrollTrigger?.kill();
+          return () => { chapter.scrollTrigger?.kill(); horizontalTween?.scrollTrigger?.kill(); horizontalTween?.kill(); };
         });
         cinematicScroll.add('(max-width: 999px)', () => {
           gsap.fromTo('.campaign-image', { scale: 1.16 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
