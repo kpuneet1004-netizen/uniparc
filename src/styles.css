@@ -1137,3 +1137,33 @@ h1, h2, h3, h4, h5, h6,
 @media(prefers-reduced-motion:reduce){
  .topbar-nav a,.topbar-cta,.closing-primary{transition:none}
 }
+
+
+/* EXPERIENCE REFINEMENT — clear first actions, honest previews, accessible object dialogs */
+.hero-actions{display:flex;align-items:center;gap:clamp(16px,2.4vw,30px);flex-wrap:wrap;margin-top:clamp(18px,2.2vw,30px)}
+.hero-primary{display:inline-flex;align-items:center;gap:22px;padding:15px 17px;background:var(--acid);color:var(--ink);text-decoration:none;font:8px var(--mono);letter-spacing:.13em;transition:transform .25s ease,background .25s ease}
+.hero-primary .arrow{width:14px;height:14px}
+.hero-primary:hover{transform:translateY(-3px);background:#efffa8}
+.hero-secondary{display:inline-flex;align-items:center;gap:12px;color:var(--paper);text-decoration:none;font:8px var(--mono);letter-spacing:.13em;transition:color .2s ease}
+.hero-secondary span{color:var(--acid);font-size:13px}
+.hero-secondary:hover{color:var(--acid)}
+.object-preview-note{border-top:1px solid #ffffff24}
+.object-preview-note h3{margin-bottom:8px}
+.object-preview-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:22px}
+.object-preview-actions button,.object-preview-actions a{display:inline-flex;align-items:center;gap:18px;min-height:44px;padding:12px 14px;border:1px solid #d9f36a80;background:transparent;color:var(--acid);text-decoration:none;font:8px var(--mono);letter-spacing:.12em;cursor:pointer}
+.object-preview-actions button{background:var(--acid);color:var(--ink);border-color:var(--acid)}
+.object-preview-actions button:hover{background:#efffa8}
+.object-preview-actions a:hover{background:#d9f36a16}
+.object-modal-panel:focus{outline:none}
+.object-modal-panel button:focus-visible,.object-modal-panel a:focus-visible{outline:2px solid var(--acid);outline-offset:4px}
+@media(max-width:760px){
+ .hero-actions{align-items:flex-start;gap:15px;flex-direction:column}
+ .hero-primary{min-height:46px;padding:14px 15px}
+ .hero-secondary{min-height:38px}
+ .object-preview-actions{align-items:stretch;flex-direction:column}
+ .object-preview-actions button,.object-preview-actions a{justify-content:space-between;width:100%;min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+ .hero-primary,.hero-secondary{transition:none}
+ .hero-primary:hover{transform:none}
+}

@@ -30,12 +30,12 @@ export default function App() {
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
+  const lastFocusedElementRef = useRef<HTMLElement | null>(null);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
-  const [waitlistNotice, setWaitlistNotice] = useState('');
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
 
   const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -217,9 +217,24 @@ export default function App() {
     if (!selectedPiece) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setSelectedPiece(null); };
+    const panel = document.querySelector<HTMLElement>('.object-modal-panel');
+    const focusable = () => Array.from(panel?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])') || []);
+    focusable()[0]?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { setSelectedPiece(null); return; }
+      if (event.key !== 'Tab') return;
+      const items = focusable();
+      if (!items.length) return;
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
     window.addEventListener('keydown', onKeyDown);
-    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+      lastFocusedElementRef.current?.focus();
+    };
   }, [selectedPiece]);
 
   return (
@@ -245,7 +260,7 @@ export default function App() {
           <div className="hero-copy">
             <p className="eyebrow hero-kicker">ALL THE THINGS THAT MAKE YOU, YOU.</p>
             <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
-            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
+            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><div className="hero-actions"><a className="hero-primary" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><a className="hero-secondary" href="#worlds">FIND YOUR FREQUENCY <span>↓</span></a></div></div>
           </div>
           <div className="hero-visual">
             <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
@@ -277,7 +292,7 @@ export default function App() {
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>03</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { lastFocusedElementRef.current = event.currentTarget; setSelectedPiece(piece); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
@@ -327,15 +342,14 @@ export default function App() {
               <div><dt>RELEASE WINDOW</dt><dd>FIRST DROP / 2026</dd></div>
             </dl>
           </div>
-          <div className="object-modal-signup">
-            <span className="object-modal-kicker">BE THERE FROM THE FIRST DROP</span>
-            <h3>Get the signal.</h3>
-            <p>Release information will be shared here when the collection is ready.</p>
-            <form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Preview only — your email has not been saved or sent."); }}>
-              <label htmlFor="object-email">EMAIL ADDRESS</label>
-              <div className="object-email-row"><input id="object-email" type="email" placeholder="you@example.com" required /><button type="submit" aria-label="Preview signup response">NOTIFY ME <span>↗</span></button></div>
-              <small>{waitlistNotice || "Preview form only. Email collection is not active and no details are stored."}</small>
-            </form>
+          <div className="object-modal-signup object-preview-note">
+            <span className="object-modal-kicker">A FIRST LOOK / NOT YET FOR SALE</span>
+            <h3>More to come.</h3>
+            <p>This is an early design preview. Product specifications, pricing and release dates will be published when the first drop is ready. No signup is collected on this preview.</p>
+            <div className="object-preview-actions">
+              <button type="button" onClick={() => setSelectedPiece(null)}>BACK TO THE EDIT <span>↗</span></button>
+              <a href="#worlds" onClick={() => setSelectedPiece(null)}>EXPLORE CULTURE <span>↗</span></a>
+            </div>
           </div>
           <div className="object-modal-foot"><span>WEAR WHAT DEFINES YOU.®</span><span>UNIPARC / 2026</span></div>
         </div>
