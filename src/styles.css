@@ -1209,7 +1209,8 @@ img{height:auto}
   max-width:100%;overflow-wrap:anywhere
 }
 p,h1,h2,h3,h4,small,a,button{overflow-wrap:break-word}
-.piece-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+/* Two featured concepts should balance as a pair instead of leaving an empty third column. */
+.piece-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));max-width:1100px;margin-inline:auto}
 .world-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .footer-main{grid-template-columns:repeat(4,minmax(0,1fr))}
 .object-modal-panel{width:min(1080px,calc(100vw - 48px));max-width:calc(100vw - 48px);max-height:calc(100svh - 48px);overflow:auto}
