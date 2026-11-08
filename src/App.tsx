@@ -214,6 +214,57 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    if (reduceMotion || !finePointer) return;
+
+    const heroVisual = rootRef.current?.querySelector<HTMLElement>('.hero-visual');
+    const hero = rootRef.current?.querySelector<HTMLElement>('.hero');
+    const cleanups: Array<() => void> = [];
+
+    if (heroVisual && hero) {
+      const rotateX = gsap.quickTo(heroVisual, 'rotationX', { duration: 0.7, ease: 'power3.out' });
+      const rotateY = gsap.quickTo(heroVisual, 'rotationY', { duration: 0.7, ease: 'power3.out' });
+      const moveX = gsap.quickTo(heroVisual, 'x', { duration: 0.7, ease: 'power3.out' });
+      const moveY = gsap.quickTo(heroVisual, 'y', { duration: 0.7, ease: 'power3.out' });
+      const onMove = (event: PointerEvent) => {
+        const bounds = hero.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        rotateX(y * -3.5);
+        rotateY(x * 4.5);
+        moveX(x * 4);
+        moveY(y * 4);
+      };
+      const onLeave = () => { rotateX(0); rotateY(0); moveX(0); moveY(0); };
+      hero.addEventListener('pointermove', onMove);
+      hero.addEventListener('pointerleave', onLeave);
+      cleanups.push(() => { hero.removeEventListener('pointermove', onMove); hero.removeEventListener('pointerleave', onLeave); gsap.set(heroVisual, { clearProps: 'transform' }); });
+    }
+
+    const cards = rootRef.current?.querySelectorAll<HTMLElement>('.world-card, .piece-card');
+    cards?.forEach((card) => {
+      const surface = card.classList.contains('world-card') ? card : card.querySelector<HTMLElement>('.piece-image');
+      if (!surface) return;
+      const rotateX = gsap.quickTo(surface, 'rotationX', { duration: 0.45, ease: 'power3.out' });
+      const rotateY = gsap.quickTo(surface, 'rotationY', { duration: 0.45, ease: 'power3.out' });
+      const onMove = (event: PointerEvent) => {
+        const bounds = surface.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        rotateX(y * -5);
+        rotateY(x * 6);
+      };
+      const onLeave = () => { rotateX(0); rotateY(0); };
+      surface.addEventListener('pointermove', onMove);
+      surface.addEventListener('pointerleave', onLeave);
+      cleanups.push(() => { surface.removeEventListener('pointermove', onMove); surface.removeEventListener('pointerleave', onLeave); gsap.set(surface, { clearProps: 'transform' }); });
+    });
+
+    return () => cleanups.forEach((cleanup) => cleanup());
+  }, []);
+
+  useEffect(() => {
     if (!selectedPiece) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -241,7 +292,7 @@ export default function App() {
           <div className="hero-copy">
             <p className="eyebrow hero-kicker">ALL THE THINGS THAT MAKE YOU, YOU.</p>
             <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
-            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
+            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto" data-cursor-label="SCROLL TO EXPLORE"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
           </div>
           <div className="hero-visual">
             <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
@@ -273,7 +324,7 @@ export default function App() {
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>03</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} type="button" className={activeFilter === filter ? 'selected' : ''} aria-pressed={activeFilter === filter} onClick={() => setActiveFilter(filter)}>{filter}<sup>03</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
           <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
