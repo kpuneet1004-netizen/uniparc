@@ -9,6 +9,13 @@ A responsive, culture-first brand presence experience for UNIPARC.
 - Lenis smooth scrolling
 - Cloudflare Workers static assets
 
+## Architecture
+- `src/App.tsx`: application composition and motion lifecycle
+- `src/components/site-sections.tsx`: reusable page sections and navigation
+- `src/styles/tokens.css`: typography, palette, spacing and layering tokens
+- `src/styles/global.css`: reset, shared primitives and accessibility
+- `src/styles/sections.css`: responsive section layouts and interactions
+
 ## Design system
 - Display: Plus Jakarta Sans
 - Body: Inter
