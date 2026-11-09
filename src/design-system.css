@@ -168,9 +168,9 @@ main > section,
 .piece-image img,
 .campaign-image { will-change: auto; }
 @media (min-width: 761px) {
-  .nav-dock > :nth-child(7),
-  .nav-dock > :nth-child(9),
-  .nav-dock > :nth-child(10) { display: none; }
+  .nav-dock > a[href="#campaign"],
+.nav-dock > a[href="#closing"],
+.nav-dock > a[href="#footer"] { display: none; }
 }
 @media (max-width: 760px) {
   :root { --section-space: 64px; }
@@ -195,9 +195,9 @@ main > section,
   .campaign-content { max-width: 34ch; }
   .campaign-content > p { max-width: 32ch; }
   .closing { min-height: 0; }
-  .nav-dock > :nth-child(7),
-  .nav-dock > :nth-child(9),
-  .nav-dock > :nth-child(10) { display: none; }
+  .nav-dock > a[href="#campaign"],
+.nav-dock > a[href="#closing"],
+.nav-dock > a[href="#footer"] { display: none; }
   .nav-dock { justify-content: space-around; overflow: hidden; }
   .nav-dock > a { min-width: 0; flex: 1 1 0; }
   .nav-dock > .dock-home { flex: 0 0 42px !important; }
