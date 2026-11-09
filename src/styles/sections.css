@@ -177,7 +177,7 @@
   .image-caption { bottom: 14px; font-size: 10px; }
   .image-coordinate { right: 13px; }
   .hero-ticker { font-size: 9px; }
-  .section-eyebrow { font-size: 11px; }
+  .section-eyebrow { flex-wrap: wrap; font-size: 11px; }
   .section-eyebrow span:last-child { text-align: right; }
   .manifesto-layout { grid-template-columns: 1fr; gap: 38px; padding: 56px 0; }
   .manifesto-heading h2, .section-intro h2, .experiences-intro h2, .edit-copy h2, .design-story-heading h2, .community-copy h2, .newsletter-layout h2 { font-size: 28px; }
@@ -226,7 +226,7 @@
   .footer-bottom span:nth-child(2) { display: none; }
 }
 @media (max-width: 390px) {
-  .hero-title { font-size: 40px; }
+  .hero-title { font-size: clamp(32px, 10vw, 38px); }
   .hero-bottomline { flex-direction: column; }
   .culture-card { min-height: 215px; }
   .culture-card-bottom strong { font-size: 13px; }
