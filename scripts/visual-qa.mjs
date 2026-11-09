@@ -24,7 +24,16 @@ for (const viewport of viewports) {
 
   const response = await page.goto(baseURL, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.locator('#main-content').waitFor({ state: 'visible', timeout: 10000 });
-  await page.waitForTimeout(1800);
+  await page.waitForTimeout(1200);
+  await page.evaluate(async () => {
+    const step = Math.max(300, Math.floor(window.innerHeight * 0.75));
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo(0, y);
+      await new Promise(resolve => setTimeout(resolve, 80));
+    }
+    window.scrollTo(0, 0);
+  });
+  await page.waitForTimeout(700);
   await page.evaluate(async () => {
     await Promise.all([...document.images].map(img => {
       if (img.complete) return Promise.resolve();
@@ -65,6 +74,15 @@ for (const viewport of viewports) {
     };
   });
 
+  let mobileMenuWorks = true;
+  if (viewport.width <= 760) {
+    const toggle = page.locator('.menu-toggle');
+    await toggle.click();
+    mobileMenuWorks = (await toggle.getAttribute('aria-expanded')) === 'true' && await page.locator('#primary-navigation').isVisible();
+    await page.locator('#primary-navigation a[href="#culture"]').click();
+    mobileMenuWorks = mobileMenuWorks && (await toggle.getAttribute('aria-expanded')) === 'false';
+  }
+
   const screenshot = `${outputDir}/${viewport.name}.png`;
   await page.screenshot({ path: screenshot, fullPage: true, animations: 'disabled' });
 
@@ -76,6 +94,7 @@ for (const viewport of viewports) {
     noRuntimeErrors: pageErrors.length === 0,
     stickyHeader: metrics.headerPosition === 'sticky',
     mobileMenuAvailable: viewport.width > 760 || metrics.menuToggleVisible,
+    mobileMenuWorks,
   };
   const failedChecks = Object.entries(checks).filter(([, pass]) => !pass).map(([name]) => name);
   report.push({ viewport: viewport.name, checks, metrics, pageErrors, screenshot });
