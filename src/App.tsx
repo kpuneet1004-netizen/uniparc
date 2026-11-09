@@ -266,14 +266,20 @@ export default function App() {
       <main>
         <section className="hero" id="home">
           <div className="hero-copy">
+            <p className="hero-overline"><span>INDEPENDENT CULTURE LABEL</span><span>ISSUE 001 — EVERYDAY UNIVERSE</span></p>
             <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
-            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
+            <div className="hero-foot hero-kicker">
+              <p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p>
+              <a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b aria-hidden="true">↓</b></a>
+            </div>
           </div>
-          <div className="hero-visual">
+          <figure className="hero-visual">
             <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
             <div className="hero-visual-wash" />
-            <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
-          </div>
+            <div className="orbit-stamp" aria-hidden="true"><svg viewBox="0 0 120 120"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
+            <figcaption className="hero-image-caption"><span>UNIPARC® / 001</span><span>MADE OF WHAT YOU LOVE.</span></figcaption>
+            <span className="hero-image-index" aria-hidden="true">01 — 04</span>
+          </figure>
           <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
         </section>
 
