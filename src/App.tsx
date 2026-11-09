@@ -60,7 +60,7 @@ function HeroSection() {
         <div className="hero-image-shade" />
         <span className="image-index">UNIPARC® / CULTURE STUDY 001</span>
         <span className="image-caption">WEAR WHAT DEFINES YOU.</span>
-        <span className="image-coordinate">15° 21' N / 75° 08' E</span>
+        <span className="image-coordinate">CULTURE / EVERYWHERE</span>
       </div>
       <div className="hero-ticker" aria-label="Culture includes anime, gaming, music, film and more"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> ART IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
     </section>
@@ -146,7 +146,7 @@ function DesignStorySection() {
 function CommunitySection() {
   return (
     <section className="community-section section-shell" id="community">
-      <div className="community-image"><img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1800&q=85" alt="Friends spending time together outdoors" loading="lazy" /><span className="community-image-note">PEOPLE MAKE THE CULTURE.</span></div>
+      <div className="community-graphic" aria-hidden="true"><span className="community-symbol">U✳</span><b>COMMUNITY<br />IS A VERB.</b><small>MAKE ROOM FOR EVERY SIDE.</small></div>
       <div className="community-copy"><SectionEyebrow number="06" label="UNIPARC IRL" right="CULTURE IS BETTER WHEN IT'S SHARED" /><p className="eyebrow">A PLACE FOR EVERY SIDE OF YOU.</p><h2>FIND YOUR<br /><em>PEOPLE.</em></h2><p className="copy-lead">Different worlds. Shared energy.</p><p>We're building a space for the people who make culture what it is. The ones who create, collect, explore, obsess and bring others along for the ride.</p><a className="text-link" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">JOIN THE CONVERSATION <Arrow diagonal /></a></div>
     </section>
   );
