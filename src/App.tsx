@@ -52,6 +52,8 @@ export default function App() {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
+    // Keep section navigation shareable and preserve the current destination in the URL.
+    window.history.replaceState(null, '', `#${id}`);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const topOffset = 24;
     if (reduceMotion) {
