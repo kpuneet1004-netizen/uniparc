@@ -267,7 +267,7 @@ export default function App() {
         <section className="hero" id="home">
           <div className="hero-copy">
             <p className="hero-overline"><span>INDEPENDENT CULTURE LABEL</span><span>ISSUE 001 — EVERYDAY UNIVERSE</span></p>
-            <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
+            <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line hero-line-outline">DEFINES</span><span className="hero-line">YOU<span className="period">.</span></span></h1>
             <div className="hero-foot hero-kicker">
               <p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p>
               <a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b aria-hidden="true">↓</b></a>
