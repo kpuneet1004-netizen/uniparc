@@ -143,7 +143,7 @@
 @media (max-width: 1024px) {
   :root { --page-gutter: 32px; --section-space: 96px; }
   .culture-card { min-height: 300px; }
-  .community-image, .community-image img { min-height: 460px; }
+  
   .edit-visual { min-height: 460px; }
 }
 @media (max-width: 760px) {
