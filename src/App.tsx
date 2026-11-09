@@ -29,5 +29,5 @@ export default function App() {
     return () => { context.revert(); ScrollTrigger.getAll().forEach((trigger) => trigger.kill()); gsap.ticker.remove(tick); lenis.destroy(); };
   }, []);
 
-  return <div className="site-shell"><SiteHeader /><main><HeroSection /><ManifestoSection /><CultureSection /><ExperiencesSection /><EditSection /><DesignStorySection /><CommunitySection /><NewsletterSection /></main><SiteFooter /></div>;
+  return <div className="site-shell"><a className="skip-link" href="#main-content">SKIP TO CONTENT</a><SiteHeader /><main id="main-content"><HeroSection /><ManifestoSection /><CultureSection /><ExperiencesSection /><EditSection /><DesignStorySection /><CommunitySection /><NewsletterSection /></main><SiteFooter /></div>;
 }
