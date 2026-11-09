@@ -345,13 +345,12 @@ export default function App() {
           <div className="manifesto-ghost" aria-hidden="true">MULTIDIMENSIONAL</div>
           <div className="manifesto-grid">
             <div className="manifesto-heading reveal-up">
-              <span className="eyebrow dark-eyebrow">YOU DON'T HAVE TO PICK JUST ONE</span>
+              <span className="eyebrow dark-eyebrow manifesto-kicker"><i aria-hidden="true" />YOU DON'T HAVE TO PICK JUST ONE</span>
               <h2 className="masked-reveal">YOU ARE<br />NOT JUST<br /><em>ONE THING</em><span className="period">.</span></h2>
-              <span className="manifesto-heading-note">ONE IDENTITY. INFINITE INTERESTS.</span>
             </div>
             <div className="manifesto-side">
               <figure className="manifesto-image reveal-up">
-                <img src={worlds[1].image} alt="A live gaming arena, one of the many worlds that shape culture" loading="lazy" decoding="async" />
+                <img src={worlds[3].image} alt="A live music crowd, one of the many cultural worlds that shape identity" loading="lazy" decoding="async" />
                 <figcaption><span>FIG. 01 — CULTURE IN EVERY DIRECTION</span><span>IND / 2026</span></figcaption>
               </figure>
               <div className="manifesto-text reveal-up">
