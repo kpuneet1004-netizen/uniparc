@@ -10,7 +10,7 @@ img { display: block; max-width: 100%; }
 :focus-visible { outline: 2px solid var(--color-lime); outline-offset: 4px; }
 .site-shell { overflow: clip; width: 100%; }
 .section-shell { width: min(100% - 64px, 1200px); margin-inline: auto; }
-.eyebrow, .section-eyebrow, .hero-topline, .image-index, .image-caption, .image-coordinate, .manifesto-foot, .section-footnote, .experience-meta, .experience-note, .edit-visual-label, .edit-disclaimer, .design-story-steps article > span, .design-story-footer, .community-image-note, .newsletter-form-wrap label, .newsletter-form-wrap small, .footer-column > span, .footer-social > span, .footer-bottom { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; }
+.eyebrow, .section-eyebrow, .hero-topline, .image-index, .image-caption, .image-coordinate, .manifesto-foot, .section-footnote, .experience-meta, .experience-note, .edit-visual-label, .edit-disclaimer, .design-story-steps article > span, .design-story-footer, .community-image-note, .newsletter-form-wrap label, .newsletter-form-wrap small, .footer-column > span, .footer-social > span, .footer-bottom { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; }
 .arrow-icon { width: 18px; height: 18px; flex: 0 0 auto; transition: transform .3s var(--ease-out); }
 a:hover .arrow-icon { transform: translate(3px, -3px); }
 .text-link { display: inline-flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.42); font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; transition: color .25s, border-color .25s; }
