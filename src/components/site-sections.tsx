@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import type { FormEvent } from 'react';
-
 const cultureWorlds = [
   { number: '01', title: 'ANIME & MANGA', note: 'Stories that stay with you', image: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1100&q=85', className: 'culture-anime' },
   { number: '02', title: 'GAMING', note: 'Worlds beyond the screen', image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1100&q=85', className: 'culture-gaming' },
@@ -81,12 +79,12 @@ export function CultureSection() {
       <SectionEyebrow number="02" label="CULTURE INDEX" right="FIND YOUR FREQUENCY" />
       <div className="section-intro"><div><p className="eyebrow">WHAT'S YOUR WORLD?</p><h2>THERE'S MORE<br />THAN <em>ONE.</em></h2></div><p>Different interests. Different obsessions. Different ways of seeing the world. Explore what you love — and find something new.</p></div>
       <div className="culture-grid">
-        {cultureWorlds.map((world) => <a className={'culture-card ' + world.className} href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer" key={world.number}>
+        {cultureWorlds.map((world) => <article className={'culture-card ' + world.className} key={world.number}>
           <img src={world.image} alt="" loading="lazy" decoding="async" />
           <span className="culture-overlay" />
           <span className="culture-number">{world.number} / CULTURE INDEX</span>
-          <span className="culture-card-bottom"><span><strong>{world.title}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span>
-        </a>)}
+          <span className="culture-card-bottom"><span><strong>{world.title}</strong><small>{world.note}</small></span></span>
+        </article>)}
       </div>
       <p className="section-footnote"><span>THE UNIVERSE DOESN'T STOP HERE.</span><span>AND NEITHER DO YOU. <b>↗</b></span></p>
     </section>
@@ -101,7 +99,7 @@ export function ExperiencesSection() {
       <div className="experience-grid">
         {experienceStories.map((story) => <article className="experience-card" key={story.number}>
           <div className="experience-image"><img src={story.image} alt={story.alt} loading="lazy" decoding="async" /><span>{story.category}</span></div>
-          <div className="experience-meta"><span>{story.number} / EXPERIENCE STUDY</span><span>DISCOVER MORE ↗</span></div>
+          <div className="experience-meta"><span>{story.number} / EXPERIENCE STUDY</span><span>FIELD NOTES / 03</span></div>
           <h3>{story.title}</h3>
         </article>)}
       </div>
@@ -148,17 +146,10 @@ export function CommunitySection() {
 }
 
 export function NewsletterSection() {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setMessage('Email signup is not connected yet. Follow UNIPARC for the next update.');
-    setEmail('');
-  };
   return (
     <section className="newsletter-section section-shell" id="newsletter">
       <SectionEyebrow number="07" label="STAY CONNECTED" right="NO NOISE. JUST THINGS WORTH YOUR ATTENTION." />
-      <div className="newsletter-layout"><div><p className="eyebrow">STAY IN THE LOOP. STAY YOURSELF.</p><h2>GET THE<br /><em>SIGNAL.</em></h2></div><div className="newsletter-form-wrap"><p>New ideas. Fresh perspectives. Stories worth discovering. First looks at what's coming.</p><form onSubmit={onSubmit}><label htmlFor="newsletter-email">EMAIL ADDRESS</label><div className="newsletter-input-row"><input id="newsletter-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" required /><button type="submit" aria-label="Submit email address"><Arrow diagonal /></button></div><small aria-live="polite">{message || 'Email collection will be enabled when the signup service is connected.'}</small></form></div></div>
+      <div className="newsletter-layout"><div><p className="eyebrow">STAY IN THE LOOP. STAY YOURSELF.</p><h2>GET THE<br /><em>SIGNAL.</em></h2></div><div className="newsletter-form-wrap"><p>New ideas. Fresh perspectives. Stories worth discovering. Follow our official channel for updates, collection announcements and community moments.</p><a className="text-link" href="https://www.instagram.com/uniparc.in/" target="_blank" rel="noreferrer">FOLLOW UNIPARC ON INSTAGRAM <Arrow diagonal /></a><small>We do not collect email addresses on this page.</small></div></div>
     </section>
   );
 }
