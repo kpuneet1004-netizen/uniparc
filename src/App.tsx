@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import CinematicIntroScene from './components/CinematicIntroScene';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -13,9 +14,9 @@ const worlds = [
 ];
 
 const pieces = [
-  { id: '01', name: 'GORGON / 001', category: 'APPAREL', label: 'BEAUTY WITH A BITE', color: 'violet', image: '/images/objects/gorgon-001.webp' },
-  { id: '02', name: 'HELLBOY / 002', category: 'APPAREL', label: 'RESEARCH. CONTAIN. DEFEND.', color: 'orange', image: '/images/objects/hellboy-002.webp' },
-  { id: '03', name: 'SERIOUS / 003', category: 'APPAREL', label: 'NOT EVERYTHING IS THAT DEEP', color: 'lime', image: '/images/objects/serious-003.webp' },
+  { id: '01', name: 'SIGNAL / 001', category: 'APPAREL', label: 'THE FIRST FREQUENCY', color: 'lime', image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=1100&q=88' },
+  { id: '02', name: 'AFTERIMAGE / 002', category: 'APPAREL', label: 'A MEMORY IN MOTION', color: 'violet', image: 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=1100&q=88' },
+  { id: '03', name: 'SIDE QUEST / 003', category: 'CULTURE', label: 'TAKE THE LONG WAY', color: 'orange', image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd5?auto=format&fit=crop&w=1100&q=88' },
 ];
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
@@ -24,12 +25,32 @@ function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   </svg>;
 }
 
+function readIntroSeen() {
+  try {
+    return window.localStorage.getItem('uniparc-intro-seen') === '1';
+  } catch {
+    // Storage can be unavailable in private browsing or restricted webviews.
+    return false;
+  }
+}
+
+function persistIntroSeen() {
+  try {
+    window.localStorage.setItem('uniparc-intro-seen', '1');
+  } catch {
+    // The intro must still finish when storage is blocked.
+  }
+}
+
 export default function App() {
   const rootRef = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
+  const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
@@ -59,6 +80,10 @@ export default function App() {
       window.scrollTo({ top: destination, behavior: 'smooth' });
     }
   };
+
+  useEffect(() => {
+    setShowSkipIntro(readIntroSeen());
+  }, []);
 
   useEffect(() => {
     const nav = navDockRef.current;
@@ -104,68 +129,43 @@ export default function App() {
     }
 
     const ctx = gsap.context(() => {
+      const finishIntro = () => {
+        window.scrollTo(0, 0);
+        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+        setActiveDock('home');
+        persistIntroSeen();
+        setIsLoaded(true);
+      };
+      const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
+      introTimelineRef.current = intro;
       if (reduceMotion) {
-        gsap.set('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 0, autoAlpha: 1 });
+        intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
-        gsap.fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual',
-          { y: 28, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 0.85, stagger: 0.09, ease: 'power3.out' }
-        );
+        intro.set('.cosmic-stage', { autoAlpha: 1 })
+          .to({}, { duration: 22.4, ease: 'none' })
+          .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
+          .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
+          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
       }
 
       if (!reduceMotion) {
-        gsap.to('.hero-visual img', { xPercent: 2, yPercent: 3, scale: 1.07, duration: 18, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+        gsap.to('.hero-visual img', { yPercent: 13, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero-visual', start: 'top top', end: 'bottom top', scrub: true } });
         gsap.to('.hero-title .outline-word', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
         gsap.to('.orbit-stamp', { rotate: 360, duration: 22, repeat: -1, ease: 'none' });
         gsap.to('.manifesto-ghost', { xPercent: -18, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1 } });
         gsap.utils.toArray<HTMLElement>('.reveal-up').forEach((el) => {
           gsap.fromTo(el, { y: 72, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.05, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
         });
-        gsap.utils.toArray<HTMLElement>('.world-card').forEach((card) => {
-          gsap.fromTo(card, { autoAlpha: 0, scale: 0.94 }, { autoAlpha: 1, scale: 1, duration: 0.85, ease: 'power3.out', scrollTrigger: { trigger: '.worlds', start: 'top 65%', once: true } });
+        gsap.utils.toArray<HTMLElement>('.world-card').forEach((card, i) => {
+          gsap.fromTo(card, { y: 100, rotate: i % 2 ? 3 : -3, autoAlpha: 0 }, { y: 0, rotate: 0, autoAlpha: 1, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 90%', once: true } });
           const image = card.querySelector('img');
-          if (image) gsap.to(image, { scale: 1.12, yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.worlds', start: 'top bottom', end: 'bottom top', scrub: 1 } });
-        });
-        gsap.utils.toArray<HTMLElement>('.section-label, .manifesto-grid, .filter-bar, .about-side, .about-main').forEach((el) => {
-          gsap.fromTo(el, { y: 42, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
-        });
-        gsap.utils.toArray<HTMLElement>('.piece-image').forEach((el) => {
-          gsap.fromTo(el, { clipPath: 'inset(12% 0 12% 0)' }, { clipPath: 'inset(0% 0 0% 0)', ease: 'none', scrollTrigger: { trigger: el, start: 'top 88%', end: 'top 42%', scrub: 0.7 } });
+          if (image) gsap.to(image, { yPercent: 10, ease: 'none', scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: true } });
         });
         gsap.utils.toArray<HTMLElement>('.piece-card').forEach((card, i) => {
           gsap.fromTo(card, { y: 90, autoAlpha: 0, rotate: i === 1 ? 2 : -1 }, { y: 0, autoAlpha: 1, rotate: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
         });
-        const cinematicScroll = gsap.matchMedia();
-        cinematicScroll.add('(min-width: 1000px)', () => {
-          const worldTrack = document.querySelector<HTMLElement>('.world-grid');
-          const worldSection = document.querySelector<HTMLElement>('.worlds');
-          let horizontalTween: gsap.core.Tween | undefined;
-          if (worldTrack && worldSection) {
-            horizontalTween = gsap.to(worldTrack, {
-              x: () => -(worldTrack.scrollWidth - window.innerWidth + window.innerWidth * 0.08),
-              ease: 'none',
-              scrollTrigger: {
-                trigger: worldSection,
-                start: 'top top',
-                end: () => '+=' + Math.max(900, worldTrack.scrollWidth - window.innerWidth + window.innerWidth * 0.08),
-                pin: true,
-                scrub: 1,
-                anticipatePin: 1,
-                invalidateOnRefresh: true,
-              },
-            });
-          }
-          const chapter = gsap.timeline({
-            scrollTrigger: { trigger: '.campaign', start: 'top top', end: '+=95%', pin: true, scrub: 1, anticipatePin: 1 },
-          });
-          chapter.fromTo('.campaign-image', { scale: 1.28 }, { scale: 1, ease: 'none' }, 0)
-            .fromTo('.campaign-content', { y: 80, autoAlpha: 0.65 }, { y: -18, autoAlpha: 1, ease: 'none' }, 0)
-            .fromTo('.campaign-mark', { y: 34, autoAlpha: 0.25 }, { y: -24, autoAlpha: 1, ease: 'none' }, 0);
-          return () => { chapter.scrollTrigger?.kill(); horizontalTween?.scrollTrigger?.kill(); horizontalTween?.kill(); };
-        });
-        cinematicScroll.add('(max-width: 999px)', () => {
-          gsap.fromTo('.campaign-image', { scale: 1.16 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
-        });
+        gsap.fromTo('.campaign-image', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
         gsap.fromTo('.closing-title', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: '.closing', start: 'top 75%', once: true } });
         gsap.utils.toArray<HTMLElement>('.masked-reveal').forEach((el) => gsap.fromTo(el, { clipPath: 'inset(0 0 100% 0)', y: 34 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.15, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 86%', once: true } }));
         const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.drop', label: '03 / THE UNIPARC EDIT' }, { selector: '.campaign', label: '04 / CULTURE IS A WAY OF LIFE' }, { selector: '.about', label: '05 / OUR POINT OF VIEW' }];
@@ -250,57 +250,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const finePointer = window.matchMedia('(pointer: fine)').matches;
-    if (reduceMotion || !finePointer) return;
-
-    const heroVisual = rootRef.current?.querySelector<HTMLElement>('.hero-visual');
-    const hero = rootRef.current?.querySelector<HTMLElement>('.hero');
-    const cleanups: Array<() => void> = [];
-
-    if (heroVisual && hero) {
-      const rotateX = gsap.quickTo(heroVisual, 'rotationX', { duration: 0.7, ease: 'power3.out' });
-      const rotateY = gsap.quickTo(heroVisual, 'rotationY', { duration: 0.7, ease: 'power3.out' });
-      const moveX = gsap.quickTo(heroVisual, 'x', { duration: 0.7, ease: 'power3.out' });
-      const moveY = gsap.quickTo(heroVisual, 'y', { duration: 0.7, ease: 'power3.out' });
-      const onMove = (event: PointerEvent) => {
-        const bounds = hero.getBoundingClientRect();
-        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-        rotateX(y * -3.5);
-        rotateY(x * 4.5);
-        moveX(x * 4);
-        moveY(y * 4);
-      };
-      const onLeave = () => { rotateX(0); rotateY(0); moveX(0); moveY(0); };
-      hero.addEventListener('pointermove', onMove);
-      hero.addEventListener('pointerleave', onLeave);
-      cleanups.push(() => { hero.removeEventListener('pointermove', onMove); hero.removeEventListener('pointerleave', onLeave); gsap.set(heroVisual, { clearProps: 'transform' }); });
-    }
-
-    const cards = rootRef.current?.querySelectorAll<HTMLElement>('.world-card, .piece-card');
-    cards?.forEach((card) => {
-      const surface = card.classList.contains('world-card') ? card : card.querySelector<HTMLElement>('.piece-image');
-      if (!surface) return;
-      const rotateX = gsap.quickTo(surface, 'rotationX', { duration: 0.45, ease: 'power3.out' });
-      const rotateY = gsap.quickTo(surface, 'rotationY', { duration: 0.45, ease: 'power3.out' });
-      const onMove = (event: PointerEvent) => {
-        const bounds = surface.getBoundingClientRect();
-        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-        rotateX(y * -5);
-        rotateY(x * 6);
-      };
-      const onLeave = () => { rotateX(0); rotateY(0); };
-      surface.addEventListener('pointermove', onMove);
-      surface.addEventListener('pointerleave', onLeave);
-      cleanups.push(() => { surface.removeEventListener('pointermove', onMove); surface.removeEventListener('pointerleave', onLeave); gsap.set(surface, { clearProps: 'transform' }); });
-    });
-
-    return () => cleanups.forEach((cleanup) => cleanup());
-  }, []);
-
-  useEffect(() => {
     if (!selectedPiece) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -311,6 +260,14 @@ export default function App() {
 
   return (
     <div className="site" ref={rootRef}>
+      <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
+        <div className="cosmic-stage">
+          <CinematicIntroScene />
+          <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
+          <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
+          {showSkipIntro && <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>}
+        </div>
+      </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
       <div className="scroll-progress" aria-hidden="true"><span /></div>
       <aside className="chapter-index" aria-live="polite"><span className="chapter-index-dot" /><span>{activeChapter}</span><span className="chapter-index-rule" /></aside>
@@ -324,18 +281,16 @@ export default function App() {
       <main>
         <section className="hero" id="home">
           <div className="hero-meta hero-kicker"><span><i className="status-dot" /> A CULTURE-FIRST LIFESTYLE LABEL</span><span>BUILT AROUND WHAT YOU LOVE <b>IND / 2026</b></span></div>
-          <div className="hero-layout">
           <div className="hero-copy">
             <p className="eyebrow hero-kicker">ALL THE THINGS THAT MAKE YOU, YOU.</p>
             <h1 className="hero-title masked-reveal"><span className="hero-line">WEAR WHAT</span><span className="hero-line"><em className="outline-word">DEFINES</em> YOU<span className="period">.</span></span></h1>
-            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto" data-cursor-label="SCROLL TO EXPLORE"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
+            <div className="hero-foot hero-kicker"><p>The stories you follow. The games you play. The music you live by. UNIPARC brings the worlds you love into what you wear.</p><a className="scroll-cue" href="#manifesto"><span>EXPLORE THE UNIVERSE</span><b>↓</b></a></div>
           </div>
           <div className="hero-visual">
-            <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
+            <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=2200&q=90" alt="Streetwear editorial campaign" fetchPriority="high" decoding="async" />
             <div className="hero-visual-wash" /><span className="visual-coordinate">FIG. 001 — THE EVERYDAY UNIVERSE</span>
             <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>MADE TO FEEL LIKE YOU.</span></div>
             <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
-          </div>
           </div>
           <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
         </section>
@@ -344,22 +299,8 @@ export default function App() {
           <div className="section-label"><span>01 / THE IDEA</span><span>A PLACE WHERE CULTURE BELONGS</span></div>
           <div className="manifesto-ghost" aria-hidden="true">MULTIDIMENSIONAL</div>
           <div className="manifesto-grid">
-            <div className="manifesto-heading reveal-up">
-              <span className="eyebrow dark-eyebrow manifesto-kicker"><i aria-hidden="true" />YOU DON'T HAVE TO PICK JUST ONE</span>
-              <h2 className="masked-reveal">YOU ARE<br />NOT JUST<br /><em>ONE THING</em><span className="period">.</span></h2>
-            </div>
-            <div className="manifesto-side">
-              <figure className="manifesto-image reveal-up">
-                <img src={worlds[3].image} alt="A live music crowd, one of the many cultural worlds that shape identity" loading="lazy" decoding="async" />
-                <figcaption><span>FIG. 01 — CULTURE IN EVERY DIRECTION</span><span>IND / 2026</span></figcaption>
-              </figure>
-              <div className="manifesto-text reveal-up">
-                <p className="lead">Your style can hold every side of you.</p>
-                <p>Maybe it's a manga you grew up with. A game you lose hours to. A lyric that says what you couldn't. A film you return to. The things you love are part of your story — and they deserve a place in it.</p>
-                <p>UNIPARC brings those worlds together in one place. Explore what you love, find familiar energy and make room for something new. No gatekeeping. No need to choose just one.</p>
-                <a className="text-link" href="#about">WHY UNIPARC EXISTS <Arrow diagonal /></a>
-              </div>
-            </div>
+            <div className="manifesto-heading reveal-up"><span className="eyebrow dark-eyebrow">YOU DON'T HAVE TO PICK JUST ONE</span><h2 className="masked-reveal">YOU ARE<br />NOT <em>ONE</em><br />THING<span className="period">.</span></h2></div>
+            <div className="manifesto-text reveal-up"><p className="lead">Your style can hold every side of you.</p><p>Maybe it's a manga you grew up with. A game you lose hours to. A lyric that says what you couldn't. A film you return to. The things you love are part of your story — and they deserve a place in it.</p><p>UNIPARC brings those worlds together in one place. Explore what you love, find familiar energy and make room for something new. No gatekeeping. No need to choose just one.</p><a className="text-link" href="#about">WHY UNIPARC EXISTS <Arrow diagonal /></a></div>
           </div>
           <div className="manifesto-foot"><span>ONE PERSON. MANY UNIVERSES.</span><span>WEAR WHAT DEFINES YOU.®</span><span>SCROLL / 001</span></div>
         </section>
@@ -374,8 +315,8 @@ export default function App() {
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} type="button" className={activeFilter === filter ? 'selected' : ''} aria-pressed={activeFilter === filter} onClick={() => setActiveFilter(filter)}>{filter}<sup>03</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={"UNIPARC " + piece.name + " graphic T-shirt concept"} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL', 'CULTURE'].map((filter) => <button key={filter} className={activeFilter === filter ? 'selected' : ''} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? '03' : '02'}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt="Editorial apparel inspiration" loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => { setSelectedPiece(piece); setWaitlistNotice(""); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
@@ -396,7 +337,7 @@ export default function App() {
 
       {selectedPiece && <div className="object-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
         <div className="object-modal-visual">
-          <img src={selectedPiece.image} alt={"UNIPARC " + selectedPiece.name + " graphic T-shirt preview"} />
+          <img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} />
           <span className="object-visual-index">UNIPARC® <i> / </i> OBJECT STUDY {selectedPiece.id}</span>
           <span className="object-visual-note">THE UNIPARC EDIT <b>2026</b></span>
         </div>
