@@ -243,3 +243,10 @@
   .site-footer { padding-inline: 20px; }
   .footer-bottom { font-size: 8px; }
 }
+
+/* Editorial index cards are intentionally non-interactive until real destinations exist. */
+.culture-card { cursor: default; }
+.culture-card:hover img { transform: none; filter: saturate(.65); }
+.culture-card:hover .culture-card-bottom b { transform: none; }
+.newsletter-form-wrap .text-link { margin-top: 22px; }
+.newsletter-form-wrap small { display: block; margin-top: 18px; color: var(--color-muted); font-size: 10px; line-height: 1.7; }
