@@ -10,7 +10,7 @@ export default function App() {
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;
-    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true, anchors: { offset: -24 } });
+    const lenis = new Lenis({ lerp: 0.1, smoothWheel: true, anchors: { offset: -96 } });
     const tick = (time: number) => lenis.raf(time * 1000);
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add(tick);
