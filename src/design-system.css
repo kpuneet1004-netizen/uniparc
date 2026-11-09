@@ -1,0 +1,217 @@
+/* UNIPARC design-system consolidation
+   Last-loaded layer: shared tokens, predictable section rhythm and breakpoint rules.
+   Keep component-specific styling in styles.css; use this file only for global consistency. */
+:root {
+  --page-gutter: clamp(20px, 5.5vw, 88px);
+  --section-space: clamp(76px, 8vw, 120px);
+  --content-width: 1440px;
+  --body-copy: 14px;
+  --body-leading: 1.75;
+}
+html { scroll-padding-top: 84px; }
+body { min-width: 320px; }
+.site { width: 100%; max-width: 100%; overflow-x: clip; }
+main > section,
+.footer { min-width: 0; }
+.section {
+  padding-inline: max(var(--page-gutter), calc((100vw - var(--content-width)) / 2));
+}
+.hero {
+  padding-left: var(--page-gutter);
+  padding-right: var(--page-gutter);
+}
+.topbar { padding-inline: var(--page-gutter); }
+.hero-layout,
+.hero-copy,
+.hero-visual,
+.manifesto-grid,
+.section-heading,
+.world-grid,
+.piece-grid,
+.about-main { min-width: 0; }
+.hero-title,
+.manifesto h2,
+.section-heading h2,
+.campaign h2,
+.about-main h2,
+.closing h2 {
+  overflow-wrap: normal;
+  word-break: normal;
+  text-wrap: balance;
+}
+.manifesto,
+.worlds,
+.drop,
+.about,
+.closing { padding-block: var(--section-space); }
+.manifesto-grid { gap: clamp(32px, 5vw, 76px); }
+.manifesto-text,
+.about-main { max-width: 62ch; }
+.manifesto-text > p:not(.lead),
+.about-main > p:not(.lead),
+.campaign-content > p {
+  font-size: var(--body-copy);
+  line-height: var(--body-leading);
+}
+.world-grid { gap: clamp(12px, 1.4vw, 20px); }
+.world-card,
+.piece-card,
+.piece-image { min-width: 0; }
+.piece-grid { gap: clamp(12px, 1.5vw, 22px); }
+.piece-image { height: auto; aspect-ratio: 4 / 5; }
+.nav-dock {
+  max-width: min(900px, calc(100vw - 40px));
+  gap: 2px;
+  padding: 6px 8px;
+}
+.nav-dock a { min-width: 0; padding-inline: clamp(10px, 1.25vw, 18px); }
+.chapter-index,
+.cursor-aura,
+.cursor-dot { display: none !important; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  :root { --page-gutter: clamp(28px, 4.5vw, 52px); --section-space: 84px; }
+  .manifesto-grid { grid-template-columns: minmax(0, 1fr) minmax(0, .9fr); }
+  .manifesto h2 { font-size: clamp(64px, 7.4vw, 88px); }
+  .about { grid-template-columns: minmax(180px, .7fr) minmax(0, 1.3fr); gap: 48px; }
+  .world-card { height: clamp(300px, 38vw, 420px); }
+}
+@media (max-width: 760px) {
+  :root { --page-gutter: clamp(18px, 5.5vw, 28px); --section-space: 68px; --body-copy: 13px; }
+  .section { padding-inline: var(--page-gutter) !important; }
+  .hero { padding-inline: var(--page-gutter) !important; }
+  .topbar { padding-inline: var(--page-gutter); }
+  .hero-layout { display: flex; flex-direction: column; gap: 0; }
+  .hero-visual { order: 0; width: 100%; height: clamp(250px, 48svh, 430px); min-height: 0; margin: 0 0 28px; }
+  .hero-copy { order: 1; padding: 0; }
+  .hero-title { font-size: clamp(3rem, 11.5vw, 5.2rem); line-height: .92; letter-spacing: -.075em; }
+  .hero-foot { display: flex; align-items: center; gap: 18px; }
+  .hero-foot p { max-width: 34ch; }
+  .scroll-cue { flex: 0 0 auto; }
+  .section-label { gap: 12px; }
+  .manifesto-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-block: 48px; }
+  .manifesto h2 { max-width: 8ch; font-size: clamp(58px, 13vw, 92px); }
+  .manifesto-side { gap: 22px; }
+  .manifesto-image { aspect-ratio: 1.5; }
+  .world-grid { grid-template-columns: minmax(0, 1fr) !important; transform: none !important; }
+  .world-card { width: 100%; height: clamp(260px, 72vw, 390px); }
+  .piece-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .piece-image { aspect-ratio: 4 / 5; }
+  .about { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .about-side { min-height: 0; }
+  .about-main h2 { font-size: clamp(44px, 10.5vw, 72px); }
+  .campaign { min-height: 560px; padding: 72px var(--page-gutter); }
+  .campaign h2 { font-size: clamp(58px, 12vw, 96px); }
+  .closing h2 { font-size: clamp(68px, 15vw, 116px); }
+  .nav-dock {
+    width: calc(100% - 24px);
+    max-width: 520px;
+    min-height: 58px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    gap: 2px;
+    padding: 5px 6px;
+  }
+  .nav-dock > a { flex: 0 0 auto; min-width: 70px; min-height: 46px; padding-inline: 8px; }
+  .nav-dock > .dock-home { flex: 0 0 44px !important; width: 44px; min-width: 44px !important; }
+  .dock-label { font-size: 6.5px; }
+  .footer { padding-inline: var(--page-gutter); padding-bottom: calc(100px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 390px) {
+  :root { --page-gutter: 18px; --section-space: 58px; }
+  .hero-title { font-size: clamp(2.7rem, 11.3vw, 3.35rem); }
+  .hero-foot { align-items: flex-start; }
+  .hero-foot p { max-width: 27ch; }
+  .scroll-cue span { max-width: 76px; line-height: 1.5; }
+  .world-card { height: 250px; }
+  .piece-grid { gap: 12px 9px; }
+  .piece-meta { flex-wrap: wrap; }
+  .nav-dock > a { min-width: 64px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker div { animation: none !important; }
+  .world-card, .piece-card, .piece-image img, .world-card img,
+  .nav-dock, .nav-dock a, .nav-dock .dock-indicator { transition: none !important; }
+}
+
+/* Editorial simplification: reduce competing labels, ornaments and motion. */
+:root {
+  --section-space: clamp(88px, 9vw, 136px);
+  --body-copy: 15px;
+  --body-leading: 1.8;
+}
+.manifesto-ghost,
+.world-atmosphere-label,
+.orbit-stamp,
+.visual-coordinate,
+.campaign-mark,
+.campaign-index { display: none !important; }
+.hero-image-caption { justify-content: flex-start; }
+.ticker { overflow: hidden; }
+.ticker > div {
+  animation: none !important;
+  transform: none !important;
+  white-space: normal;
+  width: 100%;
+  text-align: center;
+  padding-inline: 16px;
+}
+.nav-dock {
+  background: rgba(18, 18, 18, .94);
+  border: 1px solid rgba(255,255,255,.12);
+  box-shadow: 0 12px 36px rgba(0,0,0,.2);
+  backdrop-filter: blur(18px);
+}
+.nav-dock .dock-divider { opacity: .35; }
+.dock-label { letter-spacing: .12em; }
+.hero-visual img,
+.world-card img,
+.piece-image img,
+.campaign-image { will-change: auto; }
+@media (min-width: 761px) {
+  .nav-dock > a[href="#campaign"],
+.nav-dock > a[href="#closing"],
+.nav-dock > a[href="#footer"] { display: none; }
+}
+@media (max-width: 760px) {
+  :root { --section-space: 64px; }
+  .topbar-note { display: none; }
+  .topbar { justify-content: space-between; }
+  .hero-meta { gap: 10px; flex-wrap: wrap; }
+  .hero-meta > span:last-child { display: none; }
+  .hero-visual { height: clamp(230px, 56svh, 390px); }
+  .hero-image-caption span:last-child { display: none; }
+  .ticker { min-height: 48px; }
+  .ticker > div { font-size: 9px; letter-spacing: .12em; }
+  .section-label > span:last-child { display: none; }
+  .manifesto-foot { gap: 12px; flex-wrap: wrap; }
+  .manifesto-foot span:last-child { display: none; }
+  .section-heading { align-items: flex-start; gap: 18px; flex-direction: column; }
+  .section-heading > p { max-width: 34ch; }
+  .worlds-note { max-width: 32ch; line-height: 1.7; }
+  .piece-grid { grid-template-columns: minmax(0, 1fr); }
+  .piece-image { aspect-ratio: 4 / 4.4; }
+  .piece-meta { font-size: 10px; }
+  .campaign { min-height: 500px; }
+  .campaign-content { max-width: 34ch; }
+  .campaign-content > p { max-width: 32ch; }
+  .closing { min-height: 0; }
+  .nav-dock > a[href="#campaign"],
+.nav-dock > a[href="#closing"],
+.nav-dock > a[href="#footer"] { display: none; }
+  .nav-dock { justify-content: space-around; overflow: hidden; }
+  .nav-dock > a { min-width: 0; flex: 1 1 0; }
+  .nav-dock > .dock-home { flex: 0 0 42px !important; }
+  .footer-main { gap: 32px; }
+}
+@media (max-width: 390px) {
+  .hero-title { font-size: clamp(2.55rem, 11vw, 3.1rem); }
+  .nav-dock { width: calc(100% - 20px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
