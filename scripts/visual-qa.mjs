@@ -18,7 +18,7 @@ const failures = [];
 const report = [];
 
 for (const viewport of viewports) {
-  const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, deviceScaleFactor: 1, reducedMotion: 'reduce' });
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
@@ -95,8 +95,8 @@ for (const viewport of viewports) {
     mobileMenuWorks = mobileMenuWorks && (await toggle.getAttribute('aria-expanded')) === 'false';
   }
 
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(250);
+  await page.evaluate(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); document.documentElement.scrollTop = 0; document.body.scrollTop = 0; });
+  await page.waitForTimeout(600);
   const screenshot = `${outputDir}/${viewport.name}.png`;
   await page.screenshot({ path: screenshot, fullPage: true, animations: 'disabled' });
 
