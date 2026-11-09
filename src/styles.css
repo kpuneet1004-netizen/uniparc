@@ -1098,7 +1098,7 @@ h1, h2, h3, h4, h5, h6,
 /* Manifesto — editorial split composition */
 .manifesto-grid{grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);align-items:center;gap:clamp(42px,7vw,112px);padding:clamp(64px,8vw,112px) 0}
 .manifesto-copy{min-width:0}
-.manifesto-heading h2{font-size:clamp(58px,7.25vw,108px);line-height:.91;letter-spacing:-.085em;margin-top:20px;white-space:nowrap}
+.manifesto-heading h2{font-size:clamp(48px,6.4vw,96px);line-height:.91;letter-spacing:-.085em;margin-top:20px;white-space:nowrap}
 .manifesto-heading h2 em{color:var(--ink);font-style:normal}
 .manifesto-text{max-width:570px;padding:0;margin-top:32px}
 .manifesto-text .lead{font-size:clamp(19px,2vw,25px);max-width:460px;margin-bottom:16px}
