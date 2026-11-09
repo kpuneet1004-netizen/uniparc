@@ -25,15 +25,6 @@ function Arrow({ diagonal = false }: { diagonal?: boolean }) {
   </svg>;
 }
 
-function readIntroSeen() {
-  try {
-    return window.localStorage.getItem('uniparc-intro-seen') === '1';
-  } catch {
-    // Storage can be unavailable in private browsing or restricted webviews.
-    return false;
-  }
-}
-
 function persistIntroSeen() {
   try {
     window.localStorage.setItem('uniparc-intro-seen', '1');
@@ -50,13 +41,11 @@ export default function App() {
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [showSkipIntro, setShowSkipIntro] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
-  const [waitlistNotice, setWaitlistNotice] = useState('');
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
 
   const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
@@ -80,10 +69,6 @@ export default function App() {
       window.scrollTo({ top: destination, behavior: 'smooth' });
     }
   };
-
-  useEffect(() => {
-    setShowSkipIntro(readIntroSeen());
-  }, []);
 
   useEffect(() => {
     const nav = navDockRef.current;
@@ -142,7 +127,7 @@ export default function App() {
         intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
       } else {
         intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .to({}, { duration: 22.4, ease: 'none' })
+          .to({}, { duration: 4.2, ease: 'none' })
           .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
           .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
           .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
@@ -265,7 +250,7 @@ export default function App() {
           <CinematicIntroScene />
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
-          {showSkipIntro && <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>}
+          <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>
         </div>
       </div>
       <div className="cursor-aura" ref={cursorRef} aria-hidden="true" /><div className="cursor-dot" ref={cursorDotRef} aria-hidden="true" />
@@ -274,8 +259,6 @@ export default function App() {
 
       <header className="topbar">
         <a className="wordmark" href="#home" aria-label="UNIPARC home"><img className="brand-logo header-logo" src="/Uniparc.svg" alt="UNIPARC" /></a>
-        <span className="topbar-note">A HOME FOR WHAT YOU LOVE</span>
-        <span className="topbar-edition">INDEPENDENT CULTURE LABEL / 2026</span>
       </header>
 
       <main>
@@ -286,8 +269,7 @@ export default function App() {
           </div>
           <div className="hero-visual">
             <img src="/images/hero/uniparc-hero.webp" alt="UNIPARC black graphic T-shirt editorial campaign" fetchPriority="high" decoding="async" />
-            <div className="hero-visual-wash" /><span className="visual-coordinate">FIG. 001 — THE EVERYDAY UNIVERSE</span>
-            <div className="hero-image-caption"><span>UNIPARC / CULTURE STUDY 001</span><span>MADE TO FEEL LIKE YOU.</span></div>
+            <div className="hero-visual-wash" />
             <div className="orbit-stamp"><svg viewBox="0 0 120 120" role="img" aria-label="Wear what defines you"><defs><path id="stamp-circle" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" /></defs><text><textPath href="#stamp-circle">CULTURE LIVES HERE ✳ WEAR WHAT DEFINES YOU ✳ </textPath></text><circle cx="60" cy="60" r="25" /><path d="M47 69V50l13 10 13-10v19" /></svg></div>
           </div>
           <div className="ticker"><div>ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b> ANIME IS CULTURE <b>✳</b> GAMING IS CULTURE <b>✳</b> MUSIC IS CULTURE <b>✳</b> FILM IS CULTURE <b>✳</b> INTERNET IS CULTURE <b>✳</b></div></div>
@@ -309,8 +291,9 @@ export default function App() {
         <section className="worlds section" id="worlds" style={{ "--ambient-tint": activeWorld.id === "anime" ? "#b8a2ff" : activeWorld.id === "gaming" ? "#d9f36a" : activeWorld.id === "screen" ? "#ff8a68" : "#8dbdff" } as React.CSSProperties & { "--ambient-tint": string }}>
           <div className="section-heading reveal-up"><div><span className="eyebrow">02 / FIND YOUR FREQUENCY</span><h2 className="masked-reveal">WHAT ARE<br /><em>YOU INTO?</em></h2></div><p>Different interests. One place to explore.<br />Find your world — or discover a new one.</p></div>
           <div className="world-atmosphere-label"><span>YOU'RE EXPLORING</span><strong>{activeWorld.name}</strong><small>{activeWorld.note}</small></div><div className="world-grid">
-            {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} data-cursor-label="ENTER WORLD" onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)} onMouseLeave={() => setActiveWorld(worlds[0])}><img src={world.image} alt="" loading="lazy" decoding="async" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
+            {worlds.map((world) => <a className={'world-card world-' + world.id} href="#drop" key={world.id} aria-label={'Explore ' + world.name + ' in the UNIPARC edit'} data-cursor-label="ENTER WORLD" onClick={() => setActiveWorld(world)} onMouseEnter={() => setActiveWorld(world)} onFocus={() => setActiveWorld(world)}><img src={world.image} alt="" loading="lazy" decoding="async" /><span className="world-shade" /><span className="world-number">{world.number} / CULTURE INDEX</span><span className="world-tag">{world.tag}</span><span className="world-info"><span><strong>{world.name}</strong><small>{world.note}</small></span><b><Arrow diagonal /></b></span><span className="world-outline" aria-hidden="true">{world.number}</span></a>)}
           </div>
+          <div className="world-explore-panel" aria-live="polite"><span className="world-explore-index">CURRENT FREQUENCY / {activeWorld.number}</span><p><strong>{activeWorld.name}</strong> — {activeWorld.note}. Explore the current UNIPARC edit and discover the pieces taking shape.</p><a href="#drop">EXPLORE THE EDIT <Arrow diagonal /></a></div>
           <p className="worlds-note">THAT'S ONLY THE START. THERE'S ALWAYS MORE TO DISCOVER. <span>↘</span></p>
         </section>
 
@@ -332,7 +315,7 @@ export default function App() {
         </section>
 
         <section className="closing section" id="closing">
-          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><span className="closing-orbit" aria-hidden="true">U✳</span>
+          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><a className="closing-primary-link" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><span className="closing-orbit" aria-hidden="true">U✳</span>
         </section>
       </main>
 
@@ -359,14 +342,10 @@ export default function App() {
             </dl>
           </div>
           <div className="object-modal-signup">
-            <span className="object-modal-kicker">BE THERE FROM THE FIRST DROP</span>
-            <h3>Get the signal.</h3>
-            <p>Release information will be shared here when the collection is ready.</p>
-            <form onSubmit={(event) => { event.preventDefault(); setWaitlistNotice("Preview only — your email has not been saved or sent."); }}>
-              <label htmlFor="object-email">EMAIL ADDRESS</label>
-              <div className="object-email-row"><input id="object-email" type="email" placeholder="you@example.com" required /><button type="submit" aria-label="Preview signup response">NOTIFY ME <span>↗</span></button></div>
-              <small>{waitlistNotice || "Preview form only. Email collection is not active and no details are stored."}</small>
-            </form>
+            <span className="object-modal-kicker">THE FIRST UNIPARC DROP</span>
+            <h3>More to come.</h3>
+            <p>This is an early concept preview. Final product details, availability and release information will be published when the collection is ready.</p>
+            <button className="object-modal-discover" type="button" onClick={() => setSelectedPiece(null)}>BACK TO THE EDIT <Arrow diagonal /></button>
           </div>
           <div className="object-modal-foot"><span>WEAR WHAT DEFINES YOU.®</span><span>UNIPARC / 2026</span></div>
         </div>
