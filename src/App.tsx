@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import CinematicIntroScene from './components/CinematicIntroScene';
+const CinematicIntroScene = lazy(() => import('./components/CinematicIntroScene'));
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -249,7 +249,7 @@ export default function App() {
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
         <div className="cosmic-stage">
-          <CinematicIntroScene />
+          <Suspense fallback={null}><CinematicIntroScene /></Suspense>
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
           <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>
