@@ -1210,3 +1210,28 @@ h1, h2, h3, h4, h5, h6,
     line-height: .92;
   }
 }
+
+
+/* Manifesto headline: preserve every word without clipping */
+.manifesto-heading h2 {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+  font-size: clamp(46px, 5.35vw, 78px);
+  line-height: .94;
+  letter-spacing: -.075em;
+}
+.manifesto-heading h2 .period {
+  display: inline-block;
+}
+@media (max-width: 760px) {
+  .manifesto-heading h2 {
+    font-size: clamp(48px, 11.2vw, 82px);
+  }
+}
+@media (max-width: 390px) {
+  .manifesto-heading h2 {
+    font-size: clamp(43px, 10.8vw, 52px);
+  }
+}
