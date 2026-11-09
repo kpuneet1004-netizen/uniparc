@@ -60,7 +60,19 @@ for (const viewport of viewports) {
         return rect.width > 0 && (rect.left < -1 || rect.right > window.innerWidth + 1);
       })
       .slice(0, 12)
-      .map(el => ({ tag: el.tagName, className: typeof el.className === 'string' ? el.className : '', right: Math.round(el.getBoundingClientRect().right) }));
+      .map(el => {
+        let ancestor = el.parentElement;
+        let clip = null;
+        while (ancestor && ancestor !== document.body) {
+          const style = getComputedStyle(ancestor);
+          if (/(hidden|clip|scroll|auto)/.test(style.overflowX)) {
+            clip = { tag: ancestor.tagName, className: typeof ancestor.className === 'string' ? ancestor.className : '', overflowX: style.overflowX };
+            break;
+          }
+          ancestor = ancestor.parentElement;
+        }
+        return { tag: el.tagName, className: typeof el.className === 'string' ? el.className : '', right: Math.round(el.getBoundingClientRect().right), clippedBy: clip };
+      });
     return {
       title: document.title,
       documentWidth: document.documentElement.scrollWidth,
@@ -83,6 +95,8 @@ for (const viewport of viewports) {
     mobileMenuWorks = mobileMenuWorks && (await toggle.getAttribute('aria-expanded')) === 'false';
   }
 
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(250);
   const screenshot = `${outputDir}/${viewport.name}.png`;
   await page.screenshot({ path: screenshot, fullPage: true, animations: 'disabled' });
 
