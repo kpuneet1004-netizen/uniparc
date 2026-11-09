@@ -1,36 +1,51 @@
-# UNIPARC — Cinematic Interactive Experience
+# UNIPARC — Brand Universe
 
-React + TypeScript + Vite foundation for the approved homepage.
-
-## Direction
-- Cinematic motion and maximum interaction
-- Mobile experience parity, adapted for touch
-- Strict black, white and neutral-grey identity
-- Official UNIPARC logo
+A responsive, culture-first brand presence experience for UNIPARC.
 
 ## Stack
-React, TypeScript, Vite, GSAP + ScrollTrigger, Three.js, Lucide React, custom CSS.
+- React 18 + TypeScript
+- Vite 6
+- GSAP + ScrollTrigger
+- Lenis smooth scrolling
+- Cloudflare Workers static assets
+
+## Architecture
+- `src/App.tsx`: application composition and motion lifecycle
+- `src/components/site-sections.tsx`: reusable page sections and navigation
+- `src/styles/tokens.css`: typography, palette, spacing and layering tokens
+- `src/styles/global.css`: reset, shared primitives and accessibility
+- `src/styles/sections.css`: responsive section layouts and interactions
+
+## Design system
+- Display: Plus Jakarta Sans
+- Body: Inter
+- Metadata: JetBrains Mono
+- Palette: #080808, #141414, #FFFFFF, #F2F0EA, #C6FF00
+- 8px spacing scale, 1200px content width, responsive 20/32px gutters
+- Reduced-motion and keyboard focus support
 
 ## Local development
-```bash
-npm install
-npm run dev
-```
+    npm install
+    npm run dev
 
 ## Production build
-```bash
-npm run build
-```
-Vite output: `dist/`.
+    npm run build
 
-## Cloudflare Pages
-Framework: Vite; build command: `npm run build`; output directory: `dist`; production branch: `main`.
+Vite output: dist/.
 
-## Pre-launch checklist
-- Replace illustrative product photography with approved UNIPARC catalogue assets.
-- Add verified product marketplace URLs; none are fabricated in this build.
-- Confirm final product copy, FAQ, social links and legal policies.
-- Connect CMS after schemas and content ownership are finalized.
-- Test performance, accessibility and touch interactions across target devices.
+## Cloudflare
+The Worker static-assets configuration is in wrangler.jsonc. Build output is served from dist/.
 
-This repository contains a frontend foundation; it is not deployed to Cloudflare yet.
+## Integration notes
+- The email signup UI is intentionally not connected to a provider yet. Connect a permission-based email service before enabling collection.
+- Culture and community links currently point to UNIPARC's official Instagram.
+- Editorial photography should be replaced with approved UNIPARC campaign and community assets before launch.
+- Product listings, prices, stock and purchase actions are intentionally omitted until verified catalogue data and approved commerce links are available.
+- Confirm legal policies and contact details before production launch.
+
+## Quality gates
+- Run npm run build
+- Test 320px–1440px viewport widths
+- Test keyboard navigation and focus states
+- Test prefers-reduced-motion
+- Verify all image assets, links, analytics and signup integration

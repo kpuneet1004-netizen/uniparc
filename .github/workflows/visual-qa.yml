@@ -1,0 +1,47 @@
+name: UNIPARC visual QA
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [rebuild/uniparc-brand-universe]
+  workflow_dispatch:
+
+jobs:
+  visual-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install project dependencies
+        run: npm install
+      - name: Install browser test dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Build production bundle
+        run: npm run build
+      - name: Start preview server
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/uniparc-preview.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/uniparc-preview.log
+          exit 1
+      - name: Run responsive visual and interaction checks
+        run: node scripts/visual-qa.mjs
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uniparc-visual-qa
+          path: visual-qa/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,23 @@
+* { box-sizing: border-box; }
+html { scroll-behavior: auto; scroll-padding-top: 88px; background: var(--color-black); }
+body { margin: 0; min-width: 320px; background: var(--color-black); color: var(--color-white); font-family: var(--font-body); font-size: var(--text-body); line-height: 1.5; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body, button, input { font-family: var(--font-body); }
+button, a { color: inherit; }
+a { text-decoration: none; }
+button { cursor: pointer; }
+img { display: block; max-width: 100%; }
+::selection { color: var(--color-black); background: var(--color-lime); }
+:focus-visible { outline: 2px solid var(--color-lime); outline-offset: 4px; }
+.site-shell { overflow: clip; width: 100%; }
+.section-shell { width: min(100% - 64px, 1200px); margin-inline: auto; }
+.eyebrow, .section-eyebrow, .hero-topline, .image-index, .image-caption, .image-coordinate, .manifesto-foot, .section-footnote, .experience-meta, .experience-note, .edit-visual-label, .edit-disclaimer, .design-story-steps article > span, .design-story-footer, .community-image-note, .newsletter-form-wrap label, .newsletter-form-wrap small, .footer-column > span, .footer-social > span, .footer-bottom { font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; }
+.arrow-icon { width: 18px; height: 18px; flex: 0 0 auto; transition: transform .3s var(--ease-out); }
+a:hover .arrow-icon { transform: translate(3px, -3px); }
+.text-link { display: inline-flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,.42); font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; transition: color .25s, border-color .25s; }
+.text-link:hover { color: var(--color-lime); border-color: var(--color-lime); }
+.section-eyebrow { display: flex; justify-content: space-between; gap: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--color-line); color: var(--color-muted); }
+.section-eyebrow span:first-child { color: var(--color-lime); }
+.copy-lead { color: var(--color-white); font-size: var(--text-body-lg); font-weight: 600; line-height: 1.45; }
+
+.skip-link { position: fixed; z-index: var(--z-overlay); top: 12px; left: 12px; padding: 12px 16px; transform: translateY(-160%); background: var(--color-lime); color: var(--color-black); font-family: var(--font-mono); font-size: 11px; }
+.skip-link:focus { transform: translateY(0); }
