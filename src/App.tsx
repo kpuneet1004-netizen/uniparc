@@ -104,7 +104,14 @@ export default function App() {
     // Preserve incoming section links and restore the destination on browser Back/Forward.
     const scrollToHash = (behavior: ScrollBehavior = 'auto') => {
       const id = decodeURIComponent(window.location.hash.replace(/^#/, ''));
-      const target = id ? document.getElementById(id) : null;
+      if (!id) {
+        if (lenisRef.current && behavior !== 'auto') lenisRef.current.scrollTo(0, { duration: 1, force: true });
+        else if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true, force: true });
+        else window.scrollTo({ top: 0, behavior });
+        setActiveDock('home');
+        return;
+      }
+      const target = document.getElementById(id);
       if (!target) return;
       const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - 24);
       if (lenisRef.current && behavior !== 'auto') {
