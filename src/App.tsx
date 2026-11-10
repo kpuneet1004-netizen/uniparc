@@ -415,7 +415,7 @@ export default function App() {
               <div><dt>RELEASE WINDOW</dt><dd>FIRST DROP / 2026</dd></div>
             </dl>
           </div>
-          <div className="object-modal-signup">
+          <div className="object-modal-release">
             <span className="object-modal-kicker">THE FIRST UNIPARC DROP</span>
             <h3>More to come.</h3>
             <p>This is an early concept preview. Final product details, availability and release information will be published when the collection is ready.</p>
