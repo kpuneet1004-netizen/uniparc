@@ -40,20 +40,23 @@ export default function App() {
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(() => {
+    try {
+      return window.localStorage.getItem('uniparc-intro-seen') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [activeDock, setActiveDock] = useState('home');
-  const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
-  const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
-
   const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
     // Keep section navigation shareable and preserve the current destination in the URL.
-    window.history.replaceState(null, '', `#${id}`);
+    window.history.pushState(null, '', `#${id}`);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const topOffset = 24;
     if (reduceMotion) {
@@ -98,10 +101,23 @@ export default function App() {
   }, [activeDock]);
 
   useEffect(() => {
-    // A fresh visit always starts at the hero, never at a browser-restored scroll position or old hash.
-    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    window.scrollTo(0, 0);
+    // Preserve incoming section links and restore the destination on browser Back/Forward.
+    const scrollToHash = (behavior: ScrollBehavior = 'auto') => {
+      const id = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+      const target = id ? document.getElementById(id) : null;
+      if (!target) return;
+      const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - 24);
+      if (lenisRef.current && behavior !== 'auto') {
+        lenisRef.current.scrollTo(destination, { duration: 1, force: true });
+      } else if (lenisRef.current) {
+        lenisRef.current.scrollTo(destination, { immediate: true, force: true });
+      } else {
+        window.scrollTo({ top: destination, behavior });
+      }
+      setActiveDock(id);
+    };
+    const onPopState = () => scrollToHash(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+    window.addEventListener('popstate', onPopState);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
@@ -117,28 +133,30 @@ export default function App() {
 
     const ctx = gsap.context(() => {
       const finishIntro = () => {
-        window.scrollTo(0, 0);
-        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
-        setActiveDock('home');
+        if (!window.location.hash) {
+          window.scrollTo(0, 0);
+          lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+        }
+        setActiveDock(window.location.hash.slice(1) || 'home');
         persistIntroSeen();
         setIsLoaded(true);
       };
       const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
       introTimelineRef.current = intro;
-      if (reduceMotion) {
-        intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
+      if (isLoaded || reduceMotion) {
+        intro.set('.preloader', { autoAlpha: 0 });
       } else {
         intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .to({}, { duration: 4.2, ease: 'none' })
-          .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
-          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
-          .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
-          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
+          .to({}, { duration: 1.5, ease: 'none' })
+          .fromTo('.cosmic-wordmark', { scale: .72, y: 20, autoAlpha: 0, filter: 'blur(18px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: .8, ease: 'expo.out' }, '-=.05')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -18, duration: .35, delay: .15 })
+          .to('.preloader', { yPercent: -100, duration: .65, ease: 'power4.inOut' })
+          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 36, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .65, stagger: .06, ease: 'power3.out' }, '-=.3');
       }
 
       if (!reduceMotion) {
         gsap.to('.hero-visual img', { yPercent: 13, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero-visual', start: 'top top', end: 'bottom top', scrub: true } });
-        gsap.to('.hero-title .outline-word', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
+        gsap.to('.hero-title .hero-line-outline', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
         gsap.to('.orbit-stamp', { rotate: 360, duration: 22, repeat: -1, ease: 'none' });
         gsap.to('.manifesto-ghost', { xPercent: -18, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1 } });
         gsap.utils.toArray<HTMLElement>('.reveal-up').forEach((el) => {
@@ -163,12 +181,12 @@ export default function App() {
 
     return () => {
       ctx.revert();
+      window.removeEventListener('popstate', onPopState);
       lenisRef.current = null;
       if (lenis) {
         if (lenisTick) gsap.ticker.remove(lenisTick);
         lenis.destroy();
       }
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
 
@@ -249,7 +267,7 @@ export default function App() {
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
         <div className="cosmic-stage">
-          <Suspense fallback={null}><CinematicIntroScene /></Suspense>
+          {!isLoaded && <Suspense fallback={null}><CinematicIntroScene /></Suspense>}
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
           <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>
@@ -307,8 +325,8 @@ export default function App() {
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} type="button" className={activeFilter === filter ? 'selected' : ''} aria-pressed={activeFilter === filter} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? pieces.length : pieces.filter((piece) => piece.category === filter).length}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={piece.name + ' — ' + piece.label} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => setSelectedPiece(piece)} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="filter-bar" aria-hidden="true"><span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="piece-grid">{pieces.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={piece.name + ' — ' + piece.label} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => setSelectedPiece(piece)} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
