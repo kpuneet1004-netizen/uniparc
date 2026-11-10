@@ -2521,3 +2521,33 @@ body {
     transition-duration: .01ms !important;
   }
 }
+
+
+/* QA refinement: keyboard parity and narrow-screen text safety */
+@media (hover: hover) and (pointer: fine) {
+  .editorial-site .piece-card:focus-within .piece-image img {
+    transform: scale(1.045);
+    filter: grayscale(0) saturate(1);
+  }
+}
+.editorial-site .piece-card:focus-within .piece-hover-label {
+  opacity: 1;
+  transform: translateY(0);
+}
+.editorial-site .piece-card:focus-within .piece-caption {
+  transform: translateY(48px);
+}
+.editorial-site .piece-card:focus-within .piece-arrow {
+  transform: rotate(45deg);
+  background: var(--ui-acid);
+}
+.editorial-site .piece-open:focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: -7px;
+}
+@media (max-width: 760px) {
+  .editorial-site .manifesto-heading h2 {
+    white-space: normal;
+    overflow-wrap: normal;
+  }
+}
