@@ -121,14 +121,14 @@ export default function App() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
+    // Let React mount the target section before resolving an incoming hash URL.
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash('auto')));
     let lenisTick: ((time: number) => void) | undefined;
     if (lenis) {
       lenis.on('scroll', ScrollTrigger.update);
       lenisTick = (time: number) => lenis.raf(time * 1000);
       gsap.ticker.add(lenisTick);
       gsap.ticker.lagSmoothing(0);
-      const onRefresh = () => lenis.resize();
-      ScrollTrigger.addEventListener('refresh', onRefresh);
     }
 
     const ctx = gsap.context(() => {
