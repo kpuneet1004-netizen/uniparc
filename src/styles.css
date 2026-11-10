@@ -2073,3 +2073,7 @@ h1, h2, h3, h4, h5, h6,
   .hero-title { font-size: clamp(46px, 11.6vw, 58px); }
   .hero-overline { font-size: 6px; }
 }
+
+
+/* Returning visits should never flash the intro overlay before React effects run. */
+.preloader.preloader-out{visibility:hidden;pointer-events:none}
