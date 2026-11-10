@@ -1,9 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "uniparc",
-  // Wrangler v4 is required for this assets-only Worker configuration.
-  "compatibility_date": "2026-11-06",
-  "assets": {
-    "directory": "./dist"
-  }
+  "compatibility_date": "2026-11-10",
+  "assets": { "directory": "./site" }
 }
