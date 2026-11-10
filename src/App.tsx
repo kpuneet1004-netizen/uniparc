@@ -48,7 +48,30 @@ export default function App() {
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistConsent, setWaitlistConsent] = useState(false);
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const waitlistEndpoint = (import.meta as ImportMeta & { env?: { VITE_WAITLIST_ENDPOINT?: string } }).env?.VITE_WAITLIST_ENDPOINT?.trim();
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
+
+  const submitWaitlist = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!waitlistEndpoint || !waitlistConsent || waitlistStatus === 'submitting') return;
+    setWaitlistStatus('submitting');
+    try {
+      const response = await fetch(waitlistEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email: waitlistEmail.trim(), source: 'uniparc-first-drop', consent: true }),
+      });
+      if (!response.ok) throw new Error('Waitlist request failed');
+      setWaitlistEmail('');
+      setWaitlistConsent(false);
+      setWaitlistStatus('success');
+    } catch {
+      setWaitlistStatus('error');
+    }
+  };
 
   const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     const target = document.getElementById(id);
@@ -372,7 +395,17 @@ export default function App() {
         </section>
 
         <section className="closing section" id="closing">
-          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><a className="closing-primary-link" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><span className="closing-orbit" aria-hidden="true">U✳</span>
+          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Get the first release note when it is ready.</p>
+          <form className="waitlist-form" onSubmit={submitWaitlist}>
+            <label className="waitlist-label" htmlFor="waitlist-email">FIRST DROP / EMAIL NOTIFICATION</label>
+            <div className="waitlist-controls">
+              <input id="waitlist-email" type="email" name="email" autoComplete="email" placeholder="Your email address" value={waitlistEmail} onChange={(event) => { setWaitlistEmail(event.target.value); if (waitlistStatus !== 'idle') setWaitlistStatus('idle'); }} required disabled={!waitlistEndpoint || waitlistStatus === 'submitting'} />
+              <button type="submit" disabled={!waitlistEndpoint || !waitlistConsent || waitlistStatus === 'submitting'}>{waitlistStatus === 'submitting' ? 'SENDING…' : 'NOTIFY ME'} <Arrow diagonal /></button>
+            </div>
+            <label className="waitlist-consent"><input type="checkbox" checked={waitlistConsent} onChange={(event) => setWaitlistConsent(event.target.checked)} disabled={!waitlistEndpoint || waitlistStatus === 'submitting'} /><span>I agree to receive UNIPARC first-drop and launch updates by email.</span></label>
+            <p className="waitlist-status" role="status" aria-live="polite">{!waitlistEndpoint ? 'SIGN-UP IS BEING PREPARED. REGISTRATION WILL OPEN SOON.' : waitlistStatus === 'success' ? 'YOU’RE ON THE LIST. WATCH YOUR INBOX FOR THE FIRST DROP.' : waitlistStatus === 'error' ? 'WE COULDN’T SAVE THAT EMAIL. PLEASE TRY AGAIN.' : 'NO SPAM. JUST THE FIRST DROP AND IMPORTANT LAUNCH UPDATES.'}</p>
+          </form>
+          <a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><a className="closing-primary-link" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><span className="closing-orbit" aria-hidden="true">U✳</span>
         </section>
       </main>
 
