@@ -179,10 +179,9 @@ export default function App() {
         gsap.utils.toArray<HTMLElement>('.piece-card').forEach((card, i) => {
           gsap.fromTo(card, { y: 90, autoAlpha: 0, rotate: i === 1 ? 2 : -1 }, { y: 0, autoAlpha: 1, rotate: 0, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
         });
-        gsap.fromTo('.campaign-image', { scale: 1.2 }, { scale: 1, ease: 'none', scrollTrigger: { trigger: '.campaign', start: 'top bottom', end: 'bottom top', scrub: true } });
         gsap.fromTo('.closing-title', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: '.closing', start: 'top 75%', once: true } });
         gsap.utils.toArray<HTMLElement>('.masked-reveal').forEach((el) => gsap.fromTo(el, { clipPath: 'inset(0 0 100% 0)', y: 34 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 1.15, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 86%', once: true } }));
-        const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.drop', label: '03 / THE UNIPARC EDIT' }, { selector: '.campaign', label: '04 / CULTURE IS A WAY OF LIFE' }, { selector: '.about', label: '05 / OUR POINT OF VIEW' }];
+        const chapters = [{ selector: '.manifesto', label: '01 / THE IDEA' }, { selector: '.worlds', label: '02 / FIND YOUR FREQUENCY' }, { selector: '.drop', label: '03 / THE UNIPARC EDIT' }, { selector: '.about', label: '04 / OUR POINT OF VIEW' }];
         chapters.forEach(({ selector, label }) => ScrollTrigger.create({ trigger: selector, start: 'top 45%', end: 'bottom 45%', onEnter: () => setActiveChapter(label), onEnterBack: () => setActiveChapter(label) }));
         gsap.to('.manifesto-ghost', { yPercent: 16, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
       }
@@ -200,7 +199,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const targets = ['home', 'manifesto', 'worlds', 'drop', 'campaign', 'about', 'closing', 'footer']
+    const targets = ['home', 'manifesto', 'worlds', 'drop', 'about', 'closing', 'footer']
       .map((id) => document.getElementById(id))
       .filter((node): node is HTMLElement => Boolean(node));
     if (!targets.length) return;
@@ -392,15 +391,8 @@ export default function App() {
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
-        <section className="campaign editorial-campaign" id="campaign">
-          <img className="campaign-image" src="https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=2200&q=90" alt="Crowd at a live music event" loading="lazy" decoding="async" />
-          <div className="campaign-overlay" />
-          <div className="campaign-content reveal-up"><span className="eyebrow">04 / CULTURE IS A WAY OF LIFE</span><h2>NEVER JUST<br /><em>A PHASE.</em></h2><p>The stories that shape you. The people who get your references. The interests that never really leave. That's culture — and it's part of everyday life.</p><a href="#about" className="light-link">GET TO KNOW THE IDEA <Arrow diagonal /></a></div>
-          <span className="campaign-mark">CULTURE<br />LIVES HERE®</span><span className="campaign-index">CULTURE STUDY / 004</span><span className="campaign-side-note">A LIFE IN REFERENCES / 2026</span>
-        </section>
-
         <section className="about section editorial-about" id="about">
-          <div className="section-label"><span>05 / OUR POINT OF VIEW</span><span>THE REASON WE EXIST</span></div>
+          <div className="section-label"><span>04 / OUR POINT OF VIEW</span><span>THE REASON WE EXIST</span></div>
           <div className="about-layout">
             <div className="about-side"><span className="eyebrow dark-eyebrow">A PLACE WHERE CULTURE BELONGS</span><img className="about-logo" src="/Uniparc.svg" alt="UNIPARC emblem and wordmark" /><span className="about-side-note">INDEPENDENT CULTURE LABEL<br />EST. 2026</span></div>
             <div className="about-main reveal-up"><h2>MORE THAN<br />WHAT YOU <em>WEAR.</em></h2><p className="lead">A place for every interest, influence and side of you.</p><p>UNIPARC is a culture-first lifestyle label for people who don't fit into just one category. We bring fandoms, niche interests and everyday inspirations into a shared space for self-expression and belonging.</p><p>Our first pieces are graphic T-shirts — understated from a distance, full of meaning up close. It's the beginning of a wider world built around the things you love.</p><strong>NO GATEKEEPING. NO BOXES TO FIT. JUST ROOM TO BE YOU.</strong></div>
@@ -430,8 +422,7 @@ export default function App() {
         <a href="#manifesto" className={activeDock === 'manifesto' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'manifesto')} aria-current={activeDock === 'manifesto' ? 'location' : undefined}><span className="dock-number">01</span><span className="dock-label">IDEA</span></a>
         <a href="#worlds" className={activeDock === 'worlds' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'worlds')} aria-current={activeDock === 'worlds' ? 'location' : undefined}><span className="dock-number">02</span><span className="dock-label">CULTURE</span></a>
         <a href="#drop" className={activeDock === 'drop' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'drop')} aria-current={activeDock === 'drop' ? 'location' : undefined}><span className="dock-number">03</span><span className="dock-label">EDIT</span></a>
-        <a href="#campaign" className={activeDock === 'campaign' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'campaign')} aria-current={activeDock === 'campaign' ? 'location' : undefined}><span className="dock-number">04</span><span className="dock-label">LIFE</span></a>
-        <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'about')} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">05</span><span className="dock-label">ABOUT</span></a>
+        <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'about')} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">04</span><span className="dock-label">ABOUT</span></a>
         <a href="#closing" className={activeDock === 'closing' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'closing')} aria-current={activeDock === 'closing' ? 'location' : undefined}><span className="dock-number">06</span><span className="dock-label">NEXT</span></a>
         <a href="#footer" className={activeDock === 'footer' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'footer')} aria-current={activeDock === 'footer' ? 'location' : undefined}><span className="dock-number">07</span><span className="dock-label">INFO</span></a>
       </nav>
@@ -439,7 +430,7 @@ export default function App() {
       <footer className="footer editorial-footer" id="footer">
         <div className="footer-main">
           <div className="footer-brand-column"><a className="footer-logo" href="#home" aria-label="UNIPARC home"><img className="brand-logo footer-brand-logo" src="/Uniparc.svg" alt="UNIPARC" /></a><p className="footer-manifesto">A culture-first label for every side of you.</p><span className="footer-signoff">WEAR WHAT DEFINES YOU.®</span></div>
-          <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>05</span></a></div>
+          <div className="footer-column"><span className="footer-heading">EXPLORE</span><a href="#manifesto">THE IDEA <span>01</span></a><a href="#worlds">CULTURE INDEX <span>02</span></a><a href="#drop">THE UNIPARC EDIT <span>03</span></a><a href="#about">OUR STORY <span>04</span></a></div>
           <div className="footer-column"><span className="footer-heading">THE UNIVERSE</span><a href="#worlds">ANIME & MANGA</a><a href="#worlds">GAMING</a><a href="#worlds">FILM & SCREEN</a><a href="#worlds">MUSIC & MORE</a></div>
           <div className="footer-note-column"><span className="footer-heading">A PLACE WHERE CULTURE BELONGS.</span><p>From the stories you follow to the worlds you explore, there's room for every side of you here.</p><a href="#drop" className="footer-discover">DISCOVER THE EDIT ↗</a></div>
         </div>
