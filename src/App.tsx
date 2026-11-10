@@ -40,20 +40,25 @@ export default function App() {
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const pieceTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [isLoaded, setIsLoaded] = useState(() => {
+    try {
+      return window.localStorage.getItem('uniparc-intro-seen') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [activeDock, setActiveDock] = useState('home');
-  const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
-  const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
-
   const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
     // Keep section navigation shareable and preserve the current destination in the URL.
-    window.history.replaceState(null, '', `#${id}`);
+    window.history.pushState(null, '', `#${id}`);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const topOffset = 24;
     if (reduceMotion) {
@@ -98,47 +103,69 @@ export default function App() {
   }, [activeDock]);
 
   useEffect(() => {
-    // A fresh visit always starts at the hero, never at a browser-restored scroll position or old hash.
-    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    window.scrollTo(0, 0);
+    // Preserve incoming section links and restore the destination on browser Back/Forward.
+    const scrollToHash = (behavior: ScrollBehavior = 'auto') => {
+      const id = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+      if (!id) {
+        if (lenisRef.current && behavior !== 'auto') lenisRef.current.scrollTo(0, { duration: 1, force: true });
+        else if (lenisRef.current) lenisRef.current.scrollTo(0, { immediate: true, force: true });
+        else window.scrollTo({ top: 0, behavior });
+        setActiveDock('home');
+        return;
+      }
+      const target = document.getElementById(id);
+      if (!target) return;
+      const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - 24);
+      if (lenisRef.current && behavior !== 'auto') {
+        lenisRef.current.scrollTo(destination, { duration: 1, force: true });
+      } else if (lenisRef.current) {
+        lenisRef.current.scrollTo(destination, { immediate: true, force: true });
+      } else {
+        window.scrollTo({ top: destination, behavior });
+      }
+      setActiveDock(id);
+    };
+    const onPopState = () => scrollToHash(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth');
+    window.addEventListener('popstate', onPopState);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
+    // Let React mount the target section before resolving an incoming hash URL.
+    requestAnimationFrame(() => requestAnimationFrame(() => scrollToHash('auto')));
     let lenisTick: ((time: number) => void) | undefined;
     if (lenis) {
       lenis.on('scroll', ScrollTrigger.update);
       lenisTick = (time: number) => lenis.raf(time * 1000);
       gsap.ticker.add(lenisTick);
       gsap.ticker.lagSmoothing(0);
-      const onRefresh = () => lenis.resize();
-      ScrollTrigger.addEventListener('refresh', onRefresh);
     }
 
     const ctx = gsap.context(() => {
       const finishIntro = () => {
-        window.scrollTo(0, 0);
-        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
-        setActiveDock('home');
+        if (!window.location.hash) {
+          window.scrollTo(0, 0);
+          lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+        }
+        setActiveDock(window.location.hash.slice(1) || 'home');
         persistIntroSeen();
         setIsLoaded(true);
       };
       const intro = gsap.timeline({ defaults: { ease: 'power3.inOut' }, onComplete: finishIntro });
       introTimelineRef.current = intro;
-      if (reduceMotion) {
-        intro.set('.preloader', { autoAlpha: 0 }).call(() => setIsLoaded(true));
+      if (isLoaded || reduceMotion) {
+        intro.set('.preloader', { autoAlpha: 0 });
       } else {
         intro.set('.cosmic-stage', { autoAlpha: 1 })
-          .to({}, { duration: 4.2, ease: 'none' })
-          .fromTo('.cosmic-wordmark', { scale: .62, y: 28, autoAlpha: 0, filter: 'blur(24px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, '-=.1')
-          .to('.cosmic-wordmark', { autoAlpha: 0, y: -24, duration: .52, delay: .8 })
-          .to('.preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut' })
-          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 48, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .85, stagger: .09, ease: 'power3.out' }, '-=.45');
+          .to({}, { duration: 1.5, ease: 'none' })
+          .fromTo('.cosmic-wordmark', { scale: .72, y: 20, autoAlpha: 0, filter: 'blur(18px)' }, { scale: 1, y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: .8, ease: 'expo.out' }, '-=.05')
+          .to('.cosmic-wordmark', { autoAlpha: 0, y: -18, duration: .35, delay: .15 })
+          .to('.preloader', { yPercent: -100, duration: .65, ease: 'power4.inOut' })
+          .fromTo('.hero-kicker, .hero-line, .hero-foot, .hero-visual', { y: 36, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .65, stagger: .06, ease: 'power3.out' }, '-=.3');
       }
 
       if (!reduceMotion) {
         gsap.to('.hero-visual img', { yPercent: 13, scale: 1.12, ease: 'none', scrollTrigger: { trigger: '.hero-visual', start: 'top top', end: 'bottom top', scrub: true } });
-        gsap.to('.hero-title .outline-word', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
+        gsap.to('.hero-title .hero-line-outline', { xPercent: 8, ease: 'none', scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
         gsap.to('.orbit-stamp', { rotate: 360, duration: 22, repeat: -1, ease: 'none' });
         gsap.to('.manifesto-ghost', { xPercent: -18, ease: 'none', scrollTrigger: { trigger: '.manifesto', start: 'top bottom', end: 'bottom top', scrub: 1 } });
         gsap.utils.toArray<HTMLElement>('.reveal-up').forEach((el) => {
@@ -163,12 +190,12 @@ export default function App() {
 
     return () => {
       ctx.revert();
+      window.removeEventListener('popstate', onPopState);
       lenisRef.current = null;
       if (lenis) {
         if (lenisTick) gsap.ticker.remove(lenisTick);
         lenis.destroy();
       }
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, []);
 
@@ -239,17 +266,56 @@ export default function App() {
   useEffect(() => {
     if (!selectedPiece) return;
     const previousOverflow = document.body.style.overflow;
+    const main = rootRef.current?.querySelector('main');
+    const footer = rootRef.current?.querySelector('footer');
+    const nav = navDockRef.current;
+    const previousInert = [main, footer, nav].map((element) => element?.inert ?? false);
+    [main, footer, nav].forEach((element) => { if (element) element.inert = true; });
     document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setSelectedPiece(null); };
+
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusFrame = requestAnimationFrame(() => {
+      const first = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
+      (first || dialogRef.current)?.focus();
+    });
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSelectedPiece(null);
+        return;
+      }
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+      if (!focusable.length) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialogRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener('keydown', onKeyDown);
-    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      [main, footer, nav].forEach((element, index) => { if (element) element.inert = previousInert[index]; });
+      window.removeEventListener('keydown', onKeyDown);
+      requestAnimationFrame(() => pieceTriggerRef.current?.focus());
+    };
   }, [selectedPiece]);
 
   return (
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
         <div className="cosmic-stage">
-          <Suspense fallback={null}><CinematicIntroScene /></Suspense>
+          {!isLoaded && <Suspense fallback={null}><CinematicIntroScene /></Suspense>}
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
           <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>
@@ -307,8 +373,8 @@ export default function App() {
 
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
-          <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} type="button" className={activeFilter === filter ? 'selected' : ''} aria-pressed={activeFilter === filter} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? pieces.length : pieces.filter((piece) => piece.category === filter).length}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={piece.name + ' — ' + piece.label} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => setSelectedPiece(piece)} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="filter-bar" aria-hidden="true"><span>CONCEPT PREVIEW / 2026</span></div>
+          <div className="piece-grid">{pieces.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={piece.name + ' — ' + piece.label} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { pieceTriggerRef.current = event.currentTarget; setSelectedPiece(piece); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
@@ -327,7 +393,7 @@ export default function App() {
         </section>
       </main>
 
-      {selectedPiece && <div className="object-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
+      {selectedPiece && <div className="object-modal" ref={dialogRef} data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" tabIndex={-1} onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
         <div className="object-modal-visual">
           <img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} />
           <span className="object-visual-index">UNIPARC® <i> / </i> OBJECT STUDY {selectedPiece.id}</span>
@@ -349,7 +415,7 @@ export default function App() {
               <div><dt>RELEASE WINDOW</dt><dd>FIRST DROP / 2026</dd></div>
             </dl>
           </div>
-          <div className="object-modal-signup">
+          <div className="object-modal-release">
             <span className="object-modal-kicker">THE FIRST UNIPARC DROP</span>
             <h3>More to come.</h3>
             <p>This is an early concept preview. Final product details, availability and release information will be published when the collection is ready.</p>
@@ -367,7 +433,7 @@ export default function App() {
         <a href="#drop" className={activeDock === 'drop' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'drop')} aria-current={activeDock === 'drop' ? 'location' : undefined}><span className="dock-number">03</span><span className="dock-label">EDIT</span></a>
         <a href="#campaign" className={activeDock === 'campaign' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'campaign')} aria-current={activeDock === 'campaign' ? 'location' : undefined}><span className="dock-number">04</span><span className="dock-label">LIFE</span></a>
         <a href="#about" className={activeDock === 'about' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'about')} aria-current={activeDock === 'about' ? 'location' : undefined}><span className="dock-number">05</span><span className="dock-label">ABOUT</span></a>
-        <a href="#closing" className={activeDock === 'closing' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'closing')} aria-current={activeDock === 'closing' ? 'location' : undefined}><span className="dock-number">06</span><span className="dock-label">JOIN</span></a>
+        <a href="#closing" className={activeDock === 'closing' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'closing')} aria-current={activeDock === 'closing' ? 'location' : undefined}><span className="dock-number">06</span><span className="dock-label">NEXT</span></a>
         <a href="#footer" className={activeDock === 'footer' ? 'dock-link dock-active' : 'dock-link'} onClick={(event) => navigateToSection(event, 'footer')} aria-current={activeDock === 'footer' ? 'location' : undefined}><span className="dock-number">07</span><span className="dock-label">INFO</span></a>
       </nav>
       <footer className="footer" id="footer">
