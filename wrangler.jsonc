@@ -1,7 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  // wrangler.jsonc
-"name": "uniparc",
+  "name": "uniparc",
   "compatibility_date": "2026-11-06",
   "assets": {
     "directory": "./dist"
