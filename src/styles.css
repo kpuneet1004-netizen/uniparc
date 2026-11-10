@@ -36,20 +36,6 @@ body:before{content:"";position:fixed;inset:0;z-index:850;pointer-events:none;op
 @keyframes panel-in{from{transform:translateY(28px) scale(.985);opacity:.5}to{transform:translateY(0) scale(1);opacity:1}}
 .object-close{position:absolute;right:20px;top:18px;z-index:3;background:var(--ink);color:var(--paper);border:0;padding:12px 15px;font:8px var(--mono);letter-spacing:.13em}
 .object-modal-image{position:relative;min-height:520px;background:#c5c5bc;overflow:hidden}
-.object-modal-image img{width:100%;height:100%;position:absolute;inset:0;object-fit:cover;filter:grayscale(.35)}
-.object-modal-image span{position:absolute;bottom:20px;left:20px;background:var(--ink);color:white;padding:10px 12px;font:8px var(--mono);letter-spacing:.12em}
-.object-modal-copy{padding:clamp(32px,5vw,68px);display:flex;flex-direction:column;justify-content:center}
-.object-modal-copy h2{font:clamp(34px,4.3vw,58px)/.95 var(--display);letter-spacing:-.07em;margin:22px 0}
-.object-modal-copy>p{font-size:13px;line-height:1.85;color:#65665e;max-width:420px}
-.object-specs{display:grid;gap:12px;border-top:1px solid #c9c9c0;border-bottom:1px solid #c9c9c0;padding:18px 0;margin:20px 0}
-.object-specs span{display:flex;justify-content:space-between;gap:14px;color:#77786f;font:8px var(--mono);letter-spacing:.08em}
-.object-specs strong{color:var(--ink);font-weight:500;text-align:right}
-.object-modal-copy form{margin-top:8px}
-.object-modal-copy form label{display:block;font:8px var(--mono);letter-spacing:.13em;margin-bottom:10px}
-.object-modal-copy form>div{display:flex;border-bottom:1px solid var(--ink)}
-.object-modal-copy input{flex:1;min-width:0;background:transparent;border:0;padding:13px 0;font:12px 'DM Sans',sans-serif;outline:none;color:var(--ink)}
-.object-modal-copy form button{border:0;background:var(--acid);padding:0 14px;color:var(--ink);font:8px var(--mono);letter-spacing:.08em}
-.object-modal-copy form small{display:block;margin-top:10px;color:#77786f;font:8px/1.6 var(--mono)}
 @media(min-width:1500px){.hero-title{font-size:clamp(184px,13vw,250px)}.hero-copy{padding-left:4vw}.section{padding-left:11vw;padding-right:11vw}}
 @media(max-width:760px){.chapter-index{display:none}.hero-title{font-size:clamp(59px,13.5vw,108px)}.world-atmosphere-label{margin-top:0;flex-wrap:wrap}.piece-image{min-height:220px}.object-modal{padding:0;align-items:stretch}.object-modal-panel{grid-template-columns:1fr;min-height:100%;overflow:visible}.object-modal-image{min-height:42vh;height:42vh}.object-modal-copy{padding:30px 6vw 42px}.object-modal-copy h2{font-size:42px}.object-close{position:fixed;right:14px;top:14px}.object-specs span{font-size:7px}}
 @media(prefers-reduced-motion:reduce){body:before{display:none}.masked-reveal{clip-path:none!important;transform:none!important}.object-modal,.object-modal-panel{animation:none}}
@@ -738,16 +724,9 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
 .object-detail-list>div{display:grid;grid-template-columns:minmax(100px,.8fr) minmax(0,1.2fr);gap:12px;padding:10px 0;border-top:1px solid #deddd5}
 .object-detail-list dt{color:#77786f;font:8px var(--mono);letter-spacing:.12em}
 .object-detail-list dd{margin:0;color:#171814;text-align:right;font:8px var(--mono);letter-spacing:.08em;overflow-wrap:anywhere}
-.object-modal-signup{margin-top:clamp(24px,4vh,42px);padding:22px;background:#e7e6dd}
-.object-modal-signup h3{margin:9px 0 5px;font:700 clamp(25px,2.6vw,34px)/1 var(--display);letter-spacing:-.06em}
-.object-modal-signup>p{margin:0 0 17px;color:#66675f;font-size:11px;line-height:1.65}
-.object-modal-signup form label{display:block;margin-bottom:8px;color:#77786f;font:7px var(--mono);letter-spacing:.14em}
-.object-email-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
-.object-email-row input{width:100%;min-width:0;min-height:46px;padding:0 13px;border:1px solid #c7c6bd;border-radius:0;background:#f5f4ee;color:#171814;font:11px var(--mono)}
-.object-email-row input:focus{outline:2px solid #171814;outline-offset:2px}
-.object-email-row button{display:flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:0 15px;border:0;background:#171814;color:#f5f3ec;font:8px var(--mono);letter-spacing:.1em;cursor:pointer;white-space:nowrap}
-.object-email-row button span{color:var(--acid);font-size:14px}
-.object-modal-signup form small{display:block;margin-top:9px;color:#77786f;font-size:9px;line-height:1.6}
+.object-modal-release{margin-top:clamp(24px,4vh,42px);padding:22px;background:#e7e6dd}
+.object-modal-release h3{margin:9px 0 5px;font:700 clamp(25px,2.6vw,34px)/1 var(--display);letter-spacing:-.06em}
+.object-modal-release>p{margin:0 0 17px;color:#66675f;font-size:11px;line-height:1.65}
 .object-modal-foot{display:flex;justify-content:space-between;gap:12px;margin-top:auto;padding-top:22px;color:#88897f;font:7px var(--mono);letter-spacing:.12em}
 @media(max-width:760px){
  .object-modal{display:block;padding:0;background:#f1f0e9;backdrop-filter:none}
@@ -764,8 +743,8 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
  .object-modal-intro>p{font-size:13px;line-height:1.8}
  .object-detail-list>div{grid-template-columns:minmax(95px,.8fr) minmax(0,1.2fr);padding:12px 0}
  .object-detail-list dt,.object-detail-list dd{font-size:8px}
- .object-modal-signup{margin-top:28px;padding:20px}
- .object-modal-signup h3{font-size:30px}
+ .object-modal-release{margin-top:28px;padding:20px}
+ .object-modal-release h3{font-size:30px}
  .object-modal-foot{margin-top:24px}
 }
 @media(max-width:420px){
@@ -774,9 +753,7 @@ html{scroll-padding-top:92px;scroll-padding-bottom:110px}
  .object-modal-intro h2{font-size:clamp(38px,10.5vw,48px)}
  .object-detail-list>div{grid-template-columns:1fr;gap:6px}
  .object-detail-list dd{text-align:left}
- .object-email-row{grid-template-columns:minmax(0,1fr)}
- .object-email-row button{width:100%}
- .object-modal-signup{padding:17px}
+   .object-modal-release{padding:17px}
 }
 @media(prefers-reduced-motion:reduce){.object-modal{scroll-behavior:auto}}
 
@@ -1558,7 +1535,7 @@ h1, h2, h3, h4, h5, h6,
   letter-spacing: .12em;
 }
 .object-modal-discover .arrow { color: var(--acid); }
-.object-modal-signup {
+.object-modal-release {
   margin-top: clamp(24px, 4vh, 42px);
 }
 .footer {
