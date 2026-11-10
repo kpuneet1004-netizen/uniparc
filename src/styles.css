@@ -2074,3 +2074,21 @@ h1, h2, h3, h4, h5, h6,
   .hero-title { font-size: clamp(46px, 11.6vw, 58px); }
   .hero-overline { font-size: 6px; }
 }
+
+
+/* First-drop waitlist */
+.waitlist-form{position:relative;z-index:2;width:min(620px,100%);margin:34px 0 8px}
+.waitlist-label{display:block;margin-bottom:11px;font:8px var(--mono);letter-spacing:.14em;color:#4e5630}
+.waitlist-controls{display:flex;align-items:stretch;gap:8px;border-bottom:1px solid #7e884a;padding-bottom:8px}
+.waitlist-controls input{flex:1;min-width:0;border:0;border-radius:0;background:transparent;color:var(--ink);padding:15px 4px;font:500 15px 'DM Sans',sans-serif;outline:none}
+.waitlist-controls input::placeholder{color:#626b43;opacity:.8}
+.waitlist-controls input:focus-visible{box-shadow:inset 0 -2px 0 var(--ink)}
+.waitlist-controls button{display:inline-flex;align-items:center;justify-content:center;gap:13px;min-width:145px;border:1px solid var(--ink);background:var(--ink);color:var(--acid);padding:0 17px;font:9px var(--mono);letter-spacing:.1em;cursor:pointer;transition:background .2s,color .2s,opacity .2s}
+.waitlist-controls button:hover:not(:disabled){background:transparent;color:var(--ink)}
+.waitlist-controls button:disabled{opacity:.42;cursor:not-allowed}
+.waitlist-controls button .arrow{width:16px;height:16px}
+.waitlist-consent{display:flex;align-items:flex-start;gap:9px;margin-top:15px;max-width:540px;color:#50583a;font:11px/1.6 'DM Sans',sans-serif;cursor:pointer}
+.waitlist-consent input{width:15px;height:15px;flex:0 0 15px;margin:1px 0 0;accent-color:var(--ink)}
+.waitlist-status{min-height:15px;margin:12px 0 0;color:#4f5836;font:8px/1.6 var(--mono);letter-spacing:.06em}
+.waitlist-form :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+@media(max-width:760px){.waitlist-form{margin:28px 0 6px}.waitlist-controls{flex-direction:column;gap:10px}.waitlist-controls input{padding:13px 2px;font-size:14px}.waitlist-controls button{min-height:48px;width:100%}.waitlist-consent{font-size:10px}.waitlist-status{font-size:7px}}
