@@ -40,20 +40,45 @@ export default function App() {
   const introTimelineRef = useRef<gsap.core.Timeline | null>(null);
   const lenisRef = useRef<Lenis | null>(null);
   const navDockRef = useRef<HTMLElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const pieceTriggerRef = useRef<HTMLButtonElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [activeDock, setActiveDock] = useState('home');
   const [activeFilter, setActiveFilter] = useState('ALL');
   const [activeWorld, setActiveWorld] = useState(worlds[0]);
   const [activeChapter, setActiveChapter] = useState('01 / THE IDEA');
   const [selectedPiece, setSelectedPiece] = useState<(typeof pieces)[number] | null>(null);
+  const [waitlistEmail, setWaitlistEmail] = useState('');
+  const [waitlistConsent, setWaitlistConsent] = useState(false);
+  const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const waitlistEndpoint = (import.meta as ImportMeta & { env?: { VITE_WAITLIST_ENDPOINT?: string } }).env?.VITE_WAITLIST_ENDPOINT?.trim();
   const filtered = activeFilter === 'ALL' ? pieces : pieces.filter((piece) => piece.category === activeFilter);
+
+  const submitWaitlist = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!waitlistEndpoint || !waitlistConsent || waitlistStatus === 'submitting') return;
+    setWaitlistStatus('submitting');
+    try {
+      const response = await fetch(waitlistEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ email: waitlistEmail.trim(), source: 'uniparc-first-drop', consent: true }),
+      });
+      if (!response.ok) throw new Error('Waitlist request failed');
+      setWaitlistEmail('');
+      setWaitlistConsent(false);
+      setWaitlistStatus('success');
+    } catch {
+      setWaitlistStatus('error');
+    }
+  };
 
   const navigateToSection = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     const target = document.getElementById(id);
     if (!target) return;
     event.preventDefault();
     // Keep section navigation shareable and preserve the current destination in the URL.
-    window.history.replaceState(null, '', `#${id}`);
+    window.history.pushState(null, '', `#${id}`);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const topOffset = 24;
     if (reduceMotion) {
@@ -98,10 +123,16 @@ export default function App() {
   }, [activeDock]);
 
   useEffect(() => {
-    // A fresh visit always starts at the hero, never at a browser-restored scroll position or old hash.
-    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
-    window.history.replaceState(null, '', window.location.pathname + window.location.search);
-    window.scrollTo(0, 0);
+    // Preserve incoming hash URLs so shared links and browser-restored positions remain valid.
+    const onPopState = () => {
+      const id = decodeURIComponent(window.location.hash.replace(/^#/, ''));
+      const target = id ? document.getElementById(id) : null;
+      if (!target) return;
+      const destination = Math.max(0, window.scrollY + target.getBoundingClientRect().top - 24);
+      if (lenisRef.current) lenisRef.current.scrollTo(destination, { duration: 1, force: true });
+      else window.scrollTo({ top: destination, behavior: 'smooth' });
+    };
+    window.addEventListener('popstate', onPopState);
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const lenis = reduceMotion ? null : new Lenis({ lerp: 0.12, smoothWheel: true, wheelMultiplier: 0.95, anchors: { offset: -24 } });
     lenisRef.current = lenis;
@@ -117,9 +148,11 @@ export default function App() {
 
     const ctx = gsap.context(() => {
       const finishIntro = () => {
-        window.scrollTo(0, 0);
-        lenisRef.current?.scrollTo(0, { immediate: true, force: true });
-        setActiveDock('home');
+        if (!window.location.hash) {
+          window.scrollTo(0, 0);
+          lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+        }
+        setActiveDock(window.location.hash.slice(1) || 'home');
         persistIntroSeen();
         setIsLoaded(true);
       };
@@ -163,6 +196,7 @@ export default function App() {
 
     return () => {
       ctx.revert();
+      window.removeEventListener('popstate', onPopState);
       lenisRef.current = null;
       if (lenis) {
         if (lenisTick) gsap.ticker.remove(lenisTick);
@@ -239,17 +273,55 @@ export default function App() {
   useEffect(() => {
     if (!selectedPiece) return;
     const previousOverflow = document.body.style.overflow;
+    const main = rootRef.current?.querySelector('main');
+    const wasMainInert = main?.inert ?? false;
+    if (main) main.inert = true;
     document.body.style.overflow = 'hidden';
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape') setSelectedPiece(null); };
+
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const focusFirst = () => {
+      const first = dialogRef.current?.querySelector<HTMLElement>(focusableSelector);
+      (first || dialogRef.current)?.focus();
+    };
+    const focusFrame = requestAnimationFrame(focusFirst);
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSelectedPiece(null);
+        return;
+      }
+      if (event.key !== 'Tab' || !dialogRef.current) return;
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector));
+      if (!focusable.length) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
     window.addEventListener('keydown', onKeyDown);
-    return () => { document.body.style.overflow = previousOverflow; window.removeEventListener('keydown', onKeyDown); };
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      if (main) main.inert = wasMainInert;
+      window.removeEventListener('keydown', onKeyDown);
+      requestAnimationFrame(() => pieceTriggerRef.current?.focus());
+    };
   }, [selectedPiece]);
 
   return (
     <div className="site" ref={rootRef}>
       <div className={isLoaded ? 'preloader preloader-out' : 'preloader'} aria-hidden={isLoaded}>
         <div className="cosmic-stage">
-          <Suspense fallback={null}><CinematicIntroScene /></Suspense>
+          {!isLoaded && <Suspense fallback={null}><CinematicIntroScene /></Suspense>}
           <div className="cosmic-wordmark"><img className="brand-logo preloader-logo" src="/Uniparc.svg" alt="UNIPARC" /><span>WEAR WHAT DEFINES YOU.</span></div>
           <div className="cosmic-caption"><span>ONE UNIVERSE. INFINITE CULTURES.</span><span>UNIPARC® / 001</span></div>
           <button className="skip-intro" type="button" onClick={() => introTimelineRef.current?.progress(1)}>SKIP INTRO <span aria-hidden="true">↗</span></button>
@@ -308,7 +380,7 @@ export default function App() {
         <section className="drop section" id="drop">
           <div className="section-heading drop-heading reveal-up"><div><span className="eyebrow">03 / THE UNIPARC EDIT</span><h2 className="masked-reveal">FIRST LOOK.<br /><em>FRESH SIGNAL.</em></h2></div><p>A first look at the ideas and pieces<br />shaping the UNIPARC universe.</p></div>
           <div className="filter-bar" role="group" aria-label="Filter collection">{['ALL', 'APPAREL'].map((filter) => <button key={filter} type="button" className={activeFilter === filter ? 'selected' : ''} aria-pressed={activeFilter === filter} onClick={() => setActiveFilter(filter)}>{filter}<sup>{filter === 'ALL' ? pieces.length : pieces.filter((piece) => piece.category === filter).length}</sup></button>)}<span>CONCEPT PREVIEW / 2026</span></div>
-          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={piece.name + ' — ' + piece.label} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={() => setSelectedPiece(piece)} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
+          <div className="piece-grid">{filtered.map((piece) => <article className="piece-card" key={piece.id} data-cursor-label="VIEW OBJECT"><div className={'piece-image ' + piece.color}><img src={piece.image} alt={piece.name + ' — ' + piece.label} loading="lazy" decoding="async" /><span className="piece-index">OBJECT / {piece.id}</span><span className="piece-arrow"><Arrow diagonal /></span><span className="piece-caption">{piece.label}</span><span className="piece-hover-label">DISCOVER THE PIECE ↗</span><button className="piece-open" onClick={(event) => { pieceTriggerRef.current = event.currentTarget; setSelectedPiece(piece); }} aria-label={"Discover " + piece.name}>OPEN OBJECT</button></div><div className="piece-meta"><span>{piece.name}</span><span>{piece.category}</span></div></article>)}</div>
           <p className="drop-disclaimer">CONCEPT PREVIEW ONLY. FINAL PRODUCT DETAILS AND RELEASE INFORMATION WILL BE SHARED AT LAUNCH.</p>
         </section>
 
@@ -323,11 +395,21 @@ export default function App() {
         </section>
 
         <section className="closing section" id="closing">
-          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Check back soon for the first release details.</p><a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><a className="closing-primary-link" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><span className="closing-orbit" aria-hidden="true">U✳</span>
+          <span className="eyebrow">THERE'S ROOM FOR YOU HERE</span><h2 className="closing-title">FIND YOUR<br /><em>PEOPLE.</em></h2><p>The first UNIPARC drop is in the works. Get the first release note when it is ready.</p>
+          <form className="waitlist-form" onSubmit={submitWaitlist}>
+            <label className="waitlist-label" htmlFor="waitlist-email">FIRST DROP / EMAIL NOTIFICATION</label>
+            <div className="waitlist-controls">
+              <input id="waitlist-email" type="email" name="email" autoComplete="email" placeholder="Your email address" value={waitlistEmail} onChange={(event) => { setWaitlistEmail(event.target.value); if (waitlistStatus !== 'idle') setWaitlistStatus('idle'); }} required disabled={!waitlistEndpoint || waitlistStatus === 'submitting'} />
+              <button type="submit" disabled={!waitlistEndpoint || !waitlistConsent || waitlistStatus === 'submitting'}>{waitlistStatus === 'submitting' ? 'SENDING…' : 'NOTIFY ME'} <Arrow diagonal /></button>
+            </div>
+            <label className="waitlist-consent"><input type="checkbox" checked={waitlistConsent} onChange={(event) => setWaitlistConsent(event.target.checked)} disabled={!waitlistEndpoint || waitlistStatus === 'submitting'} /><span>I agree to receive UNIPARC first-drop and launch updates by email.</span></label>
+            <p className="waitlist-status" role="status" aria-live="polite">{!waitlistEndpoint ? 'SIGN-UP IS BEING PREPARED. REGISTRATION WILL OPEN SOON.' : waitlistStatus === 'success' ? 'YOU’RE ON THE LIST. WATCH YOUR INBOX FOR THE FIRST DROP.' : waitlistStatus === 'error' ? 'WE COULDN’T SAVE THAT EMAIL. PLEASE TRY AGAIN.' : 'NO SPAM. JUST THE FIRST DROP AND IMPORTANT LAUNCH UPDATES.'}</p>
+          </form>
+          <a className="closing-link" href="#home">RETURN TO THE TOP ↑</a><a className="closing-primary-link" href="#drop">EXPLORE THE FIRST EDIT <Arrow diagonal /></a><span className="closing-orbit" aria-hidden="true">U✳</span>
         </section>
       </main>
 
-      {selectedPiece && <div className="object-modal" data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
+      {selectedPiece && <div className="object-modal" ref={dialogRef} data-lenis-prevent role="dialog" aria-modal="true" aria-labelledby="object-title" tabIndex={-1} onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedPiece(null); }}><article className="object-modal-panel">
         <div className="object-modal-visual">
           <img src={selectedPiece.image} alt={"Editorial preview for " + selectedPiece.name} />
           <span className="object-visual-index">UNIPARC® <i> / </i> OBJECT STUDY {selectedPiece.id}</span>
